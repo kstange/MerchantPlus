@@ -53,6 +53,9 @@ function MerchantPlus_Update()
 	-- Hide the filtering dropdown as we'll be doing something else
 	MerchantFrameLootFilter:SetShown(not show)
 
+	-- We show our own frame objects if wanted
+	MerchantPlusFrame:SetShown(show)
+
 	-- Set up the frame for ourselves.  We blindly adjust frames we know that the official
 	-- blizzard code will fix when it transitions to another official tab.  We also need to undo
 	-- anything weird that Blizzard might do because sometimes it assumes our tab is the buyback
