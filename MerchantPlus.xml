@@ -35,12 +35,12 @@
 				<Frames>
 					<EventFrame parentKey="ScrollBar" inherits="WowTrimScrollBar">
 						<Anchors>
-							<Anchor point="TOPRIGHT" y="-32" />
+							<Anchor point="TOPRIGHT" y="-16" />
 							<Anchor point="BOTTOMRIGHT"/>
 						</Anchors>
 					</EventFrame>
 					<Frame parentKey="HeaderBar">
-						<Size y="32" x="0" />
+						<Size y="16" x="0" />
 						<Anchors>
 							<Anchor point="TOP"/>
 							<Anchor point="RIGHT" relativeKey="$parent.ScrollBar" relativePoint="LEFT"/>
