@@ -8,7 +8,7 @@ You would be able to install this addon from [CurseForge](https://www.curseforge
 
 Merchant Plus will provide an additional tab on all WoW merchants, which provides a variety of enhancements:
 
-* Vertical scrollaable format to making finding items in long merchant lists easier
+* Vertical scrollable format to make finding items in long merchant lists easier
 * Searching and filtering functions based on item properties and costs
 * Sortable headers based on item properties
 
