@@ -1,0 +1,15 @@
+package-as: MerchantPlus
+
+externals:
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+required-dependencies:
+
+ignore:
+  - .pkgmeta
+  - README.md
+  - CHANGELOG.md
+

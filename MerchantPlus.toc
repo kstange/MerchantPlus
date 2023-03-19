@@ -1,0 +1,14 @@
+## Interface: 100007
+## Version: @project-version@
+## Title: Merchant Plus
+## Notes: A Modern Scrollable UI for Merchants
+## Author: SimGuy
+## SavedVariables: MerchantPlus
+
+## X-Curse-Project-ID: 
+## X-WoWI-ID: 
+## X-Wago-ID: 
+
+Libs\Libs.xml
+Locales\Locales.xml
+MerchantPlus.lua
