@@ -1,0 +1,28 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MerchantPlus.lua"/>
+	<Button name="MerchantFrameTabPlus" parent="MerchantFrame" inherits="PanelTabButtonTemplate" text="Merchant Plus">
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="MerchantFrameTab2" relativePoint="RIGHT" x="-16" y="0"/>
+		</Anchors>
+		<Scripts>
+			<OnLoad>
+				local tabs = MerchantFrame.Tabs
+				self:SetID(#tabs)
+				PanelTemplates_SetNumTabs(MerchantFrame, #tabs)
+			</OnLoad>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				GameTooltip:SetText("", 1.0,1.0,1.0 );
+			</OnEnter>
+			<OnClick>
+				PanelTemplates_SetTab(MerchantFrame, self:GetID());
+				MerchantPlus_Update();
+			</OnClick>
+		</Scripts>
+	</Button>
+	<Frame name="MerchantPlusFrame" parent="MerchantFrame">
+		<Frames>
+		</Frames>
+	</Frame>
+</Ui>

@@ -11,4 +11,4 @@
 
 Libs\Libs.xml
 Locales\Locales.xml
-MerchantPlus.lua
+MerchantPlus.xml
