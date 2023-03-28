@@ -27,41 +27,20 @@
 			<Anchor point="BOTTOMRIGHT" x="-11" y="84" />
 		</Anchors>
 		<Frames>
-			<Frame name="MerchantPlusItemList">
+			<Frame name="MerchantPlusSearchBar" inherits="AuctionHouseSearchBarTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" />
+					<Anchor point="TOPRIGHT" />
+				</Anchors>
+			</Frame>
+			<Frame name="MerchantPlusItemList" inherits="AuctionHouseItemListTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MerchantPlusSearchBar" relativePoint="BOTTOMLEFT" />
 					<Anchor point="BOTTOMRIGHT" />
 				</Anchors>
-				<Frames>
-					<EventFrame parentKey="ScrollBar" inherits="WowTrimScrollBar">
-						<Anchors>
-							<Anchor point="TOPRIGHT" y="-16" />
-							<Anchor point="BOTTOMRIGHT"/>
-						</Anchors>
-					</EventFrame>
-					<Frame parentKey="HeaderBar">
-						<Size y="16" x="0" />
-						<Anchors>
-							<Anchor point="TOP"/>
-							<Anchor point="RIGHT" relativeKey="$parent.ScrollBar" relativePoint="LEFT"/>
-							<Anchor point="LEFT"/>
-						</Anchors>
-					</Frame>
-					<Frame parentKey="ScrollBox" inherits="WowScrollBoxList">
-						<KeyValues>
-							<KeyValue key="layoutType" value="InsetFrameTemplate" type="string"/>
-						</KeyValues>
-						<Anchors>
-							<Anchor point="TOP" relativeKey="$parent.HeaderBar" relativePoint="BOTTOM"/>
-							<Anchor point="BOTTOM"/>
-							<Anchor point="RIGHT" relativeKey="$parent.ScrollBar" relativePoint="LEFT"/>
-							<Anchor point="LEFT"/>
-						</Anchors>
-						<Frames>
-							<Frame parentKey="NineSlice" useParentLevel="true" inherits="NineSlicePanelTemplate"/>
-						</Frames>
-					</Frame>
-				</Frames>
+				<KeyValues>
+					<KeyValue key="hideRefreshFrame" type="boolean" value="true" />
+				</KeyValues>
 			</Frame>
 		</Frames>
 	</Frame>

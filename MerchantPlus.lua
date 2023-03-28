@@ -18,7 +18,8 @@ local L = Shared.Locale
 local Addon = {}
 Shared.Addon = Addon
 
-local InitialWidth = nil;
+local InitialWidth = nil
+local MerchantItems = {}
 
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
@@ -74,7 +75,7 @@ function MerchantPlus_Update()
 
 		-- Re-anchor the Buyback and Currency elements to things that won't move around
 		MerchantBuyBackItem:ClearAllPoints()
-		MerchantBuyBackItem:SetPoint("LEFT", MerchantRepairAllButton, "RIGHT", 16, 2)
+		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
 		MerchantExtraCurrencyInset:ClearAllPoints()
 		MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
 		MerchantExtraCurrencyInset:SetSize(166, 23)
@@ -89,9 +90,23 @@ function MerchantPlus_Update()
 		MerchantFrameBottomLeftBorder:Show()
 		MerchantFrameBottomRightBorder:Show()
 
-		-- TODO Render a filtering menu and search box
-		-- TODO Render an updated item list
+		MerchantPlus_List()
 	end
+end
+
+function MerchantPlus_List()
+	MerchantItems = {}
+	local items = GetMerchantNumItems()
+	for i = 1, items do
+		local item = {}
+		item.itemKey = { itemID = GetMerchantItemID(i) }
+		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
+		item.minPrice = item.price or 0
+		item.unitPrice = item.price or 0
+		item.totalQuantity = item.quantity
+		MerchantItems[i] = item
+	end
+	MerchantPlusItemList:RefreshScrollFrame()
 end
 
 -- Blizzard doesn't put this functionality in a separate function so we have to
@@ -122,11 +137,28 @@ function MerchantPlus_UpdateBuyback()
 	end
 end
 
+local function MerchantPlus_SearchStarted()
+	return true
+end
+
+local function MerchantPlus_GetEntry(index)
+	return MerchantItems[index]
+end
+
+local function MerchantPlus_GetNumEntries()
+	return #MerchantItems
+end
+
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" and not InitialWidth then
 		-- Store the width of the frame when it first opened so we can restore it
 		InitialWidth = MerchantFrame:GetWidth()
+	end
+
+	if event == "ADDON_LOADED" and target == AddonName then
+		MerchantPlusItemList:SetTableBuilderLayout(AuctionHouseTableBuilder.GetBrowseListLayout(MerchantPlusFrame, MerchantPlusItemList, "Test"));
+		MerchantPlusItemList:SetDataProvider(MerchantPlus_SearchStarted, MerchantPlus_GetEntry, MerchantPlus_GetNumEntries)
 	end
 end
 
@@ -135,7 +167,16 @@ end
 function Addon:Init()
 	hooksecurefunc("MerchantFrame_Update", MerchantPlus_Update);
 
+	local alreadyloaded, finished = IsAddOnLoaded("Blizzard_AuctionHouseUI")
+	if not finished and not alreadyloaded then
+		local loaded, reason = LoadAddOn("Blizzard_AuctionHouseUI")
+		if not loaded then
+			print("Needed Blizzard_AuctionHouseUI to load, but it didn't load:", reason)
+		end
+	end
+
 	Addon.Events = CreateFrame("Frame")
+	Addon.Events:RegisterEvent("ADDON_LOADED")
 	Addon.Events:RegisterEvent("MERCHANT_SHOW")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 end
