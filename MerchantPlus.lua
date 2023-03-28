@@ -76,6 +76,7 @@ function MerchantPlus_Update()
 		-- Re-anchor the Buyback and Currency elements to things that won't move around
 		MerchantBuyBackItem:ClearAllPoints()
 		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+		MerchantBuyBackItem:Show()
 		MerchantExtraCurrencyInset:ClearAllPoints()
 		MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
 		MerchantExtraCurrencyInset:SetSize(166, 23)
