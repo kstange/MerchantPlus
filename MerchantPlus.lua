@@ -1,6 +1,6 @@
 --
 -- Merchant Plus
--- A Modern Scrollable UI for Merchants 
+-- A Modern Scrollable UI for Merchants
 --
 -- Copyright 2023 SimGuy
 --
@@ -36,8 +36,8 @@ function MerchantPlus_Update()
 		MerchantFrame_CloseStackSplitFrame()
 		MerchantFrame.lastTab = MerchantFrame.selectedTab
 
-		MerchantFrame:SetTitle(UnitName("npc"));
-		MerchantFrame:SetPortraitToUnit("npc");
+		MerchantFrame:SetTitle(UnitName("npc"))
+		MerchantFrame:SetPortraitToUnit("npc")
 	end
 
 	-- Set the width of the frame wider or back to the default depending on the tab
@@ -46,7 +46,9 @@ function MerchantPlus_Update()
 
 	-- If we're transitioning to another tab, show the correct number of items
 	-- Otherwise, hide all of them because we're doing something different
-	for i = 1, buyback and BUYBACK_ITEMS_PER_PAGE or normal and MERCHANT_ITEMS_PER_PAGE or max(MERCHANT_ITEMS_PER_PAGE, BUYBACK_ITEMS_PER_PAGE) do
+	for i = 1, buyback and BUYBACK_ITEMS_PER_PAGE
+	            or normal and MERCHANT_ITEMS_PER_PAGE
+	            or max(MERCHANT_ITEMS_PER_PAGE, BUYBACK_ITEMS_PER_PAGE) do
 		local button = _G["MerchantItem"..i]
 		button:SetShown(not show)
 	end
@@ -102,9 +104,8 @@ function MerchantPlus_List()
 		local item = {}
 		item.itemKey = { itemID = GetMerchantItemID(i) }
 		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
-		item.minPrice = item.price or 0
-		item.unitPrice = item.price or 0
-		item.totalQuantity = item.quantity
+		item.index = i
+		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
 		MerchantItems[i] = item
 	end
 	MerchantPlusItemList:RefreshScrollFrame()
@@ -150,6 +151,128 @@ local function MerchantPlus_GetNumEntries()
 	return #MerchantItems
 end
 
+local function MerchantPlus_TableBuilderLayout(tableBuilder)
+	tableBuilder:SetHeaderContainer(MerchantPlusItemList:GetHeaderContainer())
+
+	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
+		local column = tableBuilder:AddColumn()
+		column:ConstructHeader("BUTTON", "AuctionHouseTableHeaderStringTemplate", MerchantPlusItemList, title, index)
+		column:ConstructCells("FRAME", cellType, ...)
+		if fixed then
+			column:SetFixedConstraints(width, 0)
+		else
+			column:SetFillConstraints(width, 0)
+		end
+		column:SetCellPadding(leftPadding, rightPadding)
+	end
+
+	-- Stack
+	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", 3, true, 44, 0, 8, "quantity")
+
+	-- Supply
+	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", 4, true, 50, 0, 8, "numAvailable")
+
+	-- Item Name
+	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", 1, false, 1, 4, 0, MerchantPlusItemList, false, false)
+
+	-- Price
+	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", 2, true, 146, 0, 14)
+
+	-- Available
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", 5, true, 58, 8, 0, "isPurchasable")
+end
+
+
+MerchantPlusTableNumberMixin = CreateFromMixins(TableBuilderCellMixin)
+MerchantPlusTableTextMixin   = CreateFromMixins(TableBuilderCellMixin)
+MerchantPlusTablePriceMixin  = CreateFromMixins(TableBuilderCellMixin)
+
+function MerchantPlusTableNumberMixin:Init(key)
+	self.key = key
+end
+
+function MerchantPlusTableTextMixin:Init(key)
+	self.key = key
+end
+
+function MerchantPlusTableNumberMixin:Populate(data, index)
+	local key = self.key
+
+	if key == "numAvailable" then
+		if data[key] > 0 then
+			self.Text:SetText(data[key])
+		else
+			self.Text:SetText("∞")
+		end
+	elseif key == "quantity" and data[key] > 1 then
+		self.Text:SetText(data[key])
+	else
+		self.Text:SetText("")
+	end
+end
+
+function MerchantPlusTableTextMixin:Populate(data, index)
+	local key = self.key
+
+	if key == "isPurchasable"  then
+		self.Text:SetText(data[key] and "Yes" or "No")
+	else
+		self.Text:SetText("")
+	end
+end
+
+function MerchantPlusTablePriceMixin:Populate(data, index)
+	self.AltCurrencyDisplay:SetShown(data.extendedCost)
+	self.MoneyDisplay:SetShown(data.price > 0)
+
+	if data.extendedCost then
+		local items = GetMerchantItemCostInfo(data.index)
+		for i = 1, MAX_ITEM_COST do
+			local r = 1 + items - i
+			local texture, value, link = GetMerchantItemCostItem(data.index, r)
+			local currency = self.AltCurrencyDisplay['Item' .. i]
+			-- TODO: Mark items which player does not have like official UI
+			if texture and value > 0 and r <= items then
+				currency:SetText(value)
+				local _, frame = currency:GetRegions()
+				frame:SetTexture(texture)
+				frame:ClearAllPoints()
+				frame:SetSize(13, 13)
+				frame:SetPoint("RIGHT", currency, "RIGHT", 0, 0)
+				currency.Text:ClearAllPoints()
+				currency.Text:SetPoint("RIGHT", frame, "LEFT", 0, 0)
+				currency:SetWidth(max(currency:GetTextWidth() + 13, 32))
+				currency:Show()
+			else
+				currency:Hide()
+			end
+		end
+	end
+	if data.price > 0 then
+		self.MoneyDisplay:SetAmount(data.price)
+	end
+end
+
+MerchantPlusItemListMixin = {}
+
+function MerchantPlusItemListMixin:OnLoad()
+	self.headers = {}
+	self.RefreshFrame:Hide()
+end
+
+function MerchantPlusItemListMixin:RegisterHeader(header)
+	table.insert(self.headers, header)
+end
+
+function MerchantPlusItemListMixin:GetSortOrderState(index)
+	-- TODO: Return 0 none, 1 asc, 2 desc
+	return 0
+end
+
+function MerchantPlusItemListMixin:SetSortOrder(index)
+	-- TODO: Check current sort order and then change it
+end
+
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" and not InitialWidth then
@@ -158,7 +281,8 @@ function Addon:HandleEvent(event, target)
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
-		MerchantPlusItemList:SetTableBuilderLayout(AuctionHouseTableBuilder.GetBrowseListLayout(MerchantPlusFrame, MerchantPlusItemList, "Test"));
+
+		MerchantPlusItemList:SetTableBuilderLayout(MerchantPlus_TableBuilderLayout)
 		MerchantPlusItemList:SetDataProvider(MerchantPlus_SearchStarted, MerchantPlus_GetEntry, MerchantPlus_GetNumEntries)
 	end
 end
@@ -166,7 +290,7 @@ end
 -- These are init steps specific to this addon
 -- This should be run before Core:Init()
 function Addon:Init()
-	hooksecurefunc("MerchantFrame_Update", MerchantPlus_Update);
+	hooksecurefunc("MerchantFrame_Update", MerchantPlus_Update)
 
 	local alreadyloaded, finished = IsAddOnLoaded("Blizzard_AuctionHouseUI")
 	if not finished and not alreadyloaded then

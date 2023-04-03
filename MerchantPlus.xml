@@ -27,21 +27,72 @@
 			<Anchor point="BOTTOMRIGHT" x="-11" y="84" />
 		</Anchors>
 		<Frames>
+			<!-- Todo 
 			<Frame name="MerchantPlusSearchBar" inherits="AuctionHouseSearchBarTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" />
 					<Anchor point="TOPRIGHT" />
 				</Anchors>
-			</Frame>
-			<Frame name="MerchantPlusItemList" inherits="AuctionHouseItemListTemplate">
+			</Frame> -->
+			<Frame name="MerchantPlusItemList" inherits="AuctionHouseItemListTemplate" mixin="MerchantPlusItemListMixin">
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="MerchantPlusSearchBar" relativePoint="BOTTOMLEFT" />
+					<Anchor point="TOPLEFT" /><!--relativeTo="MerchantPlusSearchBar" relativePoint="BOTTOMLEFT"-->
 					<Anchor point="BOTTOMRIGHT" />
 				</Anchors>
-				<KeyValues>
-					<KeyValue key="hideRefreshFrame" type="boolean" value="true" />
-				</KeyValues>
+				<Scripts>
+					<OnLoad method="OnLoad" />
+				</Scripts>
 			</Frame>
 		</Frames>
 	</Frame>
+	<Frame name="MerchantPlusTablePriceTemplate" mixin="MerchantPlusTablePriceMixin" virtual="true">
+		<Frames>
+			<Frame parentKey="MoneyDisplay" inherits="MoneyDisplayFrameTemplate" setAllPoints="true">
+				<KeyValues>
+					<KeyValue key="hideCopper" value="false" type="boolean"/>
+					<KeyValue key="useAuctionHouseIcons" value="true" type="boolean"/>
+				</KeyValues>
+			</Frame>
+			<Frame parentKey="AltCurrencyDisplay" hidden="true" setAllPoints="true">
+				<Size x="128" y="13"/>
+				<Frames>
+					<Button parentKey="Item1" inherits="SmallDenominationTemplate" hidden="true">
+						<Size x="32" y="13" />
+						<Anchors>
+							<Anchor point="RIGHT" />
+						</Anchors>
+					</Button>
+					<Button parentKey="Item2" inherits="SmallDenominationTemplate" hidden="true">
+						<Size x="32" y="13" />
+						<Anchors>
+							<Anchor point="RIGHT" RelativeKey="$parent.Item1" RelativePoint="LEFT" x="-4" />
+						</Anchors>
+					</Button>
+					<Button parentKey="Item3" inherits="SmallDenominationTemplate" hidden="true">
+						<Size x="32" y="13" />
+						<Anchors>
+							<Anchor point="RIGHT" RelativeKey="$parent.Item2" RelativePoint="LEFT" x="-4" />
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+	</Frame>
+	<Frame name="MerchantPlusTableTextTemplate" mixin="MerchantPlusTableTextMixin" virtual="true">
+		<Size x="0" y="16"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString parentKey="Text" inherits="Number14FontWhite" justifyH="LEFT" setAllPoints="true" />
+			</Layer>
+		</Layers>
+	</Frame>
+	<Frame name="MerchantPlusTableNumberTemplate" mixin="MerchantPlusTableNumberMixin" virtual="true">
+		<Size x="0" y="16"/>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString parentKey="Text" inherits="Number14FontWhite" justifyH="RIGHT" setAllPoints="true" />
+			</Layer>
+		</Layers>
+	</Frame>
+
 </Ui>
