@@ -224,14 +224,20 @@ end
 function MerchantPlusTablePriceMixin:Populate(data, index)
 	self.AltCurrencyDisplay:SetShown(data.extendedCost)
 	self.MoneyDisplay:SetShown(data.price > 0)
+	local afford = CanAffordMerchantItem(data.index)
+	local color = HIGHLIGHT_FONT_COLOR
+	if not afford then
+		color = DISABLED_FONT_COLOR
+	end
 
 	if data.extendedCost then
-		local items = GetMerchantItemCostInfo(data.index)
+		local items  = GetMerchantItemCostInfo(data.index)
 		for i = 1, MAX_ITEM_COST do
+			-- Put the most significant currency on the right instead of left
+			-- by reversing the order of the items displayed
 			local r = 1 + items - i
 			local texture, value, link = GetMerchantItemCostItem(data.index, r)
 			local currency = self.AltCurrencyDisplay['Item' .. i]
-			-- TODO: Mark items which player does not have like official UI
 			if texture and value > 0 and r <= items then
 				currency:SetText(value)
 				local _, frame = currency:GetRegions()
@@ -242,14 +248,24 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 				currency.Text:ClearAllPoints()
 				currency.Text:SetPoint("RIGHT", frame, "LEFT", 0, 0)
 				currency:SetWidth(max(currency:GetTextWidth() + 13, 32))
+
+				-- Color the frame if the player can't afford this
+				currency.Text:SetTextColor(color.r, color.g, color.b)
+
+				-- Enable SmallDenominationTemplate to handle Tooltips
+				currency.index = data.index
+				currency.item  = r
 				currency:Show()
 			else
 				currency:Hide()
+				currency.index = nil
+				currency.item  = nil
 			end
 		end
 	end
 	if data.price > 0 then
 		self.MoneyDisplay:SetAmount(data.price)
+		SetMoneyFrameColorByFrame(self.MoneyDisplay, not afford and "gray" or nil)
 	end
 end
 
@@ -258,6 +274,12 @@ MerchantPlusItemListMixin = {}
 function MerchantPlusItemListMixin:OnLoad()
 	self.headers = {}
 	self.RefreshFrame:Hide()
+	self.Background:SetAtlas("auctionhouse-background-index", true)
+	self.Background:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 3, -3)
+	self.Background:SetPoint("BOTTOMRIGHT", -3, 2)
+	self.NineSlice:ClearAllPoints()
+	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 0, 0)
+	self.NineSlice:SetPoint("BOTTOMRIGHT")
 end
 
 function MerchantPlusItemListMixin:RegisterHeader(header)

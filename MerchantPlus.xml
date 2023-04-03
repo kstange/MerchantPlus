@@ -23,9 +23,19 @@
 	</Button>
 	<Frame name="MerchantPlusFrame" parent="MerchantFrame" hidden="true">
 		<Anchors>
-			<Anchor point="TOPLEFT" x="11" y="-68" />
-			<Anchor point="BOTTOMRIGHT" x="-11" y="84" />
+			<Anchor point="TOPLEFT" x="0" y="-62" />
+			<Anchor point="BOTTOMRIGHT" x="-6" y="79" />
 		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND" textureSubLevel="-6">
+				<Texture file="Interface\FrameGeneral\UI-Background-Rock" horizTile="true" vertTile="true" parentKey="Background">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="2"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<Frames>
 			<!-- Todo 
 			<Frame name="MerchantPlusSearchBar" inherits="AuctionHouseSearchBarTemplate">
