@@ -16,7 +16,7 @@ An options panel will be provided to configure settings.
 
 ## Classic Support
 
-Classic support is tenatively planned but initial support will be limited to Retail. Some of the freatures are based upon functionality only available in the Retail version of the game.
+Classic support is tenatively planned but initial support will be limited to Retail. Some of the features are based upon functionality only available in the Retail version of the game.
 
 ## Compatibility
 
