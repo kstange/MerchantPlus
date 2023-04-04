@@ -37,7 +37,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<!-- Todo 
+			<!-- TODO 
 			<Frame name="MerchantPlusSearchBar" inherits="AuctionHouseSearchBarTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" />
@@ -46,7 +46,7 @@
 			</Frame> -->
 			<Frame name="MerchantPlusItemList" inherits="AuctionHouseItemListTemplate" mixin="MerchantPlusItemListMixin">
 				<Anchors>
-					<Anchor point="TOPLEFT" /><!--relativeTo="MerchantPlusSearchBar" relativePoint="BOTTOMLEFT"-->
+					<Anchor point="TOPLEFT" />
 					<Anchor point="BOTTOMRIGHT" />
 				</Anchors>
 				<Scripts>
@@ -104,5 +104,5 @@
 			</Layer>
 		</Layers>
 	</Frame>
-
+	<Button name="MerchantPlusItemListLineTemplate" inherits="AuctionHouseItemListLineTemplate" mixin="MerchantPlusItemListLineMixin" virtual="true" />
 </Ui>

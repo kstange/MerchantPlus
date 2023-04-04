@@ -29,7 +29,7 @@ function MerchantPlus_Update()
 	local changed = MerchantFrame.lastTab ~= MerchantFrame.selectedTab  -- The tab was switched
 	local buyback = MerchantFrame.selectedTab == 2                      -- Buyback tab is active
 	local normal  = MerchantFrame.selectedTab == 1                      -- Normal Merchant tab is active
-	local width   = show and 900 or InitialWidth or 336                 -- Fallback to known good width
+	local width   = show and 800 or InitialWidth or 336                 -- Fallback to known good width
 
 	-- We do this here because Blizzard won't if our tab is selected
 	if show and changed then
@@ -98,6 +98,7 @@ function MerchantPlus_Update()
 end
 
 function MerchantPlus_List()
+	-- TODO: Official game filter restricts what we can see, address this
 	MerchantItems = {}
 	local items = GetMerchantNumItems()
 	for i = 1, items do
@@ -164,6 +165,7 @@ local function MerchantPlus_TableBuilderLayout(tableBuilder)
 			column:SetFillConstraints(width, 0)
 		end
 		column:SetCellPadding(leftPadding, rightPadding)
+		return column
 	end
 
 	-- Stack
@@ -270,6 +272,7 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 end
 
 MerchantPlusItemListMixin = {}
+MerchantPlusItemListLineMixin = CreateFromMixins(TableBuilderRowMixin)
 
 function MerchantPlusItemListMixin:OnLoad()
 	self.headers = {}
@@ -295,6 +298,61 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 	-- TODO: Check current sort order and then change it
 end
 
+function MerchantPlusItemListLineMixin:InitLine()
+end
+
+function MerchantPlusItemListLineMixin:OnLineEnter()
+	self.HighlightTexture:Show()
+	-- Hide tooltip if Alt is held down
+	if not IsAltKeyDown() then
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -420, 0)
+		GameTooltip:SetMerchantItem(self.rowData.index)
+		GameTooltip_ShowCompareItem(GameTooltip)
+	end
+end
+
+function MerchantPlusItemListLineMixin:OnLineLeave()
+	self.HighlightTexture:Hide()
+	GameTooltip:Hide()
+	ResetCursor()
+end
+
+function MerchantPlusItemListLineMixin:OnHide()
+	-- TODO: Confirm this is needed
+	if ( self.hasStackSplit == 1 ) then
+		StackSplitFrame:Hide()
+	end
+end
+
+function MerchantPlusItemListLineMixin:OnClick(button)
+	if IsModifiedClick() then
+		-- This should handle most types of modified clicks, like DRESSUP
+		if HandleModifiedItemClick(GetMerchantItemLink(self.rowData.index)) then
+			return
+		end
+		-- TODO: This should pop up the the splitstack UI
+		if IsModifiedClick("SPLITSTACK") then
+			print("splitstack")
+		end
+	else
+		-- TODO:
+		-- MerchantFrame.refundItem gets set if the UI is trying to sell back a refundable item
+		-- Otherwise calling PickupMerchantItem will attempt to pick up the active item or sell
+		-- a held item
+		-- Beyond that need to handle high price and extended cost warnings
+		-- All cases of right click assuming we want to buy it
+	end
+end
+
+function MerchantPlusItemListLineMixin:OnDragStart(button)
+	-- TODO: The user is trying to pick up an item and drag it somewhere
+	print("Dragging")
+end
+
+local function MerchantPlus_LineSelected(line, data)
+	return false
+end
+
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" and not InitialWidth then
@@ -304,6 +362,8 @@ function Addon:HandleEvent(event, target)
 
 	if event == "ADDON_LOADED" and target == AddonName then
 
+		MerchantPlusItemList:SetLineTemplate("MerchantPlusItemListLineTemplate")
+		MerchantPlusItemList:SetSelectionCallback(MerchantPlus_LineSelected)
 		MerchantPlusItemList:SetTableBuilderLayout(MerchantPlus_TableBuilderLayout)
 		MerchantPlusItemList:SetDataProvider(MerchantPlus_SearchStarted, MerchantPlus_GetEntry, MerchantPlus_GetNumEntries)
 	end
