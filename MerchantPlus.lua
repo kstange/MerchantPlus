@@ -20,6 +20,13 @@ Shared.Addon = Addon
 
 local InitialWidth = nil
 local MerchantItems = {}
+local MerchantFilter = nil
+
+local MP_ITEM   = 1
+local MP_PRICE  = 2
+local MP_STACK  = 3
+local MP_SUPPLY = 4
+local MP_AVAIL  = 5
 
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
@@ -53,8 +60,18 @@ function MerchantPlus_Update()
 		button:SetShown(not show)
 	end
 
-	-- Hide the filtering dropdown as we'll be doing something else
+	-- Hide the filtering dropdown and clear the filter as we'll be doing something else
 	MerchantFrameLootFilter:SetShown(not show)
+	if show and changed then
+		-- Save and clear the filter on the merchant
+		MerchantFilter = GetMerchantFilter()
+		SetMerchantFilter(LE_LOOT_FILTER_ALL)
+	elseif MerchantFilter then
+		-- Restore the saved filter to the merchant
+		SetMerchantFilter(MerchantFilter)
+		MerchantFilter = nil
+		MerchantFrame_Update()
+	end
 
 	-- We show our own frame objects if wanted
 	MerchantPlusFrame:SetShown(show)
@@ -98,7 +115,6 @@ function MerchantPlus_Update()
 end
 
 function MerchantPlus_List()
-	-- TODO: Official game filter restricts what we can see, address this
 	MerchantItems = {}
 	local items = GetMerchantNumItems()
 	for i = 1, items do
@@ -169,19 +185,19 @@ local function MerchantPlus_TableBuilderLayout(tableBuilder)
 	end
 
 	-- Stack
-	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", 3, true, 44, 0, 8, "quantity")
+	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", MP_STACK, true, 44, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", 4, true, 50, 0, 8, "numAvailable")
+	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", MP_SUPPLY, true, 50, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", 1, false, 1, 4, 0, MerchantPlusItemList, false, false)
+	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
 
 	-- Price
-	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", 2, true, 146, 0, 14)
+	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", MP_PRICE, true, 146, 0, 14)
 
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", 5, true, 58, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", MP_AVAIL, true, 58, 8, 0, "isPurchasable")
 end
 
 
@@ -226,9 +242,8 @@ end
 function MerchantPlusTablePriceMixin:Populate(data, index)
 	self.AltCurrencyDisplay:SetShown(data.extendedCost)
 	self.MoneyDisplay:SetShown(data.price > 0)
-	local afford = CanAffordMerchantItem(data.index)
 	local color = HIGHLIGHT_FONT_COLOR
-	if not afford then
+	if CanAffordMerchantItem(data.index) == false then -- returns nil on gold items
 		color = DISABLED_FONT_COLOR
 	end
 
@@ -267,7 +282,9 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 	end
 	if data.price > 0 then
 		self.MoneyDisplay:SetAmount(data.price)
-		SetMoneyFrameColorByFrame(self.MoneyDisplay, not afford and "gray" or nil)
+		self.MoneyDisplay.CopperDisplay.Text:SetTextColor(color.r, color.g, color.b)
+		self.MoneyDisplay.SilverDisplay.Text:SetTextColor(color.r, color.g, color.b)
+		self.MoneyDisplay.GoldDisplay.Text:SetTextColor(color.r, color.g, color.b)
 	end
 end
 
@@ -290,12 +307,22 @@ function MerchantPlusItemListMixin:RegisterHeader(header)
 end
 
 function MerchantPlusItemListMixin:GetSortOrderState(index)
-	-- TODO: Return 0 none, 1 asc, 2 desc
-	return 0
+	return self.SortOrder
 end
 
 function MerchantPlusItemListMixin:SetSortOrder(index)
-	-- TODO: Check current sort order and then change it
+	if self.SortIndex == index then
+		if self.SortOrder == 2 then
+			self.SortOrder = 1
+		else
+			self.SortOrder = 2
+		end
+	else
+		self.SortIndex = index
+		self.SortOrder = 1
+	end
+	MerchantPlus_List()
+
 end
 
 function MerchantPlusItemListLineMixin:InitLine()
@@ -308,6 +335,11 @@ function MerchantPlusItemListLineMixin:OnLineEnter()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -420, 0)
 		GameTooltip:SetMerchantItem(self.rowData.index)
 		GameTooltip_ShowCompareItem(GameTooltip)
+	end
+	if CanAffordMerchantItem(self.rowData.index) == false then
+		SetCursor("BUY_ERROR_CURSOR")
+	else
+		SetCursor("BUY_CURSOR")
 	end
 end
 
