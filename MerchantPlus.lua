@@ -289,7 +289,6 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 end
 
 MerchantPlusItemListMixin = {}
-MerchantPlusItemListLineMixin = CreateFromMixins(TableBuilderRowMixin)
 
 function MerchantPlusItemListMixin:OnLoad()
 	self.headers = {}
@@ -306,24 +305,47 @@ function MerchantPlusItemListMixin:RegisterHeader(header)
 	table.insert(self.headers, header)
 end
 
+function MerchantPlusItemListMixin:SetupSortManager()
+	local sortManager = SortUtil.CreateSortManager()
+	sortManager:SetDefaultComparator(function(lhs, rhs)
+		return lhs.rowData.itemKey.itemID < rhs.rowData.itemKey.itemID
+	end)
+
+	sortManager:SetSortOrderFunc(function()
+		return self.sortOrder
+	end)
+
+	sortManager:InsertComparator(MP_ITEM, function(lhs, rhs)
+		return SortUtil.CompareUtf8i(lhs.rowData.name, rhs.rowData.name)
+	end)
+
+	self.sortManager = sortManager
+end
+
 function MerchantPlusItemListMixin:GetSortOrderState(index)
-	return self.SortOrder
+	return self.sortState
 end
 
 function MerchantPlusItemListMixin:SetSortOrder(index)
-	if self.SortIndex == index then
-		if self.SortOrder == 2 then
-			self.SortOrder = 1
+	if self.sortOrder == index then
+		if self.sortState == 1 then
+			self.sortState = 1
 		else
-			self.SortOrder = 2
+			self.sortState = 2
 		end
 	else
-		self.SortIndex = index
-		self.SortOrder = 1
+		self.sortOrder = index
+		self.sortState = 0
 	end
-	MerchantPlus_List()
-
+	--self.ScrollBox:GetDataProvider():Sort()
 end
+
+function MerchantPlusItemListMixin:GetSortOrder()
+	return { self.sortOrder, self.sortState }
+end
+
+
+MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
 
 function MerchantPlusItemListLineMixin:InitLine()
 end
@@ -396,6 +418,7 @@ function Addon:HandleEvent(event, target)
 
 		MerchantPlusItemList:SetLineTemplate("MerchantPlusItemListLineTemplate")
 		MerchantPlusItemList:SetSelectionCallback(MerchantPlus_LineSelected)
+		MerchantPlusItemList:SetupSortManager()
 		MerchantPlusItemList:SetTableBuilderLayout(MerchantPlus_TableBuilderLayout)
 		MerchantPlusItemList:SetDataProvider(MerchantPlus_SearchStarted, MerchantPlus_GetEntry, MerchantPlus_GetNumEntries)
 	end
