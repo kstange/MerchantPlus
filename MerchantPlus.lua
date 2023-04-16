@@ -297,7 +297,7 @@ function MerchantPlusItemListMixin:OnLoad()
 	self.Background:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 3, -3)
 	self.Background:SetPoint("BOTTOMRIGHT", -3, 2)
 	self.NineSlice:ClearAllPoints()
-	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 0, 0)
+	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
 end
 
