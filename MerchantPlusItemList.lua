@@ -55,10 +55,9 @@ function MerchantPlusItemListMixin:Init()
 	end)
 
 	self:SetTableBuilderLayout(Addon.TableBuilderLayout)
+
+	-- TODO: Figure out how to use real DataProvider with Sort functionality
 	self:SetDataProvider(Addon.SearchStarted, Addon.GetEntry, Addon.GetNumEntries)
-
-	self.ScrollBox:RegisterCallback("OnDataRangeChanged", self.OnScrollBoxRangeChanged, self)
-
 	self:SetupSortManager()
 
 	self.isInitialized = true
@@ -111,20 +110,16 @@ function MerchantPlusItemListMixin:GetSortOrder()
 	return { self.sortOrder, self.sortStateState }
 end
 
--- TODO: Implement or Obsolete these functions in order to eliminate dep on AuctionHouseItemListMixin
+-- TODO: Implement or eliminate these functions in order to eliminate dep on AuctionHouseItemListMixin
 --
 --  * SetDataProvider(searchStartedFunc, getEntry, getNumEntries, hasFullResultsFunc)
 --  * SetRefreshFrameFunctions(totalQuantityFunc, refreshResultsFunc)
 --  * SetTableBuilderLayout(tableBuilderLayoutFunction)
 --  * UpdateTableBuilderLayout()
---  * SetCustomError(errorText)
---  * OnScrollBoxRangeChanged(sortPending)
---  * GetSelectedEntry()
 --  * OnShow()
 --  * OnUpdate()
 --  * Reset()
 --  * SetState(state)
---  * SetSelectedEntryByCondition(condition, scrollTo)
 --  * ScrollToEntryIndex(entryIndex)
 --  * GetScrollBoxDataIndexBegin()
 --  * UpdateRefreshFrame()
@@ -144,4 +139,8 @@ end
 --  * SetSelectionCallback(selectionCallback)
 --  * SetHighlightCallback(highlightCallback)
 --  * SetLineTemplate(lineTemplate, ...)
+--  * GetSelectedEntry()
+--  * SetSelectedEntryByCondition(condition, scrollTo)
+--  * SetCustomError(errorText)
+--  * OnScrollBoxRangeChanged(sortPending)
 
