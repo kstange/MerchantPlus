@@ -19,7 +19,7 @@ local Addon = Shared.Addon
 
 MerchantPlusItemListMixin = {}
 
--- On init, set the Background and NineSlice to the correct size for the widget
+-- On frame load, set the Background and NineSlice to the correct size for the widget
 function MerchantPlusItemListMixin:OnLoad()
 	self.headers = {}
 	self.RefreshFrame:Hide()
@@ -29,6 +29,39 @@ function MerchantPlusItemListMixin:OnLoad()
 	self.NineSlice:ClearAllPoints()
 	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
+end
+
+-- On init, we will need to create various structures
+function MerchantPlusItemListMixin:Init()
+	if self.isInitialized then
+		return
+	end
+
+	local view = CreateScrollBoxListLinearView()
+
+	view:SetElementFactory(function(factory, elementData)
+		factory("MerchantPlusItemListLineTemplate", function(button, elementData)
+			-- Nothing to do
+		end)
+	end)
+
+	ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view)
+	
+	local tableBuilder = CreateTableBuilder(nil, AuctionHouseTableBuilderMixin)
+	self.tableBuilder = tableBuilder
+
+	ScrollUtil.RegisterTableBuilder(self.ScrollBox, tableBuilder, function(elementData)
+		return elementData
+	end)
+
+	self:SetTableBuilderLayout(Addon.TableBuilderLayout)
+	self:SetDataProvider(Addon.SearchStarted, Addon.GetEntry, Addon.GetNumEntries)
+
+	self.ScrollBox:RegisterCallback("OnDataRangeChanged", self.OnScrollBoxRangeChanged, self)
+
+	self:SetupSortManager()
+
+	self.isInitialized = true
 end
 
 -- This fuction will create a SortManager for helping sort the items that appear
@@ -84,11 +117,7 @@ end
 --  * SetRefreshFrameFunctions(totalQuantityFunc, refreshResultsFunc)
 --  * SetTableBuilderLayout(tableBuilderLayoutFunction)
 --  * UpdateTableBuilderLayout()
---  * SetSelectionCallback(selectionCallback)
---  * SetHighlightCallback(highlightCallback)
---  * SetLineTemplate(lineTemplate, ...)
 --  * SetCustomError(errorText)
---  * Init()
 --  * OnScrollBoxRangeChanged(sortPending)
 --  * GetSelectedEntry()
 --  * OnShow()
@@ -112,4 +141,7 @@ end
 --  * OnLeaveListLine(line, rowData)
 --  * SetRefreshCallback(refreshCallback)
 --  * CallRefreshCallback()
+--  * SetSelectionCallback(selectionCallback)
+--  * SetHighlightCallback(highlightCallback)
+--  * SetLineTemplate(lineTemplate, ...)
 

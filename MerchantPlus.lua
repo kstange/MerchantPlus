@@ -18,9 +18,9 @@ local L = Shared.Locale
 local Addon = {}
 Shared.Addon = Addon
 
-local InitialWidth = nil
-local MerchantItems = {}
-local MerchantFilter = nil
+Addon.InitialWidth = nil
+Addon.MerchantItems = {}
+Addon.MerchantFilter = nil
 
 Addon.MP_ITEM   = 1
 Addon.MP_PRICE  = 2
@@ -28,15 +28,22 @@ Addon.MP_STACK  = 3
 Addon.MP_SUPPLY = 4
 Addon.MP_AVAIL  = 5
 
+-- This allows us to detect when our tab is selected on the MerchantFrame
+function Addon:SetTab(index)
+	if self == MerchantFrame and index == MerchantFrameTabPlus:GetID() then
+		Addon:Update()
+	end
+end
+
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
-function MerchantPlus_Update()
+function Addon:Update()
 	local plustab = MerchantFrameTabPlus:GetID()                        -- Our tab ID
 	local show    = MerchantFrame.selectedTab == plustab                -- Our tab is requested
 	local changed = MerchantFrame.lastTab ~= MerchantFrame.selectedTab  -- The tab was switched
 	local buyback = MerchantFrame.selectedTab == 2                      -- Buyback tab is active
 	local normal  = MerchantFrame.selectedTab == 1                      -- Normal Merchant tab is active
-	local width   = show and 800 or InitialWidth or 336                 -- Fallback to known good width
+	local width   = show and 800 or Addon.InitialWidth or 336           -- Fallback to known good width
 
 	-- We do this here because Blizzard won't if our tab is selected
 	if show and changed then
@@ -64,12 +71,12 @@ function MerchantPlus_Update()
 	MerchantFrameLootFilter:SetShown(not show)
 	if show and changed then
 		-- Save and clear the filter on the merchant
-		MerchantFilter = GetMerchantFilter()
+		Addon.MerchantFilter = GetMerchantFilter()
 		SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	elseif MerchantFilter then
 		-- Restore the saved filter to the merchant
-		SetMerchantFilter(MerchantFilter)
-		MerchantFilter = nil
+		SetMerchantFilter(Addon.MerchantFilter)
+		Addon.MerchantFilter = nil
 		MerchantFrame_Update()
 	end
 
@@ -104,18 +111,18 @@ function MerchantPlus_Update()
 		MerchantExtraCurrencyBg:SetSize(159, 19)
 
 		-- Update the state of the buyback button
-		MerchantPlus_UpdateBuyback()
+		Addon:UpdateBuyback()
 
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
 		MerchantFrameBottomRightBorder:Show()
 
-		MerchantPlus_List()
+		Addon:List()
 	end
 end
 
-function MerchantPlus_List()
-	MerchantItems = {}
+function Addon:List()
+	Addon.MerchantItems = {}
 	local items = GetMerchantNumItems()
 	for i = 1, items do
 		local item = {}
@@ -123,14 +130,14 @@ function MerchantPlus_List()
 		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
 		item.index = i
 		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
-		MerchantItems[i] = item
+		Addon.MerchantItems[i] = item
 	end
 	MerchantPlusItemList:RefreshScrollFrame()
 end
 
 -- Blizzard doesn't put this functionality in a separate function so we have to
 -- duplicate it here.
-function MerchantPlus_UpdateBuyback()
+function Addon:UpdateBuyback()
 	local numBuybackItems = GetNumBuybackItems();
 	local buybackName, buybackTexture, buybackPrice, buybackQuantity, buybackNumAvailable, buybackIsUsable, buybackIsBound = GetBuybackItemInfo(numBuybackItems);
 	if ( buybackName ) then
@@ -156,20 +163,20 @@ function MerchantPlus_UpdateBuyback()
 	end
 end
 
-local function MerchantPlus_SearchStarted()
+function Addon:SearchStarted()
 	return true
 end
 
-local function MerchantPlus_GetEntry(index)
-	return MerchantItems[index]
+function Addon:GetEntry()
+	return Addon.MerchantItems[self]
 end
 
-local function MerchantPlus_GetNumEntries()
-	return #MerchantItems
+function Addon:GetNumEntries()
+	return #Addon.MerchantItems
 end
 
-local function MerchantPlus_TableBuilderLayout(tableBuilder)
-	tableBuilder:SetHeaderContainer(MerchantPlusItemList:GetHeaderContainer())
+function Addon:TableBuilderLayout()
+	self:SetHeaderContainer(MerchantPlusItemList:GetHeaderContainer())
 
 	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
 		local column = tableBuilder:AddColumn()
@@ -185,46 +192,37 @@ local function MerchantPlus_TableBuilderLayout(tableBuilder)
 	end
 
 	-- Stack
-	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
+	AddColumn(self, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
+	AddColumn(self, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", Addon.MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
+	AddColumn(self, "Item", "AuctionHouseTableCellItemDisplayTemplate", Addon.MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
 
 	-- Price
-	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
+	AddColumn(self, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
-end
-
-local function MerchantPlus_LineSelected(line, data)
-	return false
+	AddColumn(self, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
 end
 
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
-	if event == "MERCHANT_SHOW" and not InitialWidth then
+	if event == "MERCHANT_SHOW" and not Addon.InitialWidth then
 		-- Store the width of the frame when it first opened so we can restore it
-		InitialWidth = MerchantFrame:GetWidth()
+		Addon.InitialWidth = MerchantFrame:GetWidth()
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
-
-		MerchantPlusItemList:SetLineTemplate("MerchantPlusItemListLineTemplate")
-		MerchantPlusItemList:SetSelectionCallback(MerchantPlus_LineSelected)
-		MerchantPlusItemList:SetupSortManager()
-		MerchantPlusItemList:SetTableBuilderLayout(MerchantPlus_TableBuilderLayout)
-		MerchantPlusItemList:SetDataProvider(MerchantPlus_SearchStarted, MerchantPlus_GetEntry, MerchantPlus_GetNumEntries)
+		-- Things that need to be delayed until after the addon is fully loaded
 	end
 end
 
 -- These are init steps specific to this addon
--- This should be run before Core:Init()
 function Addon:Init()
-	hooksecurefunc("MerchantFrame_Update", MerchantPlus_Update)
+	hooksecurefunc("PanelTemplates_SetTab", Addon.SetTab)
+	hooksecurefunc("MerchantFrame_Update", Addon.Update)
 
 	local alreadyloaded, finished = IsAddOnLoaded("Blizzard_AuctionHouseUI")
 	if not finished and not alreadyloaded then

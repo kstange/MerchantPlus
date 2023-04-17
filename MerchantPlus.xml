@@ -20,7 +20,6 @@
 			</OnEnter>
 			<OnClick>
 				PanelTemplates_SetTab(MerchantFrame, self:GetID());
-				MerchantPlus_Update();
 			</OnClick>
 		</Scripts>
 	</Button>

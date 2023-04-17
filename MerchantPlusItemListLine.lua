@@ -19,11 +19,6 @@ local Addon = Shared.Addon
 
 MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
 
--- Steps to be completed upon creation of a new line.
--- We don't have anything to do here right now.
-function MerchantPlusItemListLineMixin:InitLine()
-end
-
 -- Upon entering a line, show the tooltip and highlight and update the cursor as appropriate
 function MerchantPlusItemListLineMixin:OnLineEnter()
 	self.HighlightTexture:Show()
