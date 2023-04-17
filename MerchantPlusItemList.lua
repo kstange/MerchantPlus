@@ -19,21 +19,23 @@ local Addon = Shared.Addon
 
 MerchantPlusItemListMixin = {}
 
--- On frame load, set the Background and NineSlice to the correct size for the widget
+-- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
 function MerchantPlusItemListMixin:OnLoad()
-	self.headers = {}
-	self.RefreshFrame:Hide()
-	self.Background:SetAtlas("auctionhouse-background-index", true)
-	self.Background:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 3, -3)
-	self.Background:SetPoint("BOTTOMRIGHT", -3, 2)
 	self.NineSlice:ClearAllPoints()
 	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
 end
 
+-- Before the widget is shown, set it up to show results
+function MerchantPlusItemListMixin:OnShow()
+	self:Init()
+	self:UpdateTableBuilderLayout()
+	self:RefreshScrollFrame()
+end
+
 -- On init, we will need to create various structures
 function MerchantPlusItemListMixin:Init()
-	if self.isInitialized then
+	if self.initialized then
 		return
 	end
 
@@ -54,13 +56,39 @@ function MerchantPlusItemListMixin:Init()
 		return elementData
 	end)
 
-	self:SetTableBuilderLayout(Addon.TableBuilderLayout)
+	self:UpdateTableBuilderLayout()
+	self.tableBuilder:SetDataProvider(Addon.GetEntry)
 
-	-- TODO: Figure out how to use real DataProvider with Sort functionality
-	self:SetDataProvider(Addon.SearchStarted, Addon.GetEntry, Addon.GetNumEntries)
 	self:SetupSortManager()
 
-	self.isInitialized = true
+	self.initialized = true
+end
+
+-- Update the layout of the table.
+function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
+	self.tableBuilder:Reset()
+	Addon:TableBuilderLayout(self.tableBuilder)
+	self.tableBuilder:SetTableWidth(self.ScrollBox:GetWidth())
+	self.tableBuilder:Arrange()
+end
+
+-- Update the contents of the table.
+function MerchantPlusItemListMixin:RefreshScrollFrame()
+	if not self.initialized or not self:IsShown() then
+		return
+	end
+
+	local count = Addon:GetNumEntries()
+	if count == 0 then
+		self.ResultsText:Show()
+		self.ResultsText:SetText(BROWSE_NO_RESULTS)
+		self.ScrollBox:ClearDataProvider()
+	else
+		self.ResultsText:Hide()
+		-- TODO: Replace IndexRange with a sortable DataProvider
+		local dataProvider = CreateIndexRangeDataProvider(count)
+		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
+	end
 end
 
 -- This fuction will create a SortManager for helping sort the items that appear
@@ -109,80 +137,3 @@ end
 function MerchantPlusItemListMixin:GetSortOrder()
 	return { self.sortOrder, self.sortStateState }
 end
-
--- TODO: Implement or eliminate these functions in order to eliminate dep on AuctionHouseItemListMixin
---
---  * SetDataProvider(searchStartedFunc, getEntry, getNumEntries, hasFullResultsFunc)
---  * SetRefreshFrameFunctions(totalQuantityFunc, refreshResultsFunc)
---  * SetTableBuilderLayout(tableBuilderLayoutFunction)
---  * UpdateTableBuilderLayout()
---  * OnShow()
---  * OnUpdate()
---  * Reset()
---  * SetState(state)
---  * ScrollToEntryIndex(entryIndex)
---  * GetScrollBoxDataIndexBegin()
---  * UpdateRefreshFrame()
---  * DirtyScrollFrame()
---  * UpdateSelectionHighlights()
---  * RefreshScrollFrame()
---  * OnScrollBoxScroll(scrollPercentage, visibleExtentPercentage, panExtentPercentage)
---  * GetHeaderContainer()
---
---  These are probably not actually needed:
---  * SetLineOnEnterCallback(callback)
---  * OnEnterListLine(line, rowData)
---  * SetLineOnLeaveCallback(callback)
---  * OnLeaveListLine(line, rowData)
---  * SetRefreshCallback(refreshCallback)
---  * CallRefreshCallback()
---  * SetSelectionCallback(selectionCallback)
---  * SetHighlightCallback(highlightCallback)
---  * SetLineTemplate(lineTemplate, ...)
---  * GetSelectedEntry()
---  * SetSelectedEntryByCondition(condition, scrollTo)
---  * SetCustomError(errorText)
---  * OnScrollBoxRangeChanged(sortPending)
-
--- These dummy functions mask functions from AuctionHouseItemListMixin and let me know if they get called
--- If anything breaks or logs, I know I have something to investigate
-function MerchantPlusItemListMixin:SetLineOnEnterCallback(callback)
-	print "SetLineOnEnterCallback called";
-end
-function MerchantPlusItemListMixin:OnEnterListLine(line, rowData)
-	print "OnEnterListLine called";
-end
-function MerchantPlusItemListMixin:SetLineOnLeaveCallback(callback)
-	print "SetLineOnLeaveCallback called";
-end
-function MerchantPlusItemListMixin:OnLeaveListLine(line, rowData)
-	print "OnLeaveListLine called";
-end
-function MerchantPlusItemListMixin:SetRefreshCallback(refreshCallback)
-	print "SetRefreshCallback called";
-end
-function MerchantPlusItemListMixin:CallRefreshCallback()
-	print "CallRefreshCallback called";
-end
-function MerchantPlusItemListMixin:SetSelectionCallback(selectionCallback)
-	print "SetSelectionCallback called";
-end
-function MerchantPlusItemListMixin:SetHighlightCallback(highlightCallback)
-	print "SetHighlightCallback called";
-end
-function MerchantPlusItemListMixin:SetLineTemplate(lineTemplate, ...)
-	print "SetLineTemplate called";
-end
-function MerchantPlusItemListMixin:GetSelectedEntry()
-	print "GetSelectedEntry called";
-end
-function MerchantPlusItemListMixin:SetSelectedEntryByCondition(condition, scrollTo)
-	print "SetSelectedEntryByCondition called";
-end
-function MerchantPlusItemListMixin:SetCustomError(errorText)
-	print "SetCustomError called";
-end
-function MerchantPlusItemListMixin:OnScrollBoxRangeChanged(sortPending)
-	print "OnScrollBoxRangeChanged called";
-end
-

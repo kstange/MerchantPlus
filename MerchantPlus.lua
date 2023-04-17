@@ -175,8 +175,8 @@ function Addon:GetNumEntries()
 	return #Addon.MerchantItems
 end
 
-function Addon:TableBuilderLayout()
-	self:SetHeaderContainer(MerchantPlusItemList:GetHeaderContainer())
+function Addon:TableBuilderLayout(tableBuilder)
+	tableBuilder:SetHeaderContainer(MerchantPlusItemList.HeaderContainer)
 
 	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
 		local column = tableBuilder:AddColumn()
@@ -192,19 +192,19 @@ function Addon:TableBuilderLayout()
 	end
 
 	-- Stack
-	AddColumn(self, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
+	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(self, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
+	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(self, "Item", "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
+	AddColumn(tableBuilder, "Item", "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
 
 	-- Price
-	AddColumn(self, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
+	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Available
-	AddColumn(self, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
 end
 
 -- Handle any events that are needed
@@ -223,14 +223,6 @@ end
 function Addon:Init()
 	hooksecurefunc("PanelTemplates_SetTab", Addon.SetTab)
 	hooksecurefunc("MerchantFrame_Update", Addon.Update)
-
-	local alreadyloaded, finished = IsAddOnLoaded("Blizzard_AuctionHouseUI")
-	if not finished and not alreadyloaded then
-		local loaded, reason = LoadAddOn("Blizzard_AuctionHouseUI")
-		if not loaded then
-			print("Needed Blizzard_AuctionHouseUI to load, but it didn't load:", reason)
-		end
-	end
 
 	Addon.Events = CreateFrame("Frame")
 	Addon.Events:RegisterEvent("ADDON_LOADED")
