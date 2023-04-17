@@ -21,14 +21,15 @@ MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, Tabl
 
 -- Upon entering a line, show the tooltip and highlight and update the cursor as appropriate
 function MerchantPlusItemListLineMixin:OnLineEnter()
+	local data = self:GetElementData()
 	self.HighlightTexture:Show()
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:SetMerchantItem(self.rowData.index)
+	GameTooltip:SetMerchantItem(data.index)
 	-- Show compare only on shift key since tooltips are so far right
 	if IsShiftKeyDown() then
 		GameTooltip_ShowCompareItem(GameTooltip)
 	end
-	if CanAffordMerchantItem(self.rowData.index) == false then
+	if CanAffordMerchantItem(data.index) == false then
 		SetCursor("BUY_ERROR_CURSOR")
 	else
 		SetCursor("BUY_CURSOR")
@@ -52,9 +53,10 @@ end
 
 -- This should handle all the work related to previewing or buying items.
 function MerchantPlusItemListLineMixin:OnClick(button)
+	local data = self:GetElementData()
 	if IsModifiedClick() then
 		-- This should handle most types of modified clicks, like DRESSUP
-		if HandleModifiedItemClick(GetMerchantItemLink(self.rowData.index)) then
+		if HandleModifiedItemClick(GetMerchantItemLink(data.index)) then
 			return
 		end
 		-- TODO: This should pop up the the splitstack UI

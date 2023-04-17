@@ -78,6 +78,7 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		return
 	end
 
+	Addon:UpdateVendor()
 	local count = Addon:GetNumEntries()
 	if count == 0 then
 		self.ResultsText:Show()
@@ -85,8 +86,7 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		self.ScrollBox:ClearDataProvider()
 	else
 		self.ResultsText:Hide()
-		-- TODO: Replace IndexRange with a sortable DataProvider
-		local dataProvider = CreateIndexRangeDataProvider(count)
+		local dataProvider = CreateDataProvider(Addon.MerchantItems)
 		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
 	end
 end
@@ -130,7 +130,7 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 	end
 	-- TODO: Actually invoke the sort, but we don't have a DataProvider that
 	-- knows how to use SortManager yet
-	--self.ScrollBox:GetDataProvider():Sort()
+	self.ScrollBox:GetDataProvider():Sort()
 end
 
 -- Returns a table containing the sort order and state

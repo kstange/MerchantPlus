@@ -31,13 +31,13 @@ Addon.MP_AVAIL  = 5
 -- This allows us to detect when our tab is selected on the MerchantFrame
 function Addon:SetTab(index)
 	if self == MerchantFrame and index == MerchantFrameTabPlus:GetID() then
-		Addon:Update()
+		Addon:UpdateFrame()
 	end
 end
 
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
-function Addon:Update()
+function Addon:UpdateFrame()
 	local plustab = MerchantFrameTabPlus:GetID()                        -- Our tab ID
 	local show    = MerchantFrame.selectedTab == plustab                -- Our tab is requested
 	local changed = MerchantFrame.lastTab ~= MerchantFrame.selectedTab  -- The tab was switched
@@ -117,11 +117,11 @@ function Addon:Update()
 		MerchantFrameBottomLeftBorder:Show()
 		MerchantFrameBottomRightBorder:Show()
 
-		Addon:List()
+		MerchantPlusItemList:RefreshScrollFrame()
 	end
 end
 
-function Addon:List()
+function Addon:UpdateVendor()
 	Addon.MerchantItems = {}
 	local items = GetMerchantNumItems()
 	for i = 1, items do
@@ -132,7 +132,6 @@ function Addon:List()
 		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
 		Addon.MerchantItems[i] = item
 	end
-	MerchantPlusItemList:RefreshScrollFrame()
 end
 
 -- Blizzard doesn't put this functionality in a separate function so we have to
@@ -168,7 +167,7 @@ function Addon:SearchStarted()
 end
 
 function Addon:GetEntry()
-	return Addon.MerchantItems[self]
+	return self
 end
 
 function Addon:GetNumEntries()
@@ -222,7 +221,7 @@ end
 -- These are init steps specific to this addon
 function Addon:Init()
 	hooksecurefunc("PanelTemplates_SetTab", Addon.SetTab)
-	hooksecurefunc("MerchantFrame_Update", Addon.Update)
+	hooksecurefunc("MerchantFrame_Update", Addon.UpdateFrame)
 
 	Addon.Events = CreateFrame("Frame")
 	Addon.Events:RegisterEvent("ADDON_LOADED")
