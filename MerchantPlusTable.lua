@@ -142,13 +142,17 @@ end
 MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
 
 function MerchantPlusTableItemMixin:Populate(data, index)
-	-- TODO: Can we get the reagent quality icon to appear here?
 	local quality = select(3, GetItemInfo(data.itemKey.itemID))
 	local color = ITEM_QUALITY_COLORS[quality]
+	local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemKey.itemID)
+	local icon = ""
+	if craftquality then
+		icon = C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+	end
 	if color then
-		self.Text:SetText(color.color:WrapTextInColorCode(data.name))
+		self.Text:SetText(color.color:WrapTextInColorCode(data.name) .. " " .. icon)
 	else
-		self.Text:SetText(data.name)
+		self.Text:SetText(data.name .. " " .. icon)
 	end
 	self.Icon:SetTexture(data.texture)
 end
