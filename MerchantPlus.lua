@@ -198,7 +198,7 @@ function Addon:TableBuilderLayout()
 	AddColumn(self, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(self, "Item", "AuctionHouseTableCellItemDisplayTemplate", Addon.MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
+	AddColumn(self, "Item", "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
 
 	-- Price
 	AddColumn(self, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)

@@ -138,3 +138,12 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 	end
 end
 
+-- This defines a field for showing items
+MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
+
+function MerchantPlusTableItemMixin:Populate(data, index)
+	local quality = select(3, GetItemInfo(data.itemKey.itemID))
+	local color = ITEM_QUALITY_COLORS[quality]
+	self.Text:SetText(color.color:WrapTextInColorCode(data.name))
+	self.Icon:SetTexture(data.texture)
+end
