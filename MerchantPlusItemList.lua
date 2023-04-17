@@ -47,7 +47,7 @@ function MerchantPlusItemListMixin:Init()
 
 	ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view)
 	
-	local tableBuilder = CreateTableBuilder(nil, AuctionHouseTableBuilderMixin)
+	local tableBuilder = CreateTableBuilder(nil)
 	self.tableBuilder = tableBuilder
 
 	ScrollUtil.RegisterTableBuilder(self.ScrollBox, tableBuilder, function(elementData)
@@ -143,4 +143,46 @@ end
 --  * SetSelectedEntryByCondition(condition, scrollTo)
 --  * SetCustomError(errorText)
 --  * OnScrollBoxRangeChanged(sortPending)
+
+-- These dummy functions mask functions from AuctionHouseItemListMixin and let me know if they get called
+-- If anything breaks or logs, I know I have something to investigate
+function MerchantPlusItemListMixin:SetLineOnEnterCallback(callback)
+	print "SetLineOnEnterCallback called";
+end
+function MerchantPlusItemListMixin:OnEnterListLine(line, rowData)
+	print "OnEnterListLine called";
+end
+function MerchantPlusItemListMixin:SetLineOnLeaveCallback(callback)
+	print "SetLineOnLeaveCallback called";
+end
+function MerchantPlusItemListMixin:OnLeaveListLine(line, rowData)
+	print "OnLeaveListLine called";
+end
+function MerchantPlusItemListMixin:SetRefreshCallback(refreshCallback)
+	print "SetRefreshCallback called";
+end
+function MerchantPlusItemListMixin:CallRefreshCallback()
+	print "CallRefreshCallback called";
+end
+function MerchantPlusItemListMixin:SetSelectionCallback(selectionCallback)
+	print "SetSelectionCallback called";
+end
+function MerchantPlusItemListMixin:SetHighlightCallback(highlightCallback)
+	print "SetHighlightCallback called";
+end
+function MerchantPlusItemListMixin:SetLineTemplate(lineTemplate, ...)
+	print "SetLineTemplate called";
+end
+function MerchantPlusItemListMixin:GetSelectedEntry()
+	print "GetSelectedEntry called";
+end
+function MerchantPlusItemListMixin:SetSelectedEntryByCondition(condition, scrollTo)
+	print "SetSelectedEntryByCondition called";
+end
+function MerchantPlusItemListMixin:SetCustomError(errorText)
+	print "SetCustomError called";
+end
+function MerchantPlusItemListMixin:OnScrollBoxRangeChanged(sortPending)
+	print "OnScrollBoxRangeChanged called";
+end
 
