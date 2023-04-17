@@ -144,6 +144,10 @@ MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
 function MerchantPlusTableItemMixin:Populate(data, index)
 	local quality = select(3, GetItemInfo(data.itemKey.itemID))
 	local color = ITEM_QUALITY_COLORS[quality]
-	self.Text:SetText(color.color:WrapTextInColorCode(data.name))
+	if color then
+		self.Text:SetText(color.color:WrapTextInColorCode(data.name))
+	else
+		self.Text:setText(data.name)
+	end
 	self.Icon:SetTexture(data.texture)
 end
