@@ -22,11 +22,11 @@ local InitialWidth = nil
 local MerchantItems = {}
 local MerchantFilter = nil
 
-local MP_ITEM   = 1
-local MP_PRICE  = 2
-local MP_STACK  = 3
-local MP_SUPPLY = 4
-local MP_AVAIL  = 5
+Addon.MP_ITEM   = 1
+Addon.MP_PRICE  = 2
+Addon.MP_STACK  = 3
+Addon.MP_SUPPLY = 4
+Addon.MP_AVAIL  = 5
 
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
@@ -173,7 +173,7 @@ local function MerchantPlus_TableBuilderLayout(tableBuilder)
 
 	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
 		local column = tableBuilder:AddColumn()
-		column:ConstructHeader("BUTTON", "AuctionHouseTableHeaderStringTemplate", MerchantPlusItemList, title, index)
+		column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", title, index)
 		column:ConstructCells("FRAME", cellType, ...)
 		if fixed then
 			column:SetFixedConstraints(width, 0)
@@ -185,21 +185,47 @@ local function MerchantPlus_TableBuilderLayout(tableBuilder)
 	end
 
 	-- Stack
-	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", MP_STACK, true, 44, 0, 8, "quantity")
+	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", MP_SUPPLY, true, 50, 0, 8, "numAvailable")
+	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
+	AddColumn(tableBuilder, "Item", "AuctionHouseTableCellItemDisplayTemplate", Addon.MP_ITEM, false, 1, 4, 0, MerchantPlusItemList, false, false)
 
 	-- Price
-	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", MP_PRICE, true, 146, 0, 14)
+	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", MP_AVAIL, true, 58, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
 end
 
+MerchantPlusTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin)
+
+function MerchantPlusTableHeaderStringMixin:OnClick()
+	MerchantPlusItemList:SetSortOrder(self.index)
+	self:UpdateArrow()
+end
+
+function MerchantPlusTableHeaderStringMixin:Init(title, index)
+	self:SetText(title)
+	self.index = index
+	self:UpdateArrow()
+end
+
+function MerchantPlusTableHeaderStringMixin:UpdateArrow()
+	local order, state = MerchantPlusItemList:GetSortOrder()
+	if order == self.index then
+		self.Arrow:Show()
+		if state == 0 then
+			self.Arrow:SetTexCoord(0, 1, 1, 0)
+		elseif state == 1 then
+			self.Arrow:SetTexCoord(0, 1, 1, 0)
+		end
+	else
+		self.Arrow:Hide()	
+	end
+end
 
 MerchantPlusTableNumberMixin = CreateFromMixins(TableBuilderCellMixin)
 MerchantPlusTableTextMixin   = CreateFromMixins(TableBuilderCellMixin)
@@ -286,121 +312,6 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 		self.MoneyDisplay.SilverDisplay.Text:SetTextColor(color.r, color.g, color.b)
 		self.MoneyDisplay.GoldDisplay.Text:SetTextColor(color.r, color.g, color.b)
 	end
-end
-
-MerchantPlusItemListMixin = {}
-
-function MerchantPlusItemListMixin:OnLoad()
-	self.headers = {}
-	self.RefreshFrame:Hide()
-	self.Background:SetAtlas("auctionhouse-background-index", true)
-	self.Background:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT", 3, -3)
-	self.Background:SetPoint("BOTTOMRIGHT", -3, 2)
-	self.NineSlice:ClearAllPoints()
-	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT")
-	self.NineSlice:SetPoint("BOTTOMRIGHT")
-end
-
-function MerchantPlusItemListMixin:RegisterHeader(header)
-	table.insert(self.headers, header)
-end
-
-function MerchantPlusItemListMixin:SetupSortManager()
-	local sortManager = SortUtil.CreateSortManager()
-	sortManager:SetDefaultComparator(function(lhs, rhs)
-		return lhs.rowData.itemKey.itemID < rhs.rowData.itemKey.itemID
-	end)
-
-	sortManager:SetSortOrderFunc(function()
-		return self.sortOrder
-	end)
-
-	sortManager:InsertComparator(MP_ITEM, function(lhs, rhs)
-		return SortUtil.CompareUtf8i(lhs.rowData.name, rhs.rowData.name)
-	end)
-
-	self.sortManager = sortManager
-end
-
-function MerchantPlusItemListMixin:GetSortOrderState(index)
-	return self.sortState
-end
-
-function MerchantPlusItemListMixin:SetSortOrder(index)
-	if self.sortOrder == index then
-		if self.sortState == 1 then
-			self.sortState = 1
-		else
-			self.sortState = 2
-		end
-	else
-		self.sortOrder = index
-		self.sortState = 0
-	end
-	--self.ScrollBox:GetDataProvider():Sort()
-end
-
-function MerchantPlusItemListMixin:GetSortOrder()
-	return { self.sortOrder, self.sortState }
-end
-
-
-MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
-
-function MerchantPlusItemListLineMixin:InitLine()
-end
-
-function MerchantPlusItemListLineMixin:OnLineEnter()
-	self.HighlightTexture:Show()
-	-- Hide tooltip if Alt is held down
-	if not IsAltKeyDown() then
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -420, 0)
-		GameTooltip:SetMerchantItem(self.rowData.index)
-		GameTooltip_ShowCompareItem(GameTooltip)
-	end
-	if CanAffordMerchantItem(self.rowData.index) == false then
-		SetCursor("BUY_ERROR_CURSOR")
-	else
-		SetCursor("BUY_CURSOR")
-	end
-end
-
-function MerchantPlusItemListLineMixin:OnLineLeave()
-	self.HighlightTexture:Hide()
-	GameTooltip:Hide()
-	ResetCursor()
-end
-
-function MerchantPlusItemListLineMixin:OnHide()
-	-- TODO: Confirm this is needed
-	if ( self.hasStackSplit == 1 ) then
-		StackSplitFrame:Hide()
-	end
-end
-
-function MerchantPlusItemListLineMixin:OnClick(button)
-	if IsModifiedClick() then
-		-- This should handle most types of modified clicks, like DRESSUP
-		if HandleModifiedItemClick(GetMerchantItemLink(self.rowData.index)) then
-			return
-		end
-		-- TODO: This should pop up the the splitstack UI
-		if IsModifiedClick("SPLITSTACK") then
-			print("splitstack")
-		end
-	else
-		-- TODO:
-		-- MerchantFrame.refundItem gets set if the UI is trying to sell back a refundable item
-		-- Otherwise calling PickupMerchantItem will attempt to pick up the active item or sell
-		-- a held item
-		-- Beyond that need to handle high price and extended cost warnings
-		-- All cases of right click assuming we want to buy it
-	end
-end
-
-function MerchantPlusItemListLineMixin:OnDragStart(button)
-	-- TODO: The user is trying to pick up an item and drag it somewhere
-	print("Dragging")
 end
 
 local function MerchantPlus_LineSelected(line, data)

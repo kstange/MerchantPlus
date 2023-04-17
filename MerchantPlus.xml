@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="MerchantPlus.lua"/>
+	<Script file="MerchantPlus.lua" />
+	<Script file="MerchantPlusItemList.lua" />
+	<Script file="MerchantPlusItemListLine.lua" />
 	<Button name="MerchantFrameTabPlus" parent="MerchantFrame" inherits="PanelTabButtonTemplate" text="Merchant Plus">
 		<Anchors>
 			<Anchor point="LEFT" relativeTo="MerchantFrameTab2" relativePoint="RIGHT" x="-16" y="0"/>
@@ -124,5 +126,20 @@
 			<OnDragStart method="OnDragStart" />
 		</Scripts>
 		<NormalTexture parentKey="NormalTexture" atlas="auctionhouse-rowstripe-1" setAllPoints="true" />
+	</Button>
+	<Button name="MerchantPlusTableHeaderStringTemplate" mixin="MerchantPlusTableHeaderStringMixin" inherits="ColumnDisplayButtonShortTemplate" virtual="true">
+		<Size x="0" y="19" />
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Arrow" atlas="auctionhouse-ui-sortarrow" useAtlasSize="true">
+					<Anchors>
+						<Anchor point="LEFT" relativeKey="$parent.Text" relativePoint="RIGHT" x="3" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnClick method="OnClick" />
+		</Scripts>
 	</Button>
 </Ui>
