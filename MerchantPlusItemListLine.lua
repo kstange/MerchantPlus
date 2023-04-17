@@ -22,10 +22,10 @@ MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, Tabl
 -- Upon entering a line, show the tooltip and highlight and update the cursor as appropriate
 function MerchantPlusItemListLineMixin:OnLineEnter()
 	self.HighlightTexture:Show()
-	-- Hide tooltip if Alt is held down
-	if not IsAltKeyDown() then
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT", -420, 0)
-		GameTooltip:SetMerchantItem(self.rowData.index)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetMerchantItem(self.rowData.index)
+	-- Show compare only on shift key since tooltips are so far right
+	if IsShiftKeyDown() then
 		GameTooltip_ShowCompareItem(GameTooltip)
 	end
 	if CanAffordMerchantItem(self.rowData.index) == false then
