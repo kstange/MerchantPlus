@@ -22,7 +22,7 @@ MerchantPlusItemListMixin = {}
 -- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
 function MerchantPlusItemListMixin:OnLoad()
 	self.NineSlice:ClearAllPoints()
-	self.NineSlice:SetPoint("TOPLEFT", MerchantPlusItemList.HeaderContainer, "BOTTOMLEFT")
+	self.NineSlice:SetPoint("TOPLEFT", self.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
 end
 
