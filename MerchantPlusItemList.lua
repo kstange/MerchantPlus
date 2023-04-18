@@ -129,8 +129,9 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	elseif order == Addon.MP_SUPPLY then
 		key = 'numAvailable'
 	elseif order ==  Addon.MP_AVAIL then
-		key = 'isPurchasable'
-		invert = true
+		if lhs['isPurchasable'] ~= rhs['isPurchasable'] then
+			result = lhs['isPurchasable']
+		end
 	end
 	if key then
 		if lhs[key] ~= rhs[key] then
