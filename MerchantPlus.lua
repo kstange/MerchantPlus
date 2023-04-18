@@ -9,10 +9,17 @@
 -- https://opensource.org/licenses/MIT.
 --
 
+local ACR = LibStub("AceConfigRegistry-3.0")
+local ACD = LibStub("AceConfigDialog-3.0")
+
 local AddonName, Shared = ...
 
 -- From Locales/Locales.lua
 local L = Shared.Locale
+
+-- From Metadata.lua
+local Metadata = Shared.Metadata
+local Callbacks = Metadata.OptionCallbacks
 
 -- Push us into shared object
 local Addon = {}
@@ -28,6 +35,50 @@ Addon.MP_STACK  = 3
 Addon.MP_SUPPLY = 4
 Addon.MP_USABLE = 5
 Addon.MP_AVAIL  = 6
+
+-- Get an option for the AceConfigDialog
+function Addon:GetOption(key)
+	if not key then
+		if self and self[#self] then
+			key = self[#self]
+		else
+			return nil
+		end
+	end
+
+	local value = false;
+	local settings = _G[AddonName]
+
+	if settings and settings[key] ~= nil then
+		value = settings[key]
+	elseif Metadata.Defaults and Metadata.Defaults[key] ~= nil then
+		value = Metadata.Defaults[key]
+	end
+
+	--print("GetOption", key, value)
+	return value
+end
+
+-- Set an option from the AceConfigDialog
+function Addon:SetOption(...)
+	local key = self[#self]
+	if not key then	return nil end
+
+	local value = ...
+	local settings = _G[AddonName]
+
+	--print("SetOption", key, value)
+	if settings and settings[key] ~= value then
+		settings[key] = value
+	end
+	if Metadata.OptionCallbacks and Metadata.OptionCallbacks[key] then
+		--print("OptionCallback", key)
+		local func = Metadata.OptionCallbacks[key]
+		func(key, value)
+	end
+end
+
+
 
 -- This allows us to detect when our tab is selected on the MerchantFrame
 function Addon:SetTab(index)
@@ -188,21 +239,21 @@ function Addon:TableBuilderLayout(tableBuilder)
 	end
 
 	-- Stack
-	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 50, 0, 8, "quantity")
+	AddColumn(tableBuilder, L["Stack"], "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 50, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 58, 0, 8, "numAvailable")
+	AddColumn(tableBuilder, L["Supply"], "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 58, 0, 8, "numAvailable")
 
 	-- Item Name
-	AddColumn(tableBuilder, "Item", "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
+	AddColumn(tableBuilder, L["Item"], "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
 
 	-- Price
-	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
+	AddColumn(tableBuilder, L["Price"], "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Usable
-	AddColumn(tableBuilder, "Usable", "MerchantPlusTableBooleanTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
+	AddColumn(tableBuilder, L["Usable"], "MerchantPlusTableBooleanTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableBooleanTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, L["Available"], "MerchantPlusTableBooleanTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
 end
 
 -- Handle any events that are needed
@@ -212,9 +263,18 @@ function Addon:HandleEvent(event, target)
 		Addon.InitialWidth = MerchantFrame:GetWidth()
 	end
 
-	--if event == "ADDON_LOADED" and target == AddonName then
-	--	-- Things that need to be delayed until after the addon is fully loaded
-	--end
+	if event == "ADDON_LOADED" and target == AddonName then
+		if not  _G[AddonName] then
+			_G[AddonName] = {}
+		end
+		-- Don't register options unless they're defined.
+		if Metadata.Options then
+			Metadata.Options.get = Addon.GetOption
+			Metadata.Options.set = Addon.SetOption
+			ACR:RegisterOptionsTable(AddonName, Metadata.Options)
+			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
+		end
+	end
 end
 
 -- These are init steps specific to this addon
@@ -223,7 +283,7 @@ function Addon:Init()
 	hooksecurefunc("MerchantFrame_Update", Addon.UpdateFrame)
 
 	Addon.Events = CreateFrame("Frame")
-	--Addon.Events:RegisterEvent("ADDON_LOADED")
+	Addon.Events:RegisterEvent("ADDON_LOADED")
 	Addon.Events:RegisterEvent("MERCHANT_SHOW")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 end
