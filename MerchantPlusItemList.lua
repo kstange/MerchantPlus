@@ -115,7 +115,7 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 
 	-- Item Name: sort alphabetically
 	if order == Addon.MP_ITEM then
-		local namecheck = SortUtil.CompareUtf8i(lhs['name'], rhs['name'])
+		local namecheck = SortUtil.CompareUtf8i(lhs['name'] or "Unknown Item", rhs['name'] or "Unknown Item")
 		if namecheck ~= 0 then
 			result = namecheck == -1
 		end
@@ -239,8 +239,8 @@ end
 
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
-function MerchantPlusItemListMixin:SetSortOrder(index)
-	if self.sortOrder == index and index ~= 0 then
+function MerchantPlusItemListMixin:SetSortOrder(index, state)
+	if self.sortOrder == index and index ~= 0 and state == nil then
 		if self.sortOrderState == 1 then
 			self.sortOrderState = 0
 		else
@@ -248,11 +248,15 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 		end
 	else
 		self.sortOrder = index
-		self.sortOrderState = 0
+		self.sortOrderState = state or 0
 	end
 
-	self.ScrollBox:GetDataProvider():Sort()
-	self.ScrollBox:ScrollToBegin()
+	Addon:Options_Sort_Update()
+
+	if self:IsVisible() then
+		self.ScrollBox:GetDataProvider():Sort()
+		self.ScrollBox:ScrollToBegin()
+	end
 end
 
 -- Returns a table containing the sort order and state

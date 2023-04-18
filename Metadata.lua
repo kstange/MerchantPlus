@@ -38,22 +38,21 @@ Metadata.OptionCallbacks = {}
 -- AceConfig Options table used to display a panel.
 Metadata.Options = {
 	type = "group",
-	name = format(L["OPTIONS_TITLE_MAIN"], Addon.FriendlyName) .. "     |cFFAAAAAA" .. (GetAddOnMetadata(AddonName, "Version") or "Unknown"),
+	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA" .. (GetAddOnMetadata(AddonName, "Version") or "Unknown"),
 	args = {
-		Description = {
-			name = L["OPTIONS_DESCRIPTION_MAIN"] .. "\n ",
-			type = "description",
-			fontSize = "medium",
-		},
 		TabDefault = {
-			name = L["Select Merchant Plus Tab By Default"],
+			name = format(L["OPTIONS_TITLE_TAB_DEFAULT"], Metadata.FriendlyName),
 			desc = L["OPTIONS_DESCRIPTION_TAB_DEFAULT"],
 			type = "toggle",
+			width = "full",
+			order = 1,
 		},
 		SortRemember = {
-			name = L["Remember Last Sort Option"],
+			name = L["OPTIONS_TITLE_SORT_REMEMBER"],
 			desc = L["OPTIONS_DESCRIPTION_SORT_REMEMBER"],
 			type = "toggle",
+			width = "full",
+			order = 2,
 		},
 	}
 }

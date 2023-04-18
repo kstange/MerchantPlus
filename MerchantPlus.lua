@@ -28,6 +28,7 @@ Shared.Addon = Addon
 Addon.InitialWidth = nil
 Addon.MerchantItems = {}
 Addon.MerchantFilter = nil
+Addon.SwitchOnOpen = false
 
 Addon.MP_ITEM   = 1
 Addon.MP_PRICE  = 2
@@ -78,12 +79,19 @@ function Addon:SetOption(...)
 	end
 end
 
-
-
--- This allows us to detect when our tab is selected on the MerchantFrame
+-- Actions related to changing the current frame tab
 function Addon:SetTab(index)
-	if self == MerchantFrame and index == MerchantFrameTabPlus:GetID() then
-		Addon:UpdateFrame()
+	-- We only want to act on MerchantFrame
+	if self == MerchantFrame then
+		if index == 1 and Addon:GetOption("TabDefault") and Addon.SwitchOnOpen then
+			Addon.SwitchOnOpen = false
+			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
+		end
+
+		-- Update MerchantPlusFrame when its tab is selected
+		if index == MerchantFrameTabPlus:GetID() then
+			Addon:UpdateFrame()
+		end
 	end
 end
 
@@ -257,24 +265,44 @@ function Addon:TableBuilderLayout(tableBuilder)
 end
 
 function Addon:Options_Sort_Update()
+	local settings = _G[AddonName]
 	local save = Addon:GetOption('SortRemember')
+	local key = "SortOrder"
 	if save then
 		local order, state = MerchantPlusItemList:GetSortOrder()
-		Addon:SetOption("SortOrder", { 'order' = order, 'state' = state })
+		if settings then
+			settings[key] = {
+				order = order or 0,
+				state = state or 0,
+			}
+		end
 	else
-		Addon:SetOption("SortOrder", nil)
+		if settings then
+			settings[key] = nil
+		end
 	end
 end
 
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
-	if event == "MERCHANT_SHOW" and not Addon.InitialWidth then
+	if event == "MERCHANT_SHOW" then
 		-- Store the width of the frame when it first opened so we can restore it
-		Addon.InitialWidth = MerchantFrame:GetWidth()
+		if not Addon.InitialWidth then
+			Addon.InitialWidth = MerchantFrame:GetWidth()
+		end
 
-		-- If set, default to our tab
+		-- If the user wants our tab to show by default, flag that for
+		-- the next tab switch event
 		if Addon:GetOption("TabDefault") then
-			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
+			Addon.SwitchOnOpen = true
+		end
+
+		-- Reset the sort when opening a new vendor
+		if Addon:GetOption("SortRemember") then
+			local sort = Addon:GetOption("SortOrder")
+			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
+		else
+			MerchantPlusItemList:SetSortOrder(0)
 		end
 	end
 

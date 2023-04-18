@@ -18,3 +18,17 @@
 local _, Shared = ...
 local L = Shared.Locale
 
+-- Defaults for these are the keys themselves
+--L["Stack"] = "Stack"
+--L["Supply"] = "Supply"
+--L["Item"] = "Item"
+--L["Price"] = "Price"
+--L["Usable"] = "Usable"
+--L["Available"] = "Available"
+
+-- Using short keys for these long strings, so enUS needs to be defined as well
+L["OPTIONS_TITLE_MAIN"] = "%s Options"
+L["OPTIONS_TITLE_TAB_DEFAULT"] = "Show %s tab by default"
+L["OPTIONS_DESCRIPTION_TAB_DEFAULT"] = "Use the enhanced merchant interface for all merchants. The standard Merchant tab can still be accessed at any time."
+L["OPTIONS_TITLE_SORT_REMEMBER"] = "Remember sort order"
+L["OPTIONS_DESCRIPTION_SORT_REMEMBER"] = "Keep the last used sort when switching between merchants."
