@@ -97,19 +97,26 @@ end
 -- This fuction will sort based on the request.
 function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	local order, state = self:GetSortOrder()
-	if not lhs then
+
+	-- The sort method will sometimes send nil values
+	if not lhs or not rhs then
 		return false
 	end
-	if not rhs then
-		return true
-	end
-	local result = lhs.index < rhs.index
+
+	-- Default sort by Merchant index if nothing else is set.
+	-- Use this to ensure that equal values retain a deterministic
+	-- sort, otherwise race conditions may occur where they shift
+	-- randomly.
+	local result = lhs['index'] < rhs['index']
+
 	local key = nil
 	local invert = false
+
+	-- Item Name: sort alphabetically
 	if order == Addon.MP_ITEM then
-		result = SortUtil.CompareUtf8i(lhs.name, rhs.name) < 1
+		result = SortUtil.CompareUtf8i(lhs['name'], rhs['name']) < 1
 	elseif order == Addon.MP_PRICE then
-		if lhs.extendedCost == rhs.extendedCost then
+		if lhs['extendedCost'] == rhs['extendedCost'] then
 			if not lhs.extendedCost then
 				if lhs.price ~= rhs.price then
 					result = lhs.price < rhs.price
@@ -129,10 +136,15 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 				result = true
 			end
 		end
+	-- Stack Size: sort numerically
 	elseif order == Addon.MP_STACK then
 		key = 'quantity'
+
+	-- Supply: sort numerically
 	elseif order == Addon.MP_SUPPLY then
 		key = 'numAvailable'
+
+	-- Available: sort true > false
 	elseif order ==  Addon.MP_AVAIL then
 		if lhs['isPurchasable'] ~= rhs['isPurchasable'] then
 			result = lhs['isPurchasable']
