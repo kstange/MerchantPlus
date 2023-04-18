@@ -45,39 +45,71 @@ end
 
 -- Steps to be completed when a line is hidden
 function MerchantPlusItemListLineMixin:OnHide()
-	-- TODO: Confirm this is needed
 	if ( self.hasStackSplit == 1 ) then
 		StackSplitFrame:Hide()
 	end
 end
 
+-- Override GetID to return the Merchant index for MerchantFrame's benefit
+function MerchantPlusItemListLineMixin:GetID()
+	local data = self:GetElementData()
+	return data.index
+end
+
 -- This should handle all the work related to previewing or buying items.
 function MerchantPlusItemListLineMixin:OnClick(button)
 	local data = self:GetElementData()
+
+	-- Allow us to just call built-in Merchant functions
+	local realtab = MerchantFrame.selectedTab
+	MerchantFrame.selectedTab = 1
+
+	-- This helps the MerchantFrame functions work
+	-- TODO: Automatically replicate the data into the line to make
+	--       this more reliable and use self in SplitStack() as well.
+	self.extendedCost = data.extendedCost
+	self.showNonrefundablePrompt = data.showNonrefundablePrompt
+	self.price = data.price
+	self.count = data.count
+	self.link = data.link
+	self.name = data.name
+	self.texture = data.texture
+
+	-- TODO: I am not getting right clicks?
+	print("click", button)
+
+	-- Call the OnModifiedClick function for MerchantItemButton
 	if IsModifiedClick() then
-		-- This should handle most types of modified clicks, like DRESSUP
-		if HandleModifiedItemClick(GetMerchantItemLink(data.index)) then
-			return
-		end
-		-- TODO: This should pop up the the splitstack UI
-		if IsModifiedClick("SPLITSTACK") then
-			print("splitstack")
-		end
+		MerchantItemButton_OnModifiedClick(self, button)
+
+	-- Call the OnClick function for MerchantItemButton
 	else
-		-- TODO:
-		-- MerchantFrame.refundItem gets set if the UI is trying to sell back a refundable item
-		-- Otherwise calling PickupMerchantItem will attempt to pick up the active item or sell
-		-- a held item
-		-- Beyond that need to handle high price and extended cost warnings
-		-- All cases of right click assuming we want to buy it
+		MerchantItemButton_OnClick(self, button)
+	end
+	MerchantFrame.selectedTab = realtab
+end
+
+-- This function is called by SplitStackFrame when submitting to
+-- actually purchase the requested number of items.
+function MerchantPlusItemListLineMixin:SplitStack(split)
+	local data = self:GetElementData()
+
+	-- This function helps MerchantFrame functions find the item index
+	data.GetID = function()
+		local data = self:GetElementData()
+		return data.index
+	end
+
+	if data.extendedCost or data.showNonrefundablePrompt then
+		MerchantFrame_ConfirmExtendedItemCost(data, split)
+	elseif split > 0 then
+		BuyMerchantItem(data.index, split)
 	end
 end
 
 -- This should happen if a user picks up an item from the vendor to drag it to their bags, which is
 -- not a common action but supported by the default UI.
-function MerchantPlusItemListLineMixin:OnDragStart(button)
+--function MerchantPlusItemListLineMixin:OnDragStart(button)
 	-- TODO: The user is trying to pick up an item and drag it somewhere
 	-- Can't seem to get this to fire at all
-	print("Dragging")
-end
-
+--end

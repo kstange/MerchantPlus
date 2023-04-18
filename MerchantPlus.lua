@@ -189,6 +189,12 @@ function Addon:UpdateVendor()
 		item.itemKey = { itemID = GetMerchantItemID(i) }
 		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
 		item.index = i
+
+		-- Metadata used to emulate data in ItemButtons
+		item.count = item.quantity
+		item.link  = GetMerchantItemLink(i)
+		item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(i)
+
 		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
 		Addon.MerchantItems[i] = item
 	end
