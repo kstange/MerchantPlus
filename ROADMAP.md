@@ -5,6 +5,7 @@ This is a list of features in roughly the order they are intended to be implemen
 ## Initial release
 
 * Purchasing and click handling
+* Option to permit setting the tab active, saving sort status
 
 ## First feature releases (iterative)
 
