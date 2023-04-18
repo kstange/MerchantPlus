@@ -53,12 +53,15 @@ function MerchantPlusTableHeaderStringMixin:UpdateArrow()
 	end
 end
 
--- This defines a numeric field
-MerchantPlusTableNumberMixin = CreateFromMixins(TableBuilderCellMixin)
+-- Generic cell mixin for common mixin functions
+MerchantPlusTableCellMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTableNumberMixin:Init(key)
+function MerchantPlusTableCellMixin:Init(key)
 	self.key = key
 end
+
+-- This defines a numeric field
+MerchantPlusTableNumberMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTableNumberMixin:Populate(data, index)
 	local key = self.key
@@ -77,11 +80,7 @@ function MerchantPlusTableNumberMixin:Populate(data, index)
 end
 
 -- This defines a text field
-MerchantPlusTableTextMixin = CreateFromMixins(TableBuilderCellMixin)
-
-function MerchantPlusTableTextMixin:Init(key)
-	self.key = key
-end
+MerchantPlusTableTextMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTableTextMixin:Populate(data, index)
 	local key = self.key
