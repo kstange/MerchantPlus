@@ -73,7 +73,7 @@ function Addon:UpdateFrame()
 		-- Save and clear the filter on the merchant
 		Addon.MerchantFilter = GetMerchantFilter()
 		SetMerchantFilter(LE_LOOT_FILTER_ALL)
-	elseif MerchantFilter then
+	elseif Addon.MerchantFilter then
 		-- Restore the saved filter to the merchant
 		SetMerchantFilter(Addon.MerchantFilter)
 		Addon.MerchantFilter = nil
