@@ -209,9 +209,9 @@ function Addon:HandleEvent(event, target)
 		Addon.InitialWidth = MerchantFrame:GetWidth()
 	end
 
-	if event == "ADDON_LOADED" and target == AddonName then
-		-- Things that need to be delayed until after the addon is fully loaded
-	end
+	--if event == "ADDON_LOADED" and target == AddonName then
+	--	-- Things that need to be delayed until after the addon is fully loaded
+	--end
 end
 
 -- These are init steps specific to this addon
@@ -220,7 +220,7 @@ function Addon:Init()
 	hooksecurefunc("MerchantFrame_Update", Addon.UpdateFrame)
 
 	Addon.Events = CreateFrame("Frame")
-	Addon.Events:RegisterEvent("ADDON_LOADED")
+	--Addon.Events:RegisterEvent("ADDON_LOADED")
 	Addon.Events:RegisterEvent("MERCHANT_SHOW")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 end

@@ -48,7 +48,7 @@ function MerchantPlusItemListMixin:Init()
 	end)
 
 	ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view)
-	
+
 	local tableBuilder = CreateTableBuilder(nil)
 	self.tableBuilder = tableBuilder
 

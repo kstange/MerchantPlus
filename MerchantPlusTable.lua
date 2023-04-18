@@ -27,7 +27,7 @@ function MerchantPlusTableHeaderStringMixin:OnClick()
 		MerchantPlusItemList:SetSortOrder(self.index)
 	end
 	local headers = { MerchantPlusItemList.HeaderContainer:GetChildren() }
-	for i, header in pairs(headers) do
+	for _, header in pairs(headers) do
 		header:UpdateArrow()
 	end
 end
