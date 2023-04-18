@@ -11,12 +11,12 @@ This is a list of features in roughly the order they are intended to be implemen
 ## First feature releases (iterative)
 
 * Additional columns for item data
-** Item lock reason (rating, rep, class)
-** Item lock reason watermark (specific amount or limit)
-** Item quality (epic, etc)
-** Item type (armor, pattern, pet, mount, cosmetic, reagent)
-** Item status (BoP, etc)
-** Item characteristics (profession, skill, armor type, item level)?
+  * Item lock reason (rating, rep, class)
+  * Item lock reason watermark (specific amount or limit)
+  * Item quality (epic, etc)
+  * Item type (armor, pattern, pet, mount, cosmetic, reagent)
+  * Item status (BoP, etc)
+  * Item characteristics (profession, skill, armor type, item level)?
 * Options to choose which columns are shown
 * Item type filtering
 
@@ -30,3 +30,4 @@ This is a list of features in roughly the order they are intended to be implemen
 # Long term wishlist
 
 * Search other fields
+* Classic support (may depend on Blizzard backporting some functionality)
