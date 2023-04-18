@@ -256,11 +256,26 @@ function Addon:TableBuilderLayout(tableBuilder)
 	AddColumn(tableBuilder, L["Available"], "MerchantPlusTableBooleanTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
 end
 
+function Addon:Options_Sort_Update()
+	local save = Addon:GetOption('SortRemember')
+	if save then
+		local order, state = MerchantPlusItemList:GetSortOrder()
+		Addon:SetOption("SortOrder", { 'order' = order, 'state' = state })
+	else
+		Addon:SetOption("SortOrder", nil)
+	end
+end
+
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" and not Addon.InitialWidth then
 		-- Store the width of the frame when it first opened so we can restore it
 		Addon.InitialWidth = MerchantFrame:GetWidth()
+
+		-- If set, default to our tab
+		if Addon:GetOption("TabDefault") then
+			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
+		end
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
@@ -286,6 +301,8 @@ function Addon:Init()
 	Addon.Events:RegisterEvent("ADDON_LOADED")
 	Addon.Events:RegisterEvent("MERCHANT_SHOW")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
+
+	Callbacks.SortRemember = Addon.Options_Sort_Update
 end
 
 Addon:Init()
