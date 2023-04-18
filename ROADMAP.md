@@ -4,7 +4,6 @@ This is a list of features in roughly the order they are intended to be implemen
 
 ## Initial release
 
-* Extended Cost sorting
 * Purchasing and click handling
 * Icon and boolean column types (change Available to boolean)
 
