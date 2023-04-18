@@ -5,6 +5,7 @@ This is a list of features in roughly the order they are intended to be implemen
 ## Initial release
 
 * Purchasing and click handling
+* Profile opening of merchant to figure out why the initial view comes up bogus
 
 ## First feature releases (iterative)
 
