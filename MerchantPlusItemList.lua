@@ -31,6 +31,7 @@ function MerchantPlusItemListMixin:OnShow()
 	self:Init()
 	self:UpdateTableBuilderLayout()
 	self:RefreshScrollFrame()
+	self.ScrollBox:ScrollToBegin()
 end
 
 -- On init, we will need to create various structures
@@ -239,7 +240,7 @@ end
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
 function MerchantPlusItemListMixin:SetSortOrder(index)
-	if self.sortOrder == index then
+	if self.sortOrder == index and index ~= 0 then
 		if self.sortOrderState == 1 then
 			self.sortOrderState = 0
 		else
@@ -251,6 +252,7 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 	end
 
 	self.ScrollBox:GetDataProvider():Sort()
+	self.ScrollBox:ScrollToBegin()
 end
 
 -- Returns a table containing the sort order and state
