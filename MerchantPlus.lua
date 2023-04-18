@@ -162,10 +162,6 @@ function Addon:UpdateBuyback()
 	end
 end
 
-function Addon:SearchStarted()
-	return true
-end
-
 function Addon:GetEntry()
 	return self
 end
