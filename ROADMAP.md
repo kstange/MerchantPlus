@@ -6,7 +6,7 @@ This is a list of features in roughly the order they are intended to be implemen
 
 * Extended Cost sorting
 * Purchasing and click handling
-* Icon and boolean column types (change Availalble to boolean)
+* Icon and boolean column types (change Available to boolean)
 
 ## First feature releases (iterative)
 
