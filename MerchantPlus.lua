@@ -26,7 +26,8 @@ Addon.MP_ITEM   = 1
 Addon.MP_PRICE  = 2
 Addon.MP_STACK  = 3
 Addon.MP_SUPPLY = 4
-Addon.MP_AVAIL  = 5
+Addon.MP_USABLE = 5
+Addon.MP_AVAIL  = 6
 
 -- This allows us to detect when our tab is selected on the MerchantFrame
 function Addon:SetTab(index)
@@ -198,6 +199,8 @@ function Addon:TableBuilderLayout(tableBuilder)
 	-- Price
 	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
+	-- Usable
+	AddColumn(tableBuilder, "Usable", "MerchantPlusTableTextTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
 	-- Available
 	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
 end

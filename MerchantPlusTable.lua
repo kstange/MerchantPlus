@@ -85,7 +85,7 @@ MerchantPlusTableTextMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 function MerchantPlusTableTextMixin:Populate(data, index)
 	local key = self.key
 
-	if key == "isPurchasable"  then
+	if key == "isPurchasable" or key == "isUsable" then
 		self.Text:SetText(data[key] and "Yes" or "No")
 	else
 		self.Text:SetText("")
