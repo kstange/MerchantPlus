@@ -12,4 +12,4 @@ ignore:
   - .pkgmeta
   - README.md
   - CHANGELOG.md
-
+  - ROADMAP.md
