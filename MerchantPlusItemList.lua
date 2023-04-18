@@ -59,8 +59,6 @@ function MerchantPlusItemListMixin:Init()
 	self:UpdateTableBuilderLayout()
 	self.tableBuilder:SetDataProvider(Addon.GetEntry)
 
-	self:SetupSortManager()
-
 	self.initialized = true
 end
 
@@ -91,23 +89,64 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 	end
 end
 
--- This fuction will create a SortManager for helping sort the items that appear
--- in the list.
-function MerchantPlusItemListMixin:SetupSortManager()
-	local sortManager = SortUtil.CreateSortManager()
-	sortManager:SetDefaultComparator(function(lhs, rhs)
-		return lhs.rowData.itemKey.itemID < rhs.rowData.itemKey.itemID
-	end)
+-- This fuction will sort based on the request.
+function MerchantPlusItemListMixin:Sort(lhs, rhs)
+	local order, state = self:GetSortOrder()
+	if not lhs then
+		return false
+	end
+	if not rhs then
+		return true
+	end
+	local result = lhs.index < rhs.index
+	local key = nil
+	local invert = false
+	if order == Addon.MP_ITEM then
+		result = SortUtil.CompareUtf8i(lhs.name, rhs.name) < 1
+	elseif order == Addon.MP_PRICE then
+		if lhs.extendedCost == rhs.extendedCost then
+			if not lhs.extendedCost then
+				if lhs.price ~= rhs.price then
+					result = lhs.price < rhs.price
+				end
+			else
+				-- TODO: Sorting by price with item costs??
+				local lhitems = GetMerchantItemCostInfo(lhs.index)
+				local rhitems = GetMerchantItemCostInfo(rhs.index)
+				if lhitems ~= rhitems then
+					result = lhitems < rhitems
+				end
+			end
+		else
+			if lhs.extendedCost then
+				result = false
+			else
+				result = true
+			end
+		end
+	elseif order == Addon.MP_STACK then
+		key = 'quantity'
+	elseif order == Addon.MP_SUPPLY then
+		key = 'numAvailable'
+	elseif order ==  Addon.MP_AVAIL then
+		key = 'isPurchasable'
+		invert = true
+	end
+	if key then
+		if lhs[key] ~= rhs[key] then
+			if not invert then
+				result = lhs[key] < rhs[key]
+			else
+				result = lhs[key] > rhs[key]
+			end
+		end
+	end
 
-	sortManager:SetSortOrderFunc(function()
-		return self.sortOrder
-	end)
-
-	sortManager:InsertComparator(Addon.MP_ITEM, function(lhs, rhs)
-		return SortUtil.CompareUtf8i(lhs.rowData.name, rhs.rowData.name)
-	end)
-
-	self.sortManager = sortManager
+	if state == 1 then
+		return not result
+	else
+		return result
+	end
 end
 
 -- Returns the sortOrderState, which is 0 for ascending and 1 for descending
@@ -128,12 +167,13 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 		self.sortOrder = index
 		self.sortOrderState = 0
 	end
-	-- TODO: Actually invoke the sort, but we don't have a DataProvider that
-	-- knows how to use SortManager yet
-	self.ScrollBox:GetDataProvider():Sort()
+
+	self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
+		return MerchantPlusItemList:Sort(lhs, rhs)
+	end)
 end
 
 -- Returns a table containing the sort order and state
 function MerchantPlusItemListMixin:GetSortOrder()
-	return { self.sortOrder, self.sortStateState }
+	return self.sortOrder, self.sortOrderState
 end

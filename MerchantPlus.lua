@@ -191,10 +191,10 @@ function Addon:TableBuilderLayout(tableBuilder)
 	end
 
 	-- Stack
-	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 44, 0, 8, "quantity")
+	AddColumn(tableBuilder, "Stack", "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 50, 0, 8, "quantity")
 
 	-- Supply
-	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 50, 0, 8, "numAvailable")
+	AddColumn(tableBuilder, "Supply", "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 58, 0, 8, "numAvailable")
 
 	-- Item Name
 	AddColumn(tableBuilder, "Item", "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
@@ -203,7 +203,7 @@ function Addon:TableBuilderLayout(tableBuilder)
 	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 58, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
 end
 
 -- Handle any events that are needed

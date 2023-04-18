@@ -21,8 +21,15 @@ local Addon = Shared.Addon
 MerchantPlusTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin)
 
 function MerchantPlusTableHeaderStringMixin:OnClick()
-	MerchantPlusItemList:SetSortOrder(self.index)
-	self:UpdateArrow()
+	if IsControlKeyDown() then
+		MerchantPlusItemList:SetSortOrder(0)
+	else
+		MerchantPlusItemList:SetSortOrder(self.index)
+	end
+	local headers = { MerchantPlusItemList.HeaderContainer:GetChildren() }
+	for i, header in pairs(headers) do
+		header:UpdateArrow()
+	end
 end
 
 function MerchantPlusTableHeaderStringMixin:Init(title, index)
@@ -37,7 +44,7 @@ function MerchantPlusTableHeaderStringMixin:UpdateArrow()
 	if order == self.index then
 		self.Arrow:Show()
 		if state == 0 then
-			self.Arrow:SetTexCoord(0, 1, 1, 0)
+			self.Arrow:SetTexCoord(0, 1, 0, 1)
 		elseif state == 1 then
 			self.Arrow:SetTexCoord(0, 1, 1, 0)
 		end
