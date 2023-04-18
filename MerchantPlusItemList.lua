@@ -114,19 +114,82 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 
 	-- Item Name: sort alphabetically
 	if order == Addon.MP_ITEM then
-		result = SortUtil.CompareUtf8i(lhs['name'], rhs['name']) < 1
+		local namecheck = SortUtil.CompareUtf8i(lhs['name'], rhs['name'])
+		if namecheck ~= 0 then
+			result = namecheck == -1
+		end
+
+	-- Item Price: sort by magic:
+	--   Items with regular gold prices first, in cost order
+	--   Items with extended cost currency, ordered most to least significant
+	--     First by name of currency, then by amount of currency
 	elseif order == Addon.MP_PRICE then
+		-- If extendedCost state is the same, compare the values
 		if lhs['extendedCost'] == rhs['extendedCost'] then
-			if not lhs.extendedCost then
-				if lhs.price ~= rhs.price then
-					result = lhs.price < rhs.price
+			-- This is just gold, check which side is higher
+			if not lhs['extendedCost'] then
+				-- If the value is the same, allow to fall back to index
+				if lhs['price'] ~= rhs['price'] then
+					result = lhs['price'] < rhs['price']
 				end
+
+			-- This is extended cost, compare the currencies
 			else
-				-- TODO: Sorting by price with item costs??
-				local lhitems = GetMerchantItemCostInfo(lhs.index)
-				local rhitems = GetMerchantItemCostInfo(rhs.index)
-				if lhitems ~= rhitems then
-					result = lhitems < rhitems
+				-- Get the number of currencies required for each item
+				local lhitems = GetMerchantItemCostInfo(lhs['index'])
+				local rhitems = GetMerchantItemCostInfo(rhs['index'])
+
+				local difference = 0
+
+				-- Loop through all currencies
+				for i = 1, MAX_ITEM_COST do
+					-- If we've already found a difference, stop
+					if difference ~= 0 then
+						break
+					end
+
+					-- Get the currency item and number required
+					local li = 1 + lhitems - i
+					local ri = 1 + rhitems - i
+					local _, lhvalue, lhlink, lhname = GetMerchantItemCostItem(lhs['index'], li)
+					local _, rhvalue, rhlink, rhname = GetMerchantItemCostItem(rhs['index'], ri)
+
+					-- If one side has something and the other has nothing
+					-- put those with no item first
+					if lhvalue <= 0 and rhvalue > 0 then
+						difference = -1
+					elseif lhvalue > 0 and rhvalue <= 0 then
+						difference = 1
+					elseif lhvalue > 0 and rhvalue > 0 then
+
+						-- If this is an item instead of a currency, get its name
+						if not lhname then
+							lhname = GetItemInfo(lhlink)
+						end
+						if not rhname then
+							rhname = GetItemInfo(rhlink)
+						end
+
+						-- Sort the currency by name first
+						-- If names are the same, sort by value
+						-- If values are the same, fall back to index
+						local namecheck = SortUtil.CompareUtf8i(lhname, rhname)
+						if namecheck == 0 then
+							if lhvalue < rhvalue then
+								difference = -1
+							elseif lhvalue > rhvalue then
+								difference = 1
+							end
+						else
+							difference = namecheck
+						end
+					end
+				end
+
+				-- If the sort indicated there was a difference, return that result,
+				-- otherwise we fall back to the sort by index.
+				if difference ~= 0 then
+					result = difference == -1
 				end
 			end
 		else
