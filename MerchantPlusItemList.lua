@@ -150,11 +150,6 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	end
 end
 
--- Returns the sortOrderState, which is 0 for ascending and 1 for descending
-function MerchantPlusItemListMixin:GetSortOrderState(index)
-	return self.sortOrderState
-end
-
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
 function MerchantPlusItemListMixin:SetSortOrder(index)
