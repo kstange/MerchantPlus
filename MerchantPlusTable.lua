@@ -92,6 +92,26 @@ function MerchantPlusTableTextMixin:Populate(data, index)
 	end
 end
 
+-- This defines a field for showing an icon
+MerchantPlusTableIconMixin = CreateFromMixins(MerchantPlusTableCellMixin)
+
+function MerchantPlusTableIconMixin:Populate(data, index)
+	local key = self.key
+
+	if data[key] then
+		self.Icon:SetTexture(data[key])
+	end
+end
+
+-- This defines a field for showing a boolean checkmark
+MerchantPlusTableBooleanMixin = CreateFromMixins(MerchantPlusTableCellMixin)
+
+function MerchantPlusTableBooleanMixin:Populate(data, index)
+	local key = self.key
+
+	self.Icon:SetShown(data[key])
+end
+
 -- This defines a field for showing prices
 MerchantPlusTablePriceMixin = CreateFromMixins(TableBuilderCellMixin)
 

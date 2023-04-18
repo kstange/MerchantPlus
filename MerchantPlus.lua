@@ -200,9 +200,9 @@ function Addon:TableBuilderLayout(tableBuilder)
 	AddColumn(tableBuilder, "Price", "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
 
 	-- Usable
-	AddColumn(tableBuilder, "Usable", "MerchantPlusTableTextTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
+	AddColumn(tableBuilder, "Usable", "MerchantPlusTableBooleanTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
 	-- Available
-	AddColumn(tableBuilder, "Available", "MerchantPlusTableTextTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
+	AddColumn(tableBuilder, "Available", "MerchantPlusTableBooleanTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
 end
 
 -- Handle any events that are needed
