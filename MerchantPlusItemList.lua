@@ -86,7 +86,12 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		self.ResultsText:Hide()
 		local dataProvider = CreateDataProvider(Addon.MerchantItems)
 		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
+
+		self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
+			return self:Sort(lhs, rhs)
+		end)
 	end
+
 end
 
 -- This fuction will sort based on the request.
@@ -164,9 +169,7 @@ function MerchantPlusItemListMixin:SetSortOrder(index)
 		self.sortOrderState = 0
 	end
 
-	self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
-		return MerchantPlusItemList:Sort(lhs, rhs)
-	end)
+	self.ScrollBox:GetDataProvider():Sort()
 end
 
 -- Returns a table containing the sort order and state
