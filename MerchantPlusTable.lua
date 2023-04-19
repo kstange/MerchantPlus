@@ -63,6 +63,7 @@ end
 -- This defines a numeric field
 MerchantPlusTableNumberMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
+-- TODO: Move key-specific behavior to Metadata or format function
 function MerchantPlusTableNumberMixin:Populate(data, index)
 	local key = self.key
 
@@ -72,10 +73,14 @@ function MerchantPlusTableNumberMixin:Populate(data, index)
 		else
 			self.Text:SetText("∞")
 		end
-	elseif key == "quantity" and data[key] > 1 then
-		self.Text:SetText(data[key])
+	elseif key == "quantity" then
+		if  data[key] > 1 then
+			self.Text:SetText(data[key])
+		else
+			self.Text:SetText("")
+		end
 	else
-		self.Text:SetText("")
+		self.Text:SetText(data[key])
 	end
 end
 
