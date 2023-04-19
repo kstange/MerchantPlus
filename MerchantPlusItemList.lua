@@ -170,21 +170,11 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	-- randomly.
 	local result = lhs['index'] < rhs['index']
 
-	local key = nil
-	local invert = false
-
-	-- Item Name: sort alphabetically
-	if order == Metadata.Columns.item.id then
-		local namecheck = SortUtil.CompareUtf8i(lhs['name'] or "Unknown Item", rhs['name'] or "Unknown Item")
-		if namecheck ~= 0 then
-			result = namecheck == -1
-		end
-
 	-- Item Price: sort by magic:
 	--   Items with regular gold prices first, in cost order
 	--   Items with extended cost currency, ordered most to least significant
 	--     First by name of currency, then by amount of currency
-	elseif order == Metadata.Columns.price.id then
+	if order == Metadata.Columns.price.id then
 		-- If extendedCost state is the same, compare the values
 		if lhs['extendedCost'] == rhs['extendedCost'] then
 			-- This is just gold, check which side is higher
@@ -260,36 +250,42 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 				result = true
 			end
 		end
-	-- Stack Size: sort numerically
-	elseif order == Metadata.Columns.quantity.id then
-		key = 'quantity'
+	else
 
-	-- Supply: sort numerically
-	elseif order == Metadata.Columns.supply.id then
-		key = 'numAvailable'
+		-- Default Sort Methods
+		for _, col in pairs(Metadata.Columns) do
+			if col.id == order and col.field then
+				local key = col.field
 
-	-- Usable: sort true > false
-	elseif order == Metadata.Columns.usable.id then
-		if lhs['isUsable'] ~= rhs['isUsable'] then
-			result = lhs['isUsable']
-		end
+				-- Handle item sort (by name only)
+				if col.celltype == Metadata.CellTypes.Item then
+					local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
+					if namecheck ~= 0 then
+						result = namecheck == -1
+					end
 
-	-- Available: sort true > false
-	elseif order == Metadata.Columns.purchasable.id then
-		if lhs['isPurchasable'] ~= rhs['isPurchasable'] then
-			result = lhs['isPurchasable']
-		end
-	end
-	if key then
-		if lhs[key] ~= rhs[key] then
-			if not invert then
-				result = lhs[key] < rhs[key]
-			else
-				result = lhs[key] > rhs[key]
+				-- Handle number sort
+				elseif col.celltype == Metadata.CellTypes.Number then
+					if lhs[key] ~= rhs[key] then
+						result = lhs[key] < rhs[key]
+					end
+
+				-- Handle text sort
+				elseif col.celltype == Metadata.CellTypes.Text then
+					local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
+					if namecheck ~= 0 then
+						result = namecheck == -1
+					end
+
+				-- Handle boolean sort
+				elseif col.celltype == Metadata.CellTypes.Boolean then
+					if lhs[key] ~= rhs[key] then
+						result = lhs[key]
+					end
+				end
 			end
 		end
 	end
-
 	if state == 1 then
 		return not result
 	else

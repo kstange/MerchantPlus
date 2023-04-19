@@ -39,7 +39,7 @@ Metadata.Columns = {
 		id = 1,
 		name = L["Item"],
 		celltype = Metadata.CellTypes.Item,
-		field = nil,
+		field = "name",
 		required = true,
 		default = { order = 3, enabled = true, },
 		fixed = false,
