@@ -1,28 +1,37 @@
 # About Merchant Plus
 
-This addon will provide a modern update to merchant interfaces in WoW.
+This addon provides a modern update to merchant interfaces in WoW.
 
-You would be able to install this addon from [CurseForge](https://www.curseforge.com/wow/addons/merchant-plus "CurseForge"), [Wago](https://addons.wago.io/addons/merchant-plus), or [WoWInterface](https://www.wowinterface.com/downloads/info???-MerchantPlus.html).
+You can install this addon from [CurseForge](https://www.curseforge.com/wow/addons/merchant-plus "CurseForge"), [Wago](https://addons.wago.io/addons/merchant-plus), or [WoWInterface](https://www.wowinterface.com/downloads/info???-MerchantPlus.html).
 
 ## Features
 
-Merchant Plus will provide an additional tab on all WoW merchants, which provides a variety of enhancements:
+Merchant Plus provide an additional tab on all WoW merchants, which provides a variety of enhancements:
 
 * Vertical scrollable format to make finding items in long merchant lists easier
-* Searching and filtering functions based on item properties and costs
 * Sortable headers based on item properties
 
-An options panel will be provided to configure settings.
+An options panel is  provided to configure basic settings.
+
+## Planned Features
+
+In future updates, the following major improvements are planned:
+
+* Additional data columns and options to choose which columns are visible
+* Filtering based upon data in one or more columns
+* Searching based upon data in one or more columns
+
+There is no specific timeline for these features to be completed.
 
 ## Classic Support
 
-Classic support is tenatively planned but initial support will be limited to Retail. Some of the features are based upon functionality only available in the Retail version of the game.
+Currently Merchant Plus requires functionality only available in Retail.  Blizzard periodically backports features to Classic versions, so this the required functions may be available eventually.  Until that time, Classic support is not planned.
 
 ## Compatibility
 
-This addon will not replace the existing UI, so it should not conflict with addons that modify the contents of default Merchant windows, though it also likely will benefit from them.  Addons that replace the entire frame are likely to prevent Merchant Plus from appearing.  Addons that re-skin the merchant frame may result in layout problems.
+This addon does not replace the existing UI, but it makes many changes to the merchant window, so it may conflict with other addons that modify the contents or layout.  Addons that replace the window will prevent Merchant Plus from appearing entirely.  Addons that re-skin the merchant window may cause layout problems.
 
-Ideally, Merchant Plus will not be the cause of any conflicts.  If any are discovered, I'll attempt to fix what I can from the Merchant Plus side.
+Ideally, Merchant Plus will not be the cause of any conflicts. If you discover any, please [report them](https://github.com/kstange/MerchantPlus/issues/), and I'll fix what I can from the Merchant Plus side.
 
 ## Localization
 

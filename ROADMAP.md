@@ -1,12 +1,8 @@
 # Roadmap
 
-This is a list of features in roughly the order they are intended to be implemented.  It is not confirmed that all of them are possible and priority may be changed.
+This is a list of features in roughly the order they are intended to be implemented, categorized by type.  It is not confirmed that all of them are possible and priority may be changed.
 
-## Initial release
-
-* Generalize sort and move some bits into Metadata
-
-## First feature releases (iterative)
+## Data
 
 * Additional columns for item data
   * Item lock reason (rating, rep, class)
@@ -16,16 +12,19 @@ This is a list of features in roughly the order they are intended to be implemen
   * Item status (BoP, etc)
   * Item characteristics (profession, skill, armor type, item level)?
 * Options to choose which columns are shown
+
+## Filtering
+
 * Item type filtering
-
-## Future feature releases
-
 * Filtering by contents of column (epic vs rare)
 * Filtering by usable item (profession, armor class, level, already known)
 * Filtering by requirement to purchase
-* Search by name
 
-# Long term wishlist
+## Search
 
-* Search other fields
+* Search by item name
+* Search in other fields
+
+## Long Term
+
 * Classic support (may depend on Blizzard backporting some functionality)
