@@ -80,8 +80,6 @@ end
 
 -- This should handle all the work related to previewing or buying items.
 function MerchantPlusItemListLineMixin:OnClick(button)
-	local data = self:GetElementData()
-
 	if Addon.Trace then print("clicked:", button) end
 
 	-- Allow us to just call built-in Merchant functions

@@ -128,7 +128,7 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 			-- Put the most significant currency on the right instead of left
 			-- by reversing the order of the items displayed
 			local r = 1 + items - i
-			local texture, value, link = GetMerchantItemCostItem(data.index, r)
+			local texture, value = GetMerchantItemCostItem(data.index, r)
 			local currency = self.AltCurrencyDisplay['Item' .. i]
 			if texture and value > 0 and r <= items then
 				currency:SetText(value)

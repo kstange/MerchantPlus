@@ -55,10 +55,8 @@ function MerchantPlusItemListMixin:Init()
 
 	local view = CreateScrollBoxListLinearView()
 
-	view:SetElementFactory(function(factory, elementData)
-		factory("MerchantPlusItemListLineTemplate", function(button, elementData)
-			-- Nothing to do
-		end)
+	view:SetElementFactory(function(factory)
+		factory("MerchantPlusItemListLineTemplate", function() end)
 	end)
 
 	ScrollUtil.InitScrollBoxListWithScrollBar(self.ScrollBox, self.ScrollBar, view)

@@ -208,7 +208,7 @@ function Addon:SetTableLayout()
 			order[col.default.order] = key
 		end
 	end
-	for index, key in ipairs(order) do
+	for _, key in ipairs(order) do
 		local col = Metadata.Columns[key]
 		MerchantPlusItemList:AddColumn(col.name, col.celltype, col.id, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
 	end
