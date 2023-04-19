@@ -56,9 +56,9 @@ function MerchantPlusItemListLineMixin:OnHide()
 	end
 end
 
--- Import data into a  Line to emulate an ItemButton so native MerchantFrame functions
+-- Import data into the ItemListLine to emulate an ItemButton so native MerchantFrame functions
 -- work on them.
-function MerchantPlusItemListLineMixin:AddButtonData()
+function MerchantPlusItemListLineMixin:UpdateButtonData()
 	local data = self:GetElementData()
 
 	if Addon.Trace then print("called: UpdateButtonData", data.index) end
