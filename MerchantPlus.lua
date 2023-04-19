@@ -111,9 +111,6 @@ function Addon:UpdateFrame()
 	if show and changed then
 		MerchantFrame_CloseStackSplitFrame()
 		MerchantFrame.lastTab = MerchantFrame.selectedTab
-
-		MerchantFrame:SetTitle(UnitName("npc"))
-		MerchantFrame:SetPortraitToUnit("npc")
 	end
 
 	-- Set the width of the frame wider or back to the default depending on the tab
@@ -137,6 +134,10 @@ function Addon:UpdateFrame()
 	-- anything weird that Blizzard might do because sometimes it assumes our tab is the buyback
 	-- tab.
 	if show then
+		-- Set the portrait and name of the frame
+		MerchantFrame:SetTitle(UnitName("npc"))
+		MerchantFrame:SetPortraitToUnit("npc")
+
 		-- Hide all the buttons from the merchant page
 		MerchantPageText:Hide()
 		MerchantPrevPageButton:Hide()
