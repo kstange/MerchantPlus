@@ -6,12 +6,12 @@ You can install this addon from [CurseForge](https://www.curseforge.com/wow/addo
 
 ## Features
 
-Merchant Plus provide an additional tab on all WoW merchants, which provides a variety of enhancements:
+Merchant Plus adds an additional tab to all WoW merchants, which provides the following enhancements:
 
-* Vertical scrollable format to make finding items in long merchant lists easier
-* Sortable headers based on item properties
+* Wider vertical scrolling list to allow more information to be viewed at once
+* Sortable columns of item data
 
-An options panel is  provided to configure basic settings.
+An options panel is included to configure basic settings.
 
 ## Planned Features
 
