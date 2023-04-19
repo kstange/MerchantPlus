@@ -158,6 +158,9 @@ function MerchantPlusTablePriceMixin:Populate(data, index)
 	end
 	if data.price > 0 then
 		self.MoneyDisplay:SetAmount(data.price)
+		if self.MoneyDisplay.SilverDisplay.amount == 0 and self.MoneyDisplay.GoldDisplay.amount == 0 then
+			self.MoneyDisplay.SilverDisplay:Hide()
+		end
 		self.MoneyDisplay.CopperDisplay.Text:SetTextColor(color.r, color.g, color.b)
 		self.MoneyDisplay.SilverDisplay.Text:SetTextColor(color.r, color.g, color.b)
 		self.MoneyDisplay.GoldDisplay.Text:SetTextColor(color.r, color.g, color.b)
@@ -168,7 +171,7 @@ end
 MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
 
 function MerchantPlusTableItemMixin:Populate(data, index)
-	local name = data.name or "Unknown Item"
+	local name = data.name or ""
 	local quality = select(3, GetItemInfo(data.itemKey.itemID))
 	local color = ITEM_QUALITY_COLORS[quality]
 	local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemKey.itemID)
