@@ -167,16 +167,6 @@ function Addon:UpdateFrame()
 		MerchantFrameBottomRightBorder:Show()
 	end
 
-	-- Restore the saved sort when switching to this frame
-	if show and changed then
-		if Addon:GetOption("SortRemember") then
-			local sort = Addon:GetOption("SortOrder")
-			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
-		else
-			MerchantPlusItemList:SetSortOrder(0)
-		end
-	end
-
 	-- We show our own frame now that everything is done
 	MerchantPlusFrame:SetShown(show)
 end
@@ -256,6 +246,14 @@ function Addon:HandleEvent(event, target)
 		-- the next tab switch event
 		if Addon:GetOption("TabDefault") then
 			Addon.SwitchOnOpen = true
+		end
+
+		-- Restore the saved sort when opening the vendor if configured
+		if Addon:GetOption("SortRemember") then
+			local sort = Addon:GetOption("SortOrder")
+			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
+		else
+			MerchantPlusItemList:SetSortOrder(0)
 		end
 	end
 
