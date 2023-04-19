@@ -60,6 +60,9 @@ end
 function MerchantPlusItemListLineMixin:OnClick(button)
 	local data = self:GetElementData()
 
+	-- TODO: I am not getting right clicks?
+	if Addon.Trace then print("clicked:", button) end
+
 	-- Allow us to just call built-in Merchant functions
 	local realtab = MerchantFrame.selectedTab
 	MerchantFrame.selectedTab = 1
@@ -74,9 +77,6 @@ function MerchantPlusItemListLineMixin:OnClick(button)
 	self.link = data.link
 	self.name = data.name
 	self.texture = data.texture
-
-	-- TODO: I am not getting right clicks?
-	print("click", button)
 
 	-- Call the OnModifiedClick function for MerchantItemButton
 	if IsModifiedClick() then
@@ -93,6 +93,8 @@ end
 -- actually purchase the requested number of items.
 function MerchantPlusItemListLineMixin:SplitStack(split)
 	local data = self:GetElementData()
+
+	if Addon.Trace then print("splitstack:", split) end
 
 	-- This function helps MerchantFrame functions find the item index
 	data.GetID = function()

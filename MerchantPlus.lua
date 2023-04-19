@@ -26,9 +26,9 @@ local Addon = {}
 Shared.Addon = Addon
 
 Addon.InitialWidth = nil
-Addon.MerchantItems = {}
 Addon.MerchantFilter = nil
 Addon.SwitchOnOpen = false
+Addon.Trace = false
 
 Addon.MP_ITEM   = 1
 Addon.MP_PRICE  = 2
@@ -83,6 +83,7 @@ end
 function Addon:SetTab(index)
 	-- We only want to act on MerchantFrame
 	if self == MerchantFrame then
+		if Addon.Trace then print("called: SetTab") end
 		if index == 1 and Addon:GetOption("TabDefault") and Addon.SwitchOnOpen then
 			Addon.SwitchOnOpen = false
 			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
@@ -98,6 +99,12 @@ end
 -- This gets called any time that our tab becomes focused or any time MerchantFrame_Update()
 -- gets called.  We want to know if Blizzard starts messing with things from other tabs.
 function Addon:UpdateFrame()
+	-- Don't do anything if the MerchantFrame isn't visible
+	if not MerchantFrame:IsShown() then
+		return
+	end
+	if Addon.Trace then print("called: UpdateFrame") end
+
 	local plustab = MerchantFrameTabPlus:GetID()                        -- Our tab ID
 	local show    = MerchantFrame.selectedTab == plustab                -- Our tab is requested
 	local changed = MerchantFrame.lastTab ~= MerchantFrame.selectedTab  -- The tab was switched
@@ -132,16 +139,12 @@ function Addon:UpdateFrame()
 	if show and changed then
 		-- Save and clear the filter on the merchant
 		Addon.MerchantFilter = GetMerchantFilter()
-		SetMerchantFilter(LE_LOOT_FILTER_ALL)
-	elseif Addon.MerchantFilter then
+	elseif (normal or buyback) and Addon.MerchantFilter then
 		-- Restore the saved filter to the merchant
 		SetMerchantFilter(Addon.MerchantFilter)
 		Addon.MerchantFilter = nil
 		MerchantFrame_Update()
 	end
-
-	-- We show our own frame objects if wanted
-	MerchantPlusFrame:SetShown(show)
 
 	-- Set up the frame for ourselves.  We blindly adjust frames we know that the official
 	-- blizzard code will fix when it transitions to another official tab.  We also need to undo
@@ -176,28 +179,20 @@ function Addon:UpdateFrame()
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
 		MerchantFrameBottomRightBorder:Show()
-
-		MerchantPlusItemList:RefreshScrollFrame()
 	end
-end
 
-function Addon:UpdateVendor()
-	Addon.MerchantItems = {}
-	local items = GetMerchantNumItems()
-	for i = 1, items do
-		local item = {}
-		item.itemKey = { itemID = GetMerchantItemID(i) }
-		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
-		item.index = i
-
-		-- Metadata used to emulate data in ItemButtons
-		item.count = item.quantity
-		item.link  = GetMerchantItemLink(i)
-		item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(i)
-
-		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
-		Addon.MerchantItems[i] = item
+	-- Restore the saved sort when switching to this frame
+	if show and changed then
+		if Addon:GetOption("SortRemember") then
+			local sort = Addon:GetOption("SortOrder")
+			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
+		else
+			MerchantPlusItemList:SetSortOrder(0)
+		end
 	end
+
+	-- We show our own frame now that everything is done
+	MerchantPlusFrame:SetShown(show)
 end
 
 -- Blizzard doesn't put this functionality in a separate function so we have to
@@ -228,15 +223,8 @@ function Addon:UpdateBuyback()
 	end
 end
 
-function Addon:GetEntry()
-	return self
-end
-
-function Addon:GetNumEntries()
-	return #Addon.MerchantItems
-end
-
 function Addon:TableBuilderLayout(tableBuilder)
+	if Addon.Trace then print("called: TableBuilderLayout") end
 	tableBuilder:SetHeaderContainer(MerchantPlusItemList.HeaderContainer)
 
 	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
@@ -292,6 +280,7 @@ end
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" then
+		if Addon.Trace then print("called: MERCHANT_SHOW") end
 		-- Store the width of the frame when it first opened so we can restore it
 		if not Addon.InitialWidth then
 			Addon.InitialWidth = MerchantFrame:GetWidth()
@@ -302,14 +291,22 @@ function Addon:HandleEvent(event, target)
 		if Addon:GetOption("TabDefault") then
 			Addon.SwitchOnOpen = true
 		end
+	end
 
-		-- Reset the sort when opening a new vendor
-		if Addon:GetOption("SortRemember") then
-			local sort = Addon:GetOption("SortOrder")
-			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
-		else
-			MerchantPlusItemList:SetSortOrder(0)
-		end
+	if event == "MERCHANT_UPDATE" then
+		if Addon.Trace then print("called: MERCHANT_UPDATE") end
+		MerchantPlusItemList:RefreshScrollFrame()
+	end
+
+	if event == "MERCHANT_FILTER_ITEM_UPDATE" then
+		if Addon.Trace then print("called: MERCHANT_FILTER_ITEM_UPDATE") end
+		MerchantPlusItemList:RefreshScrollFrame()
+	end
+
+	if event == "MERCHANT_CLOSED" then
+		if Addon.Trace then print("called: MERCHANT_CLOSED") end
+		-- Clear the saved filter so it returns to default on reopen
+		Addon.MerchantFilter = nil
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
@@ -323,6 +320,7 @@ function Addon:HandleEvent(event, target)
 			ACR:RegisterOptionsTable(AddonName, Metadata.Options)
 			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
 		end
+		Addon.Trace = Addon:GetOption("Trace")
 	end
 end
 
@@ -334,6 +332,9 @@ function Addon:Init()
 	Addon.Events = CreateFrame("Frame")
 	Addon.Events:RegisterEvent("ADDON_LOADED")
 	Addon.Events:RegisterEvent("MERCHANT_SHOW")
+	Addon.Events:RegisterEvent("MERCHANT_UPDATE")
+	Addon.Events:RegisterEvent("MERCHANT_FILTER_ITEM_UPDATE")
+	Addon.Events:RegisterEvent("MERCHANT_CLOSED")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 
 	Callbacks.SortRemember = Addon.Options_Sort_Update

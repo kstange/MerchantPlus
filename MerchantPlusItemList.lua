@@ -57,14 +57,15 @@ function MerchantPlusItemListMixin:Init()
 		return elementData
 	end)
 
-	self:UpdateTableBuilderLayout()
-	self.tableBuilder:SetDataProvider(Addon.GetEntry)
+	self.tableBuilder:SetDataProvider(self.GetDataRow)
 
 	self.initialized = true
 end
 
 -- Update the layout of the table.
 function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
+	if Addon.Trace then print("called: UpdateTableBuilderLayout") end
+
 	self.tableBuilder:Reset()
 	Addon:TableBuilderLayout(self.tableBuilder)
 	self.tableBuilder:SetTableWidth(self.ScrollBox:GetWidth())
@@ -73,19 +74,22 @@ end
 
 -- Update the contents of the table.
 function MerchantPlusItemListMixin:RefreshScrollFrame()
+	if Addon.Trace then print("called: RefreshScrollFrame") end
+
 	if not self.initialized or not self:IsShown() then
 		return
 	end
 
-	Addon:UpdateVendor()
-	local count = Addon:GetNumEntries()
+	local MerchantItems = self:UpdateMerchant()
+	local count = #MerchantItems
 	if count == 0 then
 		self.ResultsText:Show()
 		self.ResultsText:SetText(BROWSE_NO_RESULTS)
 		self.ScrollBox:ClearDataProvider()
 	else
 		self.ResultsText:Hide()
-		local dataProvider = CreateDataProvider(Addon.MerchantItems)
+		local dataProvider = CreateDataProvider(MerchantItems)
+		self.ScrollBox:ClearDataProvider()
 		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
 
 		self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
@@ -93,6 +97,35 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		end)
 	end
 
+end
+
+-- Return the ElementData back directly to the TableBuilder
+function MerchantPlusItemListMixin:GetDataRow()
+	return self
+end
+
+-- Sync updated Merchant information
+function MerchantPlusItemListMixin:UpdateMerchant()
+	if Addon.Trace then print("called: UpdateMerchant") end
+
+	SetMerchantFilter(LE_LOOT_FILTER_ALL)
+	local MerchantItems = {}
+	local items = GetMerchantNumItems()
+	for i = 1, items do
+		local item = {}
+		item.itemKey = { itemID = GetMerchantItemID(i) }
+		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
+		item.index = i
+
+		-- Metadata used to emulate data in ItemButtons
+		item.count = item.quantity
+		item.link  = GetMerchantItemLink(i)
+		item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(i)
+
+		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
+		MerchantItems[i] = item
+	end
+	return MerchantItems
 end
 
 -- This fuction will sort based on the request.
@@ -240,6 +273,8 @@ end
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
 function MerchantPlusItemListMixin:SetSortOrder(index, state)
+	if Addon.Trace then print("called: SetSortOrder") end
+
 	if self.sortOrder == index and index ~= 0 and state == nil then
 		if self.sortOrderState == 1 then
 			self.sortOrderState = 0
@@ -253,7 +288,7 @@ function MerchantPlusItemListMixin:SetSortOrder(index, state)
 
 	Addon:Options_Sort_Update()
 
-	if self:IsVisible() then
+	if self.initialized and self:IsVisible() and self.ScrollBox:HasDataProvider() then
 		self.ScrollBox:GetDataProvider():Sort()
 		self.ScrollBox:ScrollToBegin()
 	end
