@@ -85,11 +85,7 @@ MerchantPlusTableTextMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 function MerchantPlusTableTextMixin:Populate(data, index)
 	local key = self.key
 
-	if key == "isPurchasable" or key == "isUsable" then
-		self.Text:SetText(data[key] and "Yes" or "No")
-	else
-		self.Text:SetText("")
-	end
+	self.Text:SetText(data[key] or "")
 end
 
 -- This defines a field for showing an icon
@@ -100,6 +96,9 @@ function MerchantPlusTableIconMixin:Populate(data, index)
 
 	if data[key] then
 		self.Icon:SetTexture(data[key])
+		self.Icon:Show()
+	else
+		self.Icon:Hide()
 	end
 end
 
