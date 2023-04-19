@@ -83,7 +83,7 @@ end
 function Addon:SetTab(index)
 	-- We only want to act on MerchantFrame
 	if self == MerchantFrame then
-		if Addon.Trace then print("called: SetTab") end
+		if Addon.Trace then print("called: SetTab", index, MerchantFrame.lastTab) end
 		if index == 1 and Addon:GetOption("TabDefault") and Addon.SwitchOnOpen then
 			Addon.SwitchOnOpen = false
 			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
@@ -91,7 +91,9 @@ function Addon:SetTab(index)
 
 		-- Update MerchantPlusFrame when its tab is selected
 		if index == MerchantFrameTabPlus:GetID() then
-			Addon:UpdateFrame()
+			if  index ~= MerchantFrame.lastTab then
+				Addon:UpdateFrame()
+			end
 		end
 	end
 end
@@ -136,11 +138,14 @@ function Addon:UpdateFrame()
 
 	-- Hide the filtering dropdown and clear the filter as we'll be doing something else
 	MerchantFrameLootFilter:SetShown(not show)
+	if Addon.Trace then print("current filter:", GetMerchantFilter()) end
 	if show and changed then
 		-- Save and clear the filter on the merchant
 		Addon.MerchantFilter = GetMerchantFilter()
+		if Addon.Trace then print("saved filter:", Addon.MerchantFilter) end
 	elseif (normal or buyback) and Addon.MerchantFilter then
 		-- Restore the saved filter to the merchant
+		if Addon.Trace then print("restored filter:", Addon.MerchantFilter) end
 		SetMerchantFilter(Addon.MerchantFilter)
 		Addon.MerchantFilter = nil
 		MerchantFrame_Update()
