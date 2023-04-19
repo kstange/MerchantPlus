@@ -1,6 +1,6 @@
 # About Merchant Plus
 
-This addon provides a modern update to merchant interfaces in WoW.
+This addon provides a modern update to merchant (vendor) interfaces in WoW.
 
 You can install this addon from [CurseForge](https://www.curseforge.com/wow/addons/merchant-plus "CurseForge"), [Wago](https://addons.wago.io/addons/merchant-plus), or [WoWInterface](https://www.wowinterface.com/downloads/info???-MerchantPlus.html).
 
