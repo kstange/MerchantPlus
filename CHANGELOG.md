@@ -1,4 +1,4 @@
-# Version 10.0.7.0
+# Version 10.0.7.0-beta
 
 * Initial Version
 
