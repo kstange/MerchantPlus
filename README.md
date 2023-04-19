@@ -25,7 +25,7 @@ There is no specific timeline for these features to be completed.
 
 ## Classic Support
 
-Currently Merchant Plus requires functionality only available in Retail.  Blizzard periodically backports features to Classic versions, so this the required functions may be available eventually.  Until that time, Classic support is not planned.
+Currently Merchant Plus requires functionality only available in Retail.  Blizzard periodically backports features to Classic versions, so the required functions may be available eventually.  Until that time, Classic support is not planned.
 
 ## Compatibility
 
