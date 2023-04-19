@@ -17,6 +17,9 @@ local L = Shared.Locale
 -- From MerchantPlus.lua
 local Addon = Shared.Addon
 
+-- From Metadata.lua
+local Metadata = Shared.Metadata
+
 MerchantPlusItemListMixin = {}
 
 -- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
@@ -67,6 +70,7 @@ function MerchantPlusItemListMixin:Init()
 		return elementData
 	end)
 
+	self.tableBuilder:SetHeaderContainer(self.HeaderContainer)
 	self.tableBuilder:SetDataProvider(self.GetDataRow)
 
 	self.initialized = true
@@ -77,9 +81,26 @@ function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
 	if Addon.Trace then print("called: UpdateTableBuilderLayout") end
 
 	self.tableBuilder:Reset()
-	Addon:TableBuilderLayout(self.tableBuilder)
+	if self.layoutCallback then
+		self:layoutCallback()
+	end
 	self.tableBuilder:SetTableWidth(self.ScrollBox:GetWidth())
 	self.tableBuilder:Arrange()
+end
+
+-- Add a column to the TableBuilder
+function MerchantPlusItemListMixin:AddColumn(title, celltype, index, fixed, width, left, right, ...)
+	local tableBuilder = self.tableBuilder
+	local column = tableBuilder:AddColumn()
+	column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", title, index)
+	column:ConstructCells("FRAME", celltype, ...)
+	if fixed then
+		column:SetFixedConstraints(width, 0)
+	else
+		column:SetFillConstraints(width, 0)
+	end
+	column:SetCellPadding(left, right)
+	return column
 end
 
 -- Update the contents of the table.
@@ -153,7 +174,7 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	local invert = false
 
 	-- Item Name: sort alphabetically
-	if order == Addon.MP_ITEM then
+	if order == Metadata.Columns.item.id then
 		local namecheck = SortUtil.CompareUtf8i(lhs['name'] or "Unknown Item", rhs['name'] or "Unknown Item")
 		if namecheck ~= 0 then
 			result = namecheck == -1
@@ -163,7 +184,7 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	--   Items with regular gold prices first, in cost order
 	--   Items with extended cost currency, ordered most to least significant
 	--     First by name of currency, then by amount of currency
-	elseif order == Addon.MP_PRICE then
+	elseif order == Metadata.Columns.price.id then
 		-- If extendedCost state is the same, compare the values
 		if lhs['extendedCost'] == rhs['extendedCost'] then
 			-- This is just gold, check which side is higher
@@ -240,21 +261,21 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 			end
 		end
 	-- Stack Size: sort numerically
-	elseif order == Addon.MP_STACK then
+	elseif order == Metadata.Columns.quantity.id then
 		key = 'quantity'
 
 	-- Supply: sort numerically
-	elseif order == Addon.MP_SUPPLY then
+	elseif order == Metadata.Columns.supply.id then
 		key = 'numAvailable'
 
 	-- Usable: sort true > false
-	elseif order == Addon.MP_USABLE then
+	elseif order == Metadata.Columns.usable.id then
 		if lhs['isUsable'] ~= rhs['isUsable'] then
 			result = lhs['isUsable']
 		end
 
 	-- Available: sort true > false
-	elseif order == Addon.MP_AVAIL then
+	elseif order == Metadata.Columns.purchasable.id then
 		if lhs['isPurchasable'] ~= rhs['isPurchasable'] then
 			result = lhs['isPurchasable']
 		end
@@ -292,7 +313,9 @@ function MerchantPlusItemListMixin:SetSortOrder(index, state)
 		self.sortOrderState = state or 0
 	end
 
-	Addon:Options_Sort_Update()
+	if self.sortCallback then
+		self:sortCallback()
+	end
 
 	if self.initialized and self:IsVisible() and self.ScrollBox:HasDataProvider() then
 		self.ScrollBox:GetDataProvider():Sort()

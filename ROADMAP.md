@@ -4,7 +4,6 @@ This is a list of features in roughly the order they are intended to be implemen
 
 ## Initial release
 
-* Move TableBuilderLayout to Metadata table and builder function into ItemList
 * Generalize sort and move some bits into Metadata
 
 ## First feature releases (iterative)

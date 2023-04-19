@@ -30,13 +30,6 @@ Addon.MerchantFilter = nil
 Addon.SwitchOnOpen = false
 Addon.Trace = false
 
-Addon.MP_ITEM   = 1
-Addon.MP_PRICE  = 2
-Addon.MP_STACK  = 3
-Addon.MP_SUPPLY = 4
-Addon.MP_USABLE = 5
-Addon.MP_AVAIL  = 6
-
 -- Get an option for the AceConfigDialog
 function Addon:GetOption(key)
 	if not key then
@@ -216,42 +209,22 @@ function Addon:UpdateBuyback()
 	end
 end
 
-function Addon:TableBuilderLayout(tableBuilder)
-	if Addon.Trace then print("called: TableBuilderLayout") end
-	tableBuilder:SetHeaderContainer(MerchantPlusItemList.HeaderContainer)
-
-	local function AddColumn(tableBuilder, title, cellType, index, fixed, width, leftPadding, rightPadding, ...)
-		local column = tableBuilder:AddColumn()
-		column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", title, index)
-		column:ConstructCells("FRAME", cellType, ...)
-		if fixed then
-			column:SetFixedConstraints(width, 0)
-		else
-			column:SetFillConstraints(width, 0)
+function Addon:SetTableLayout()
+	if Addon.Trace then print("called: SetTableLayout") end
+	local order = {}
+	for key, col in pairs(Metadata.Columns) do
+		if col.default.enabled and not order[col.default.order] then
+			order[col.default.order] = key
 		end
-		column:SetCellPadding(leftPadding, rightPadding)
-		return column
 	end
-
-	-- Stack
-	AddColumn(tableBuilder, L["Stack"], "MerchantPlusTableNumberTemplate", Addon.MP_STACK, true, 50, 0, 8, "quantity")
-
-	-- Supply
-	AddColumn(tableBuilder, L["Supply"], "MerchantPlusTableNumberTemplate", Addon.MP_SUPPLY, true, 58, 0, 8, "numAvailable")
-
-	-- Item Name
-	AddColumn(tableBuilder, L["Item"], "MerchantPlusTableItemTemplate", Addon.MP_ITEM, false, 1, 4, 0)
-
-	-- Price
-	AddColumn(tableBuilder, L["Price"], "MerchantPlusTablePriceTemplate", Addon.MP_PRICE, true, 146, 0, 14)
-
-	-- Usable
-	AddColumn(tableBuilder, L["Usable"], "MerchantPlusTableBooleanTemplate", Addon.MP_USABLE, true, 58, 8, 0, "isUsable")
-	-- Available
-	AddColumn(tableBuilder, L["Available"], "MerchantPlusTableBooleanTemplate", Addon.MP_AVAIL, true, 70, 8, 0, "isPurchasable")
+	for index, key in ipairs(order) do
+		local col = Metadata.Columns[key]
+		MerchantPlusItemList:AddColumn(col.name, col.celltype, col.id, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
+	end
 end
 
 function Addon:Options_Sort_Update()
+	if Addon.Trace then print("called: Options_Sort_Update") end
 	local settings = _G[AddonName]
 	local save = Addon:GetOption('SortRemember')
 	local key = "SortOrder"
@@ -312,6 +285,7 @@ function Addon:HandleEvent(event, target)
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
+		if Addon.Trace then print("called: ADDON_LOADED") end
 		if not  _G[AddonName] then
 			_G[AddonName] = {}
 		end
@@ -323,6 +297,9 @@ function Addon:HandleEvent(event, target)
 			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
 		end
 		Addon.Trace = Addon:GetOption("Trace")
+
+		MerchantPlusItemList.layoutCallback = Addon.SetTableLayout
+		MerchantPlusItemList.sortCallback   = Addon.Options_Sort_Update
 	end
 end
 

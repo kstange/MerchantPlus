@@ -183,7 +183,7 @@
 				<Texture parentKey="Icon" atlas="checkmark-minimal" useAtlasSize="false" hidden="true">
 					<Size x="14" y="14"/>
 					<Anchors>
-						<Anchor point="CENTER" x="-5" />
+						<Anchor point="CENTER" />
 					</Anchors>
 				</Texture>
 			</Layer>
