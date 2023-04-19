@@ -286,14 +286,16 @@ function Addon:HandleEvent(event, target)
 		end
 	end
 
+	-- This generally means the merchant's contents changed
 	if event == "MERCHANT_UPDATE" then
 		if Addon.Trace then print("called: MERCHANT_UPDATE") end
 		MerchantPlusItemList:RefreshScrollFrame()
 	end
 
+	-- I haven't yet found a case where we need to do anything as this is
+	-- usually followed by MERCHANT_UPDATE
 	if event == "MERCHANT_FILTER_ITEM_UPDATE" then
 		if Addon.Trace then print("called: MERCHANT_FILTER_ITEM_UPDATE") end
-		--MerchantPlusItemList:RefreshScrollFrame()
 	end
 
 	if event == "MERCHANT_CLOSED" then
@@ -301,6 +303,12 @@ function Addon:HandleEvent(event, target)
 		-- Hide the MerchantPlus frame so we don't call OnShow before
 		-- MerchantFrame sets itself up.
 		MerchantPlusFrame:Hide()
+	end
+
+	-- If player's inventory changed, the items available on the vendor might change
+	if event == "UNIT_INVENTORY_CHANGED" then
+		if Addon.Trace then print("called: UNIT_INVENTORY_CHANGED") end
+		MerchantPlusItemList:RefreshScrollFrame()
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
@@ -329,6 +337,7 @@ function Addon:Init()
 	Addon.Events:RegisterEvent("MERCHANT_UPDATE")
 	Addon.Events:RegisterEvent("MERCHANT_FILTER_ITEM_UPDATE")
 	Addon.Events:RegisterEvent("MERCHANT_CLOSED")
+	Addon.Events:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 
 	Callbacks.SortRemember = Addon.Options_Sort_Update
