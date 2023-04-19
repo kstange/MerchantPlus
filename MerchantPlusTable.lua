@@ -67,7 +67,7 @@ function MerchantPlusTableNumberMixin:Populate(data, index)
 	local key = self.key
 
 	if key == "numAvailable" then
-		if data[key] > 0 then
+		if data[key] >= 0 then
 			self.Text:SetText(data[key])
 		else
 			self.Text:SetText("∞")
