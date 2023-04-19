@@ -90,6 +90,7 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		return
 	end
 
+	SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	local count = GetMerchantNumItems()
 	if count == 0 then
 		self.ResultsText:Show()
@@ -115,7 +116,6 @@ end
 
 -- Sync updated Merchant information
 function MerchantPlusItemListMixin:UpdateMerchant()
-	SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	local items = GetMerchantNumItems()
 	local MerchantItems = {}
 	if Addon.Trace then print("called: UpdateMerchant", items) end
@@ -137,7 +137,6 @@ function MerchantPlusItemListMixin:UpdateMerchantItem(index)
 	item.link  = GetMerchantItemLink(index)
 	item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(index)
 
-	--item.tooltip = C_TooltipInfo.GetMerchantItem(index)
 	return item
 end
 
