@@ -14,6 +14,9 @@ local AddonName, Shared = ...
 -- From Locales/Locales.lua
 local L = Shared.Locale
 
+-- From SortFunctions.lua
+local Sort = Shared.Sort
+
 -- Push us into shared object
 local Metadata = {}
 Shared.Metadata = Metadata
@@ -23,7 +26,7 @@ Metadata.FriendlyName = "Merchant Plus"
 -- Compatibility for WoW 10.1.0
 local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
---
+-- This is a list of supported cell types
 Metadata.CellTypes = {
 	Item    = "MerchantPlusTableItemTemplate",
 	Price   = "MerchantPlusTablePriceTemplate",
@@ -51,6 +54,7 @@ Metadata.Columns = {
 		name = L["Price"],
 		celltype = Metadata.CellTypes.Price,
 		field = nil,
+		sortfunction = Sort.SortPrice,
 		required = true,
 		default = { order = 4, enabled = true, },
 		fixed = true,
