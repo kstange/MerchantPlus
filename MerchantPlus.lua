@@ -86,7 +86,7 @@ function Addon:SetTab(index)
 		if Addon.Trace then print("called: SetTab", index, MerchantFrame.lastTab) end
 		if index == 1 and Addon:GetOption("TabDefault") and Addon.SwitchOnOpen then
 			Addon.SwitchOnOpen = false
-			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID());
+			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID())
 		end
 
 		-- Update MerchantPlusFrame when its tab is selected
@@ -136,20 +136,8 @@ function Addon:UpdateFrame()
 		button:SetShown(not show)
 	end
 
-	-- Hide the filtering dropdown and clear the filter as we'll be doing something else
+	-- Hide the filtering dropdown as we'll be doing something else
 	MerchantFrameLootFilter:SetShown(not show)
-	if Addon.Trace then print("current filter:", GetMerchantFilter()) end
-	if show and changed then
-		-- Save and clear the filter on the merchant
-		Addon.MerchantFilter = GetMerchantFilter()
-		if Addon.Trace then print("saved filter:", Addon.MerchantFilter) end
-	elseif (normal or buyback) and Addon.MerchantFilter then
-		-- Restore the saved filter to the merchant
-		if Addon.Trace then print("restored filter:", Addon.MerchantFilter) end
-		SetMerchantFilter(Addon.MerchantFilter)
-		Addon.MerchantFilter = nil
-		MerchantFrame_Update()
-	end
 
 	-- Set up the frame for ourselves.  We blindly adjust frames we know that the official
 	-- blizzard code will fix when it transitions to another official tab.  We also need to undo
@@ -305,13 +293,14 @@ function Addon:HandleEvent(event, target)
 
 	if event == "MERCHANT_FILTER_ITEM_UPDATE" then
 		if Addon.Trace then print("called: MERCHANT_FILTER_ITEM_UPDATE") end
-		MerchantPlusItemList:RefreshScrollFrame()
+		--MerchantPlusItemList:RefreshScrollFrame()
 	end
 
 	if event == "MERCHANT_CLOSED" then
 		if Addon.Trace then print("called: MERCHANT_CLOSED") end
-		-- Clear the saved filter so it returns to default on reopen
-		Addon.MerchantFilter = nil
+		-- Hide the MerchantPlus frame so we don't call OnShow before
+		-- MerchantFrame sets itself up.
+		MerchantPlusFrame:Hide()
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then

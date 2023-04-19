@@ -21,6 +21,7 @@ MerchantPlusItemListMixin = {}
 
 -- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
 function MerchantPlusItemListMixin:OnLoad()
+	if Addon.Trace then print("called: OnLoad") end
 	self.NineSlice:ClearAllPoints()
 	self.NineSlice:SetPoint("TOPLEFT", self.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
@@ -28,14 +29,23 @@ end
 
 -- Before the widget is shown, set it up to show results
 function MerchantPlusItemListMixin:OnShow()
+	if Addon.Trace then print("called: OnShow") end
 	self:Init()
 	self:UpdateTableBuilderLayout()
 	self:RefreshScrollFrame()
 	self.ScrollBox:ScrollToBegin()
 end
 
+-- Before the widget is hidden, clean up stuff
+function MerchantPlusItemListMixin:OnHide()
+	if Addon.Trace then print("called: OnHide") end
+	ResetSetMerchantFilter()
+	MerchantFrame_Update()
+end
+
 -- On init, we will need to create various structures
 function MerchantPlusItemListMixin:Init()
+	if Addon.Trace then print("called: Init") end
 	if self.initialized then
 		return
 	end
@@ -80,16 +90,15 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		return
 	end
 
-	local MerchantItems = self:UpdateMerchant()
-	local count = #MerchantItems
+	local count = GetMerchantNumItems()
 	if count == 0 then
 		self.ResultsText:Show()
 		self.ResultsText:SetText(BROWSE_NO_RESULTS)
 		self.ScrollBox:ClearDataProvider()
 	else
 		self.ResultsText:Hide()
+		local MerchantItems = self:UpdateMerchant()
 		local dataProvider = CreateDataProvider(MerchantItems)
-		self.ScrollBox:ClearDataProvider()
 		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
 
 		self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
@@ -106,26 +115,30 @@ end
 
 -- Sync updated Merchant information
 function MerchantPlusItemListMixin:UpdateMerchant()
-	if Addon.Trace then print("called: UpdateMerchant") end
-
 	SetMerchantFilter(LE_LOOT_FILTER_ALL)
-	local MerchantItems = {}
 	local items = GetMerchantNumItems()
+	local MerchantItems = {}
+	if Addon.Trace then print("called: UpdateMerchant", items) end
 	for i = 1, items do
-		local item = {}
-		item.itemKey = { itemID = GetMerchantItemID(i) }
-		item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(i)
-		item.index = i
-
-		-- Metadata used to emulate data in ItemButtons
-		item.count = item.quantity
-		item.link  = GetMerchantItemLink(i)
-		item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(i)
-
-		item.tooltip = C_TooltipInfo.GetMerchantItem(i)
-		MerchantItems[i] = item
+		MerchantItems[i] = self:UpdateMerchantItem(i)
 	end
 	return MerchantItems
+end
+
+-- Fetch the data for a single item by Merchant index
+function MerchantPlusItemListMixin:UpdateMerchantItem(index)
+	local item = {}
+	item.itemKey = { itemID = GetMerchantItemID(index) }
+	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
+	item.index = index
+
+	-- Metadata used to emulate data in ItemButtons
+	item.count = item.quantity
+	item.link  = GetMerchantItemLink(index)
+	item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(index)
+
+	--item.tooltip = C_TooltipInfo.GetMerchantItem(index)
+	return item
 end
 
 -- This fuction will sort based on the request.
