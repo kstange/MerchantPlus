@@ -5,9 +5,9 @@
 ## Author: SimGuy
 ## SavedVariables: MerchantPlus
 
-## X-Curse-Project-ID: 
-## X-WoWI-ID: 
-## X-Wago-ID: 
+## X-Curse-Project-ID: 852491 
+## X-WoWI-ID: 26570 
+## X-Wago-ID: XKq99xKy
 
 Libs\Libs.xml
 Locales\Locales.xml
