@@ -172,10 +172,13 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 
 	for _, col in pairs(Metadata.Columns) do
 		if col.id == order and col.sortfunction then
+
+			-- Handle custom sort function if provided
 			local sort = col.sortfunction(nil, lhs, rhs)
 			if sort ~= nil then
 				result = sort
 			end
+
 		elseif col.id == order and col.field then
 			local key = col.field
 
