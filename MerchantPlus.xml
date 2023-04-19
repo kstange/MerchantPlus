@@ -232,7 +232,9 @@
 			</Layer>
 		</Layers>
 		<Scripts>
+			<OnLoad method="OnLoad" />
 			<OnClick method="OnClick" />
+			<OnDragStart method="OnClick" />
 			<OnEnter method="OnEnter" />
 			<OnLeave method="OnLeave" />
 			<OnHide method="OnHide" />

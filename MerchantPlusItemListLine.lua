@@ -19,6 +19,12 @@ local Addon = Shared.Addon
 
 MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
 
+-- Register mouse events we need for this
+function MerchantPlusItemListLineMixin:OnLoad()
+	self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	self:RegisterForDrag("LeftButton")
+end
+
 -- Upon entering a line, show the tooltip and highlight and update the cursor as appropriate
 function MerchantPlusItemListLineMixin:OnLineEnter()
 	local data = self:GetElementData()
@@ -50,33 +56,39 @@ function MerchantPlusItemListLineMixin:OnHide()
 	end
 end
 
--- Override GetID to return the Merchant index for MerchantFrame's benefit
-function MerchantPlusItemListLineMixin:GetID()
+-- Import data into a  Line to emulate an ItemButton so native MerchantFrame functions
+-- work on them.
+function MerchantPlusItemListLineMixin:AddButtonData()
 	local data = self:GetElementData()
-	return data.index
+
+	if Addon.Trace then print("called: UpdateButtonData", data.index) end
+
+	self:SetID(data.index)
+
+	self.price        = data.price > 0 and data.price or nil
+	self.extendedCost = data.extendedCost or nil
+	self.name         = data.name
+	self.link         = GetMerchantItemLink(data.index)
+	self.texture      = data.texture
+	self.count        = data.quantity
+	self.numInStock   = data.numAvailable
+	self.hasItem      = true
+
+	self.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(data.index)
+
 end
 
 -- This should handle all the work related to previewing or buying items.
 function MerchantPlusItemListLineMixin:OnClick(button)
 	local data = self:GetElementData()
 
-	-- TODO: I am not getting right clicks?
 	if Addon.Trace then print("clicked:", button) end
 
 	-- Allow us to just call built-in Merchant functions
 	local realtab = MerchantFrame.selectedTab
 	MerchantFrame.selectedTab = 1
 
-	-- This helps the MerchantFrame functions work
-	-- TODO: Automatically replicate the data into the line to make
-	--       this more reliable and use self in SplitStack() as well.
-	self.extendedCost = data.extendedCost
-	self.showNonrefundablePrompt = data.showNonrefundablePrompt
-	self.price = data.price
-	self.count = data.count
-	self.link = data.link
-	self.name = data.name
-	self.texture = data.texture
+	self:UpdateButtonData()
 
 	-- Call the OnModifiedClick function for MerchantItemButton
 	if IsModifiedClick() then
@@ -94,24 +106,14 @@ end
 function MerchantPlusItemListLineMixin:SplitStack(split)
 	local data = self:GetElementData()
 
-	if Addon.Trace then print("splitstack:", split) end
+	if Addon.Trace then print("called: SplitStack", split) end
 
-	-- This function helps MerchantFrame functions find the item index
-	data.GetID = function()
-		local data = self:GetElementData()
-		return data.index
-	end
+	self:UpdateButtonData()
 
 	if data.extendedCost or data.showNonrefundablePrompt then
-		MerchantFrame_ConfirmExtendedItemCost(data, split)
+		MerchantFrame_ConfirmExtendedItemCost(self, split)
 	elseif split > 0 then
 		BuyMerchantItem(data.index, split)
 	end
 end
 
--- This should happen if a user picks up an item from the vendor to drag it to their bags, which is
--- not a common action but supported by the default UI.
---function MerchantPlusItemListLineMixin:OnDragStart(button)
-	-- TODO: The user is trying to pick up an item and drag it somewhere
-	-- Can't seem to get this to fire at all
---end

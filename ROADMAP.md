@@ -4,10 +4,8 @@ This is a list of features in roughly the order they are intended to be implemen
 
 ## Initial release
 
-* Purchasing and click handling
 * Move TableBuilderLayout to Metadata table and builder function into ItemList
 * Generalize sort and move some bits into Metadata
-* Generalize ItemListLine value copies
 
 ## First feature releases (iterative)
 

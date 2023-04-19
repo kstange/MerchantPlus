@@ -131,12 +131,6 @@ function MerchantPlusItemListMixin:UpdateMerchantItem(index)
 	item.itemKey = { itemID = GetMerchantItemID(index) }
 	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
 	item.index = index
-
-	-- Metadata used to emulate data in ItemButtons
-	item.count = item.quantity
-	item.link  = GetMerchantItemLink(index)
-	item.showNonrefundablePrompt = not C_MerchantFrame.IsMerchantItemRefundable(index)
-
 	return item
 end
 
