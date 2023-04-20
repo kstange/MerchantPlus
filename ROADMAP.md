@@ -10,7 +10,8 @@ This is a list of features in roughly the order they are intended to be implemen
   * Item quality (epic, etc)
   * Item type (armor, pattern, pet, mount, cosmetic, reagent)
   * Item status (BoP, etc)
-  * Item characteristics (profession, skill, armor type, item level)?
+  * Item characteristics (profession, skill, armor type, item level)
+  * Item collection status (known, pet dup limit, appearance)
 * Options to choose which columns are shown
 
 ## Filtering
