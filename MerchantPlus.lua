@@ -98,7 +98,6 @@ function Addon:UpdateFrame()
 	if not MerchantFrame:IsShown() then
 		return
 	end
-	if Addon.Trace then print("called: UpdateFrame") end
 
 	local plustab = MerchantFrameTabPlus:GetID()                        -- Our tab ID
 	local show    = MerchantFrame.selectedTab == plustab                -- Our tab is requested
@@ -106,6 +105,8 @@ function Addon:UpdateFrame()
 	local buyback = MerchantFrame.selectedTab == 2                      -- Buyback tab is active
 	local normal  = MerchantFrame.selectedTab == 1                      -- Normal Merchant tab is active
 	local width   = show and 800 or Addon.InitialWidth or 336           -- Fallback to known good width
+
+	if Addon.Trace then print("called: UpdateFrame; show", show, "changed", changed) end
 
 	-- We do this here because Blizzard won't if our tab is selected
 	if show and changed then
