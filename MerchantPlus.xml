@@ -219,7 +219,7 @@
 			</Layer>
 		</Layers>
 	</Frame>
-	<Button name="MerchantPlusItemListLineTemplate" mixin="MerchantPlusItemListLineMixin" virtual="true">
+	<Button name="MerchantPlusItemListLineTemplate" mixin="MerchantPlusItemListLineMixin" registerForClicks="LeftButtonUp, RightButtonUp" registerForDrag="LeftButton" virtual="true">
 		<Size x="0" y="20" />
 		<Anchors>
 			<Anchor point="LEFT" />
@@ -233,7 +233,6 @@
 			</Layer>
 		</Layers>
 		<Scripts>
-			<OnLoad method="OnLoad" />
 			<OnClick method="OnClick" />
 			<OnDragStart method="OnClick" />
 			<OnEnter method="OnEnter" />

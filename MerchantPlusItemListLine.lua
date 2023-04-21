@@ -19,12 +19,6 @@ local Addon = Shared.Addon
 
 MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
 
--- Register mouse events we need for this
-function MerchantPlusItemListLineMixin:OnLoad()
-	self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	self:RegisterForDrag("LeftButton")
-end
-
 -- Upon entering a line, show the tooltip and highlight and update the cursor as appropriate
 function MerchantPlusItemListLineMixin:OnLineEnter()
 	local data = self:GetElementData()
