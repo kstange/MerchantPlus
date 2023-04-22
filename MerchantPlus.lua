@@ -25,10 +25,38 @@ local Callbacks = Metadata.OptionCallbacks
 local Addon = {}
 Shared.Addon = Addon
 
-Addon.InitialWidth = nil
-Addon.MerchantFilter = nil
-Addon.SwitchOnOpen = false
 Addon.Trace = false
+
+local InitialWidth = nil
+local SwitchOnOpen = false
+local BuybackDirty = false
+
+MerchantPlusFrameMixin = {}
+
+-- Re-anchor the Buyback and Currency elements to things that won't move around
+function MerchantPlusFrameMixin:OnLoad()
+	MerchantBuyBackItem:ClearAllPoints()
+	MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+	MerchantExtraCurrencyInset:ClearAllPoints()
+	MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
+	MerchantExtraCurrencyInset:SetSize(166, 23)
+	MerchantExtraCurrencyBg:ClearAllPoints()
+	MerchantExtraCurrencyBg:SetPoint("RIGHT", MerchantMoneyBg, "LEFT", -4, 0)
+	MerchantExtraCurrencyBg:SetSize(159, 19)
+end
+
+MerchantPlusTabMixin = {}
+
+-- Set up the Merchant Plus Tab
+function MerchantPlusTabMixin:OnLoad()
+	PanelTemplates_SetNumTabs(MerchantPlusTabFrame, #MerchantPlusTabFrame.Tabs)
+	PanelTemplates_SetTab(MerchantPlusTabFrame, 0)
+end
+
+-- Handle the click on the tab
+function MerchantPlusTabMixin:OnClick()
+	PanelTemplates_SetTab(MerchantPlusTabFrame, self:GetID())
+end
 
 -- Get an option for the AceConfigDialog
 function Addon:GetOption(key)
@@ -76,17 +104,49 @@ end
 function Addon:SetTab(index)
 	-- We only want to act on MerchantFrame
 	if self == MerchantFrame then
-		if Addon.Trace then print("called: SetTab", index, MerchantFrame.lastTab) end
-		if index == 1 and Addon:GetOption("TabDefault") and Addon.SwitchOnOpen then
-			Addon.SwitchOnOpen = false
-			PanelTemplates_SetTab(MerchantFrame, MerchantFrameTabPlus:GetID())
+		if Addon.Trace then print("called: SetTab MerchantFrame", index) end
+
+		-- Reset the filter back to Blizzard's default
+		ResetSetMerchantFilter()
+		MerchantFrame_UpdateFilterString()
+
+		-- If on tab 1 and Merchant Plus is requested, immediately switch
+		if index == 1 and SwitchOnOpen then
+			SwitchOnOpen = false
+			PanelTemplates_SetTab(MerchantPlusTabFrame, 1)
+
+		-- Otherwise deselect our tab
+		else
+			if  PanelTemplates_GetSelectedTab(MerchantPlusTabFrame) == 1 then
+				PanelTemplates_SetTab(MerchantPlusTabFrame, 0)
+			end
 		end
 
+	elseif self == MerchantPlusTabFrame then
+		if Addon.Trace then print("called: SetTab MerchantPlusTabFrame", index) end
+
 		-- Update MerchantPlusFrame when its tab is selected
-		if index == MerchantFrameTabPlus:GetID() then
-			if  index ~= MerchantFrame.lastTab then
-				Addon:UpdateFrame()
+		if index == 1 then
+
+			-- We're on the Buyback tab, but we need the merchant to be on
+			-- tab 1 so that the native click handlers work properly
+			if PanelTemplates_GetSelectedTab(MerchantFrame) == 2 then
+				SwitchOnOpen = true
+
+				-- This taints MerchantFrame.selectedTab, but there's no
+				-- other way to force the Frame to think it's on the
+				-- Merchant tab if transitioning from the Buyback tab.
+				--
+				-- The taint clears itself if the user transitions to
+				-- the Merchant tab manually at any time.	
+				PanelTemplates_SetTab(MerchantFrame, 1)
 			end
+
+			-- Deselect the Merchant tab, since we should always be
+			-- transitioning from it, but we don't want to change the
+			-- internal value ot selectedTab.
+			PanelTemplates_DeselectTab(MerchantFrameTab1)
+			Addon:UpdateFrame()
 		end
 	end
 end
@@ -99,41 +159,30 @@ function Addon:UpdateFrame()
 		return
 	end
 
-	local plustab = MerchantFrameTabPlus:GetID()                        -- Our tab ID
-	local show    = MerchantFrame.selectedTab == plustab                -- Our tab is requested
-	local changed = MerchantFrame.lastTab ~= MerchantFrame.selectedTab  -- The tab was switched
-	local buyback = MerchantFrame.selectedTab == 2                      -- Buyback tab is active
-	local normal  = MerchantFrame.selectedTab == 1                      -- Normal Merchant tab is active
-	local width   = show and 800 or Addon.InitialWidth or 336           -- Fallback to known good width
+	-- Check if our tab is selected
+	local show = PanelTemplates_GetSelectedTab(MerchantPlusTabFrame) == 1
 
-	if Addon.Trace then print("called: UpdateFrame; show", show, "changed", changed) end
+	-- Check if we are on the Buyback tab
+	local buyback = PanelTemplates_GetSelectedTab(MerchantFrame) == 2 
 
-	-- We do this here because Blizzard won't if our tab is selected
-	if show and changed then
-		MerchantFrame_CloseStackSplitFrame()
-		MerchantFrame.lastTab = MerchantFrame.selectedTab
-	end
+	-- We should have saved the width, but if not use 336 which has been standard for a while
+	local width = show and 800 or InitialWidth or 336
 
-	-- Set the width of the frame wider or back to the default depending on the tab
-	-- we're switching to
+	if Addon.Trace then print("called: UpdateFrame; show", show) end
+
+	-- Set the width of the frame wider or back to the default
 	MerchantFrame:SetWidth(width)
 
-	-- If we're transitioning to another tab, show the correct number of items
-	-- Otherwise, hide all of them because we're doing something different
-	for i = 1, buyback and BUYBACK_ITEMS_PER_PAGE
-	            or normal and MERCHANT_ITEMS_PER_PAGE
-	            or max(MERCHANT_ITEMS_PER_PAGE, BUYBACK_ITEMS_PER_PAGE) do
+	-- Hide or show MerchantItem buttons
+	for i = 1, BUYBACK_ITEMS_PER_PAGE do
 		local button = _G["MerchantItem"..i]
-		button:SetShown(not show)
+		button:SetShown(not show and (i <= MERCHANT_ITEMS_PER_PAGE or buyback))
 	end
 
-	-- Hide the filtering dropdown as we'll be doing something else
+	-- Hide or show the filtering dropdown
 	MerchantFrameLootFilter:SetShown(not show)
 
-	-- Set up the frame for ourselves.  We blindly adjust frames we know that the official
-	-- blizzard code will fix when it transitions to another official tab.  We also need to undo
-	-- anything weird that Blizzard might do because sometimes it assumes our tab is the buyback
-	-- tab.
+	-- Set up the frame if our tab is selected
 	if show then
 		-- Set the portrait and name of the frame
 		MerchantFrame:SetTitle(UnitName("npc"))
@@ -150,55 +199,74 @@ function Addon:UpdateFrame()
 		-- Update the state of repair buttons
 		MerchantFrame_UpdateRepairButtons()
 
-		-- Re-anchor the Buyback and Currency elements to things that won't move around
-		MerchantBuyBackItem:ClearAllPoints()
-		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+		-- Show the Buyback button
 		MerchantBuyBackItem:Show()
-		MerchantExtraCurrencyInset:ClearAllPoints()
-		MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
-		MerchantExtraCurrencyInset:SetSize(166, 23)
-		MerchantExtraCurrencyBg:ClearAllPoints()
-		MerchantExtraCurrencyBg:SetPoint("RIGHT", MerchantMoneyBg, "LEFT", -4, 0)
-		MerchantExtraCurrencyBg:SetSize(159, 19)
 
-		-- Update the state of the buyback button
-		Addon:UpdateBuyback()
+		-- Update the Buyback button if something happened while we weren't looking
+		if BuybackDirty then
+			Addon:UpdateBuyback()
+		end
 
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
 		MerchantFrameBottomRightBorder:Show()
 	end
 
-	-- We show our own frame now that everything is done
+	-- Show or hide our own frame now that everything is set up
 	MerchantPlusFrame:SetShown(show)
 end
 
--- Blizzard doesn't put this functionality in a separate function so we have to
--- duplicate it here.
-function Addon:UpdateBuyback()
-	local numBuybackItems = GetNumBuybackItems();
-	local buybackName, buybackTexture, buybackPrice, buybackQuantity, buybackNumAvailable, buybackIsUsable, buybackIsBound = GetBuybackItemInfo(numBuybackItems);
-	if ( buybackName ) then
-		MerchantBuyBackItemName:SetText(buybackName);
-		SetItemButtonCount(MerchantBuyBackItemItemButton, buybackQuantity);
-		SetItemButtonStock(MerchantBuyBackItemItemButton, buybackNumAvailable);
-		SetItemButtonTexture(MerchantBuyBackItemItemButton, buybackTexture);
-		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, GetBuybackItemLink(numBuybackItems), buybackIsBound);
-		MerchantBuyBackItemMoneyFrame:Show();
-		MoneyFrame_Update("MerchantBuyBackItemMoneyFrame", buybackPrice);
-		MerchantBuyBackItem:Show();
+-- If a buyback happens when we are on the buyback tab, flag that we need to update it next
+-- time UpdateFrame() is called.
+function Addon:HandleBuyback()
+	local buybackTab = PanelTemplates_GetSelectedTab(MerchantFrame) == 2
+	if Addon.Trace then print("called: HandleBuyback", buybackTab) end
+	if buybackTab then
+		BuybackDirty = true
+	end
+end
 
+-- Blizzard doesn't put this functionality in a separate function so we have to duplicate it here.
+-- MerchantFrame_Update() would take care of this when the inventory changes, but only when it
+-- thinks the Merchant tab is active, meaning if you buy back from the Buyback tab it will not
+-- update.
+--
+-- This taints the ItemButton and elements, but we will attempt to clear taint when the window
+-- closes in hopes that it doesn't spread.
+--
+-- To minimize how often this gets called, we will only call it if a buyback happens while on
+-- the buyback tab.
+function Addon:UpdateBuyback()
+	local count = GetNumBuybackItems()
+	local name, texture, price, quantity, numAvailable, _, isBound = GetBuybackItemInfo(count)
+
+	if Addon.Trace then print("called: UpdateBuyback", name) end
+
+	if not BuybackDirty then
+		return
+	end
+
+	if ( name ) then
+		MerchantBuyBackItemName:SetText(name)
+		SetItemButtonCount(MerchantBuyBackItemItemButton, quantity)
+		SetItemButtonTexture(MerchantBuyBackItemItemButton, texture)
+		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, GetBuybackItemLink(count), isBound)
+		MerchantBuyBackItemMoneyFrame:Show()
+		MoneyFrame_Update("MerchantBuyBackItemMoneyFrame", price)
 	else
-		MerchantBuyBackItemName:SetText("");
-		MerchantBuyBackItemMoneyFrame:Hide();
-		SetItemButtonTexture(MerchantBuyBackItemItemButton, "");
-		SetItemButtonCount(MerchantBuyBackItemItemButton, 0);
-		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, nil);
+		MerchantBuyBackItemName:SetText("")
+		SetItemButtonCount(MerchantBuyBackItemItemButton, nil)
+		SetItemButtonTexture(MerchantBuyBackItemItemButton, nil)
+		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, nil)
+		MerchantBuyBackItemMoneyFrame:Hide()
+		MoneyFrame_Update("MerchantBuyBackItemMoneyFrame", 0)
 		-- Hide the tooltip upon sale
-		if ( GameTooltip:IsOwned(MerchantBuyBackItemItemButton) ) then
-			GameTooltip:Hide();
+		if GameTooltip:IsOwned(MerchantBuyBackItemItemButton) then
+			GameTooltip:Hide()
 		end
 	end
+
+	BuybackDirty = false
 end
 
 function Addon:SetTableLayout()
@@ -240,14 +308,14 @@ function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" then
 		if Addon.Trace then print("called: MERCHANT_SHOW") end
 		-- Store the width of the frame when it first opened so we can restore it
-		if not Addon.InitialWidth then
-			Addon.InitialWidth = MerchantFrame:GetWidth()
+		if not InitialWidth then
+			InitialWidth = MerchantFrame:GetWidth()
 		end
 
 		-- If the user wants our tab to show by default, flag that for
 		-- the next tab switch event
 		if Addon:GetOption("TabDefault") then
-			Addon.SwitchOnOpen = true
+			SwitchOnOpen = true
 		end
 
 		-- Restore the saved sort when opening the vendor if configured
@@ -276,6 +344,13 @@ function Addon:HandleEvent(event, target)
 		-- Hide the MerchantPlus frame so we don't call OnShow before
 		-- MerchantFrame sets itself up.
 		MerchantPlusFrame:Hide()
+		PanelTemplates_SetTab(MerchantPlusTabFrame, 0)
+		-- Close any confirmation dialogs if we are closed
+		StaticPopup_Hide("CONFIRM_PURCHASE_NONREFUNDABLE_ITEM")
+		StaticPopup_Hide("CONFIRM_PURCHASE_TOKEN_ITEM")
+		StaticPopup_Hide("CONFIRM_HIGH_COST_ITEM")
+		StaticPopup_Hide("CONFIRM_PURCHASE_ITEM_DELAYED")
+		Addon:ClearMerchantTaint()
 	end
 
 	-- If player's inventory changed, the items available on the vendor might change
@@ -303,10 +378,40 @@ function Addon:HandleEvent(event, target)
 	end
 end
 
+-- Calling native functions may taint variables in secure frames, but we
+-- can nil them to hopefully ensure the taint doesn't propagate.
+function Addon:ClearTaint(n)
+	local t = _G[n]
+	if Addon.Trace then print("called: ClearTaint", n) end
+	for k, v in pairs(t) do
+		local secure, addon = issecurevariable(t, k)
+		if secure == false and addon == AddonName then
+			t[k] = nil
+			local fixed = issecurevariable(t, k)
+			if Addon.Trace then print("tainted:", n, addon, k, "| cleared:", fixed) end
+		end
+	end
+end
+
+-- Provide a function to hook for MerchantFrame actions
+function Addon:ClearMerchantTaint()
+	Addon:ClearTaint("MerchantFrame")
+	Addon:ClearTaint("MerchantBuyBackItem")
+	Addon:ClearTaint("MerchantBuyBackItemItemButton")
+	Addon:ClearTaint("MerchantBuyBackItemMoneyFrame")
+end
+
 -- These are init steps specific to this addon
 function Addon:Init()
 	hooksecurefunc("PanelTemplates_SetTab", Addon.SetTab)
 	hooksecurefunc("MerchantFrame_Update", Addon.UpdateFrame)
+
+	-- Buyback while on the Buyback tab
+	hooksecurefunc("BuybackItem", Addon.HandleBuyback)
+
+	-- Attempt to clear tainted table data from the MerchantFrame
+	-- after buying something
+	hooksecurefunc("BuyMerchantItem", Addon.ClearMerchantTaint)
 
 	Addon.Events = CreateFrame("Frame")
 	Addon.Events:RegisterEvent("ADDON_LOADED")

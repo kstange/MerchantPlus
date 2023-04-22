@@ -43,7 +43,6 @@ end
 function MerchantPlusItemListMixin:OnHide()
 	if Addon.Trace then print("called: OnHide") end
 	ResetSetMerchantFilter()
-	MerchantFrame_Update()
 end
 
 -- On init, we will need to create various structures

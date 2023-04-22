@@ -76,10 +76,6 @@ end
 function MerchantPlusItemListLineMixin:OnClick(button)
 	if Addon.Trace then print("clicked:", button) end
 
-	-- Allow us to just call built-in Merchant functions
-	local realtab = MerchantFrame.selectedTab
-	MerchantFrame.selectedTab = 1
-
 	self:UpdateButtonData()
 
 	-- Call the OnModifiedClick function for MerchantItemButton
@@ -90,7 +86,6 @@ function MerchantPlusItemListLineMixin:OnClick(button)
 	else
 		MerchantItemButton_OnClick(self, button)
 	end
-	MerchantFrame.selectedTab = realtab
 end
 
 -- This function is called by SplitStackFrame when submitting to
@@ -108,4 +103,3 @@ function MerchantPlusItemListLineMixin:SplitStack(split)
 		BuyMerchantItem(data.index, split)
 	end
 end
-
