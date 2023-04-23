@@ -14,9 +14,6 @@ local ACD = LibStub("AceConfigDialog-3.0")
 
 local AddonName, Shared = ...
 
--- From Locales/Locales.lua
-local L = Shared.Locale
-
 -- From Metadata.lua
 local Metadata = Shared.Metadata
 local Callbacks = Metadata.OptionCallbacks
@@ -25,7 +22,13 @@ local Callbacks = Metadata.OptionCallbacks
 local Addon = {}
 Shared.Addon = Addon
 
-Addon.Trace = false
+-- Push a debugging function into the shared object
+local function trace(...)
+	if Addon:GetOption("Trace") and ... then
+		print(...)
+	end
+end
+Shared.Trace = trace
 
 local InitialWidth = nil
 local SwitchOnOpen = false
@@ -77,7 +80,6 @@ function Addon:GetOption(key)
 		value = Metadata.Defaults[key]
 	end
 
-	--print("GetOption", key, value)
 	return value
 end
 
@@ -89,12 +91,10 @@ function Addon:SetOption(...)
 	local value = ...
 	local settings = _G[AddonName]
 
-	--print("SetOption", key, value)
 	if settings and settings[key] ~= value then
 		settings[key] = value
 	end
 	if Metadata.OptionCallbacks and Metadata.OptionCallbacks[key] then
-		--print("OptionCallback", key)
 		local func = Metadata.OptionCallbacks[key]
 		func(key, value)
 	end
@@ -104,7 +104,7 @@ end
 function Addon:SetTab(index)
 	-- We only want to act on MerchantFrame
 	if self == MerchantFrame then
-		if Addon.Trace then print("called: SetTab MerchantFrame", index) end
+		trace("called: SetTab MerchantFrame", index)
 
 		-- Reset the filter back to Blizzard's default
 		ResetSetMerchantFilter()
@@ -123,7 +123,7 @@ function Addon:SetTab(index)
 		end
 
 	elseif self == MerchantPlusTabFrame then
-		if Addon.Trace then print("called: SetTab MerchantPlusTabFrame", index) end
+		trace("called: SetTab MerchantPlusTabFrame", index)
 
 		-- Update MerchantPlusFrame when its tab is selected
 		if index == 1 then
@@ -168,7 +168,7 @@ function Addon:UpdateFrame()
 	-- We should have saved the width, but if not use 336 which has been standard for a while
 	local width = show and 800 or InitialWidth or 336
 
-	if Addon.Trace then print("called: UpdateFrame; show", show) end
+	trace("called: UpdateFrame; show", show)
 
 	-- Set the width of the frame wider or back to the default
 	MerchantFrame:SetWidth(width)
@@ -220,7 +220,7 @@ end
 -- time UpdateFrame() is called.
 function Addon:HandleBuyback()
 	local buybackTab = PanelTemplates_GetSelectedTab(MerchantFrame) == 2
-	if Addon.Trace then print("called: HandleBuyback", buybackTab) end
+	trace("called: HandleBuyback", buybackTab)
 	if buybackTab then
 		BuybackDirty = true
 	end
@@ -240,7 +240,7 @@ function Addon:UpdateBuyback()
 	local count = GetNumBuybackItems()
 	local name, texture, price, quantity, numAvailable, _, isBound = GetBuybackItemInfo(count)
 
-	if Addon.Trace then print("called: UpdateBuyback", name) end
+	trace("called: UpdateBuyback", name)
 
 	if not BuybackDirty then
 		return
@@ -270,7 +270,7 @@ function Addon:UpdateBuyback()
 end
 
 function Addon:SetTableLayout()
-	if Addon.Trace then print("called: SetTableLayout") end
+	trace("called: SetTableLayout")
 	local order = {}
 	for key, col in pairs(Metadata.Columns) do
 		if col.default.enabled and not order[col.default.order] then
@@ -284,7 +284,7 @@ function Addon:SetTableLayout()
 end
 
 function Addon:Options_Sort_Update()
-	if Addon.Trace then print("called: Options_Sort_Update") end
+	trace("called: Options_Sort_Update")
 	local settings = _G[AddonName]
 	local save = Addon:GetOption('SortRemember')
 	local key = "SortOrder"
@@ -306,7 +306,7 @@ end
 -- Handle any events that are needed
 function Addon:HandleEvent(event, target)
 	if event == "MERCHANT_SHOW" then
-		if Addon.Trace then print("called: MERCHANT_SHOW") end
+		trace("called: MERCHANT_SHOW")
 		-- Store the width of the frame when it first opened so we can restore it
 		if not InitialWidth then
 			InitialWidth = MerchantFrame:GetWidth()
@@ -329,18 +329,18 @@ function Addon:HandleEvent(event, target)
 
 	-- This generally means the merchant's contents changed
 	if event == "MERCHANT_UPDATE" then
-		if Addon.Trace then print("called: MERCHANT_UPDATE") end
+		trace("called: MERCHANT_UPDATE")
 		MerchantPlusItemList:RefreshScrollFrame()
 	end
 
 	-- I haven't yet found a case where we need to do anything as this is
 	-- usually followed by MERCHANT_UPDATE
 	if event == "MERCHANT_FILTER_ITEM_UPDATE" then
-		if Addon.Trace then print("called: MERCHANT_FILTER_ITEM_UPDATE") end
+		trace("called: MERCHANT_FILTER_ITEM_UPDATE")
 	end
 
 	if event == "MERCHANT_CLOSED" then
-		if Addon.Trace then print("called: MERCHANT_CLOSED") end
+		trace("called: MERCHANT_CLOSED")
 		-- Hide the MerchantPlus frame so we don't call OnShow before
 		-- MerchantFrame sets itself up.
 		MerchantPlusFrame:Hide()
@@ -355,15 +355,15 @@ function Addon:HandleEvent(event, target)
 
 	-- If player's inventory changed, the items available on the vendor might change
 	if event == "UNIT_INVENTORY_CHANGED" then
-		if Addon.Trace then print("called: UNIT_INVENTORY_CHANGED") end
+		trace("called: UNIT_INVENTORY_CHANGED")
 		MerchantPlusItemList:RefreshScrollFrame()
 	end
 
 	if event == "ADDON_LOADED" and target == AddonName then
-		if Addon.Trace then print("called: ADDON_LOADED") end
 		if not  _G[AddonName] then
 			_G[AddonName] = {}
 		end
+		trace("called: ADDON_LOADED")
 		-- Don't register options unless they're defined.
 		if Metadata.Options then
 			Metadata.Options.get = Addon.GetOption
@@ -371,8 +371,6 @@ function Addon:HandleEvent(event, target)
 			ACR:RegisterOptionsTable(AddonName, Metadata.Options)
 			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
 		end
-		Addon.Trace = Addon:GetOption("Trace")
-
 		MerchantPlusItemList.layoutCallback = Addon.SetTableLayout
 		MerchantPlusItemList.sortCallback   = Addon.Options_Sort_Update
 	end
@@ -382,13 +380,13 @@ end
 -- can nil them to hopefully ensure the taint doesn't propagate.
 function Addon:ClearTaint(n)
 	local t = _G[n]
-	if Addon.Trace then print("called: ClearTaint", n) end
+	trace("called: ClearTaint", n)
 	for k, v in pairs(t) do
 		local secure, addon = issecurevariable(t, k)
 		if secure == false and addon == AddonName then
 			t[k] = nil
 			local fixed = issecurevariable(t, k)
-			if Addon.Trace then print("tainted:", n, addon, k, "| cleared:", fixed) end
+			trace("tainted:", n, addon, k, "| cleared:", fixed)
 		end
 	end
 end

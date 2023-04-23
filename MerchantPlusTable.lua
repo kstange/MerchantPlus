@@ -11,11 +11,8 @@
 
 local AddonName, Shared = ...
 
--- From Locales/Locales.lua
-local L = Shared.Locale
-
--- From MerchantPlus.lua
-local Addon = Shared.Addon
+-- Import a shared trace function if one exists
+local trace = Shared.Trace or function() end
 
 -- This defines a header that can be clicked to sort itself
 MerchantPlusTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin)

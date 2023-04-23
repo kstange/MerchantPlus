@@ -11,11 +11,8 @@
 
 local AddonName, Shared = ...
 
--- From Locales/Locales.lua
-local L = Shared.Locale
-
--- From MerchantPlus.lua
-local Addon = Shared.Addon
+-- Import a shared trace function if one exists
+local trace = Shared.Trace or function() end
 
 -- From Metadata.lua
 local Metadata = Shared.Metadata
@@ -24,7 +21,7 @@ MerchantPlusItemListMixin = {}
 
 -- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
 function MerchantPlusItemListMixin:OnLoad()
-	if Addon.Trace then print("called: OnLoad") end
+	trace("called: OnLoad")
 	self.NineSlice:ClearAllPoints()
 	self.NineSlice:SetPoint("TOPLEFT", self.HeaderContainer, "BOTTOMLEFT")
 	self.NineSlice:SetPoint("BOTTOMRIGHT")
@@ -32,7 +29,7 @@ end
 
 -- Before the widget is shown, set it up to show results
 function MerchantPlusItemListMixin:OnShow()
-	if Addon.Trace then print("called: OnShow") end
+	trace("called: OnShow")
 	self:Init()
 	self:UpdateTableBuilderLayout()
 	self:RefreshScrollFrame()
@@ -41,13 +38,13 @@ end
 
 -- Before the widget is hidden, clean up stuff
 function MerchantPlusItemListMixin:OnHide()
-	if Addon.Trace then print("called: OnHide") end
+	trace("called: OnHide")
 	ResetSetMerchantFilter()
 end
 
 -- On init, we will need to create various structures
 function MerchantPlusItemListMixin:Init()
-	if Addon.Trace then print("called: Init") end
+	trace("called: Init")
 	if self.initialized then
 		return
 	end
@@ -75,7 +72,7 @@ end
 
 -- Update the layout of the table.
 function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
-	if Addon.Trace then print("called: UpdateTableBuilderLayout") end
+	trace("called: UpdateTableBuilderLayout")
 
 	self.tableBuilder:Reset()
 	if self.layoutCallback then
@@ -102,7 +99,7 @@ end
 
 -- Update the contents of the table.
 function MerchantPlusItemListMixin:RefreshScrollFrame()
-	if Addon.Trace then print("called: RefreshScrollFrame") end
+	trace("called: RefreshScrollFrame")
 
 	if not self.initialized or not self:IsShown() then
 		return
@@ -136,7 +133,7 @@ end
 function MerchantPlusItemListMixin:UpdateMerchant()
 	local items = GetMerchantNumItems()
 	local MerchantItems = {}
-	if Addon.Trace then print("called: UpdateMerchant", items) end
+	trace("called: UpdateMerchant", items)
 	for i = 1, items do
 		MerchantItems[i] = self:UpdateMerchantItem(i)
 	end
@@ -219,7 +216,7 @@ end
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
 function MerchantPlusItemListMixin:SetSortOrder(index, state)
-	if Addon.Trace then print("called: SetSortOrder") end
+	trace("called: SetSortOrder")
 
 	if self.sortOrder == index and index ~= 0 and state == nil then
 		if self.sortOrderState == 1 then

@@ -11,11 +11,8 @@
 
 local AddonName, Shared = ...
 
--- From Locales/Locales.lua
-local L = Shared.Locale
-
--- From MerchantPlus.lua
-local Addon = Shared.Addon
+-- Import a shared trace function if one exists
+local trace = Shared.Trace or function() end
 
 MerchantPlusItemListLineMixin = CreateFromMixins(TemplatedListElementMixin, TableBuilderRowMixin)
 
@@ -55,7 +52,7 @@ end
 function MerchantPlusItemListLineMixin:UpdateButtonData()
 	local data = self:GetElementData()
 
-	if Addon.Trace then print("called: UpdateButtonData", data.index) end
+	trace("called: UpdateButtonData", data.index)
 
 	self:SetID(data.index)
 
@@ -74,7 +71,7 @@ end
 
 -- This should handle all the work related to previewing or buying items.
 function MerchantPlusItemListLineMixin:OnClick(button)
-	if Addon.Trace then print("clicked:", button) end
+	trace("clicked:", button)
 
 	self:UpdateButtonData()
 
@@ -93,7 +90,7 @@ end
 function MerchantPlusItemListLineMixin:SplitStack(split)
 	local data = self:GetElementData()
 
-	if Addon.Trace then print("called: SplitStack", split) end
+	trace("called: SplitStack", split)
 
 	self:UpdateButtonData()
 
