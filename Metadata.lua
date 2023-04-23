@@ -99,6 +99,26 @@ Metadata.Columns = {
 		width = 70,
 		padding = { 0, 0 },
 	},
+	index = {
+		name = L["Index"],
+		celltype = Metadata.CellTypes.Number,
+		field = "index",
+		required = false,
+		default = { enabled = false, },
+		fixed = true,
+		width = 52,
+		padding = { 0, 8 },
+	},
+	id = {
+		name = L["Item ID"],
+		celltype = Metadata.CellTypes.Number,
+		field = "itemID",
+		required = false,
+		default = { enabled = false, },
+		fixed = true,
+		width = 60,
+		padding = { 0, 8 },
+	},
 }
 
 -- A table indicating the defaults for Options by key.
