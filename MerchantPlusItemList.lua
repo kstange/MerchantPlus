@@ -218,7 +218,7 @@ end
 function MerchantPlusItemListMixin:SetSortOrder(key, state)
 	trace("called: SetSortOrder")
 
-	if self.sortOrder == key and key ~= nil and state == nil then
+	if self.sortOrder == key and key ~= "" and state == nil then
 		if self.sortOrderState == 1 then
 			self.sortOrderState = 0
 		else
