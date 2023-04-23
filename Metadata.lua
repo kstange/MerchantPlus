@@ -39,7 +39,6 @@ Metadata.CellTypes = {
 -- This table defines the columns for the TableBuilder to use
 Metadata.Columns = {
 	item = {
-		id = 1,
 		name = L["Item"],
 		celltype = Metadata.CellTypes.Item,
 		field = "name",
@@ -50,7 +49,6 @@ Metadata.Columns = {
 		padding = { 4, 0 },
 	},
 	price = {
-		id = 2,
 		name = L["Price"],
 		celltype = Metadata.CellTypes.Price,
 		field = nil,
@@ -62,7 +60,6 @@ Metadata.Columns = {
 		padding = { 0, 14 },
 	},
 	quantity = {
-		id = 3,
 		name = L["Stack"],
 		celltype = Metadata.CellTypes.Number,
 		field = "quantity",
@@ -73,7 +70,6 @@ Metadata.Columns = {
 		padding = { 0, 8 },
 	},
 	supply = {
-		id = 4,
 		name = L["Supply"],
 		celltype = Metadata.CellTypes.Number,
 		field = "numAvailable",
@@ -84,7 +80,6 @@ Metadata.Columns = {
 		padding = { 0, 8 },
 	},
 	usable = {
-		id = 5,
 		name = L["Usable"],
 		celltype = Metadata.CellTypes.Boolean,
 		field = "isUsable",
@@ -95,7 +90,6 @@ Metadata.Columns = {
 		padding = { 0, 0 },
 	},
 	purchasable = {
-		id = 6,
 		name = L["Available"],
 		celltype = Metadata.CellTypes.Boolean,
 		field = "isPurchasable",

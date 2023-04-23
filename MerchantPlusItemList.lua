@@ -83,10 +83,10 @@ function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
 end
 
 -- Add a column to the TableBuilder
-function MerchantPlusItemListMixin:AddColumn(title, celltype, index, fixed, width, left, right, ...)
+function MerchantPlusItemListMixin:AddColumn(key, title, celltype, fixed, width, left, right, ...)
 	local tableBuilder = self.tableBuilder
 	local column = tableBuilder:AddColumn()
-	column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", title, index)
+	column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", key, title)
 	column:ConstructCells("FRAME", celltype, ...)
 	if fixed then
 		column:SetFixedConstraints(width, 0)
@@ -164,8 +164,8 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 	-- randomly.
 	local result = lhs['index'] < rhs['index']
 
-	for _, col in pairs(Metadata.Columns) do
-		if col.id == order and col.sortfunction then
+	for ckey, col in pairs(Metadata.Columns) do
+		if ckey == order and col.sortfunction then
 
 			-- Handle custom sort function if provided
 			local sort = col.sortfunction(nil, lhs, rhs)
@@ -173,7 +173,7 @@ function MerchantPlusItemListMixin:Sort(lhs, rhs)
 				result = sort
 			end
 
-		elseif col.id == order and col.field then
+		elseif ckey == order and col.field then
 			local key = col.field
 
 			-- Handle item sort (by name only)
@@ -215,17 +215,17 @@ end
 
 -- Set the sort to the header that was selected, or if it's already selected,
 -- reverse it
-function MerchantPlusItemListMixin:SetSortOrder(index, state)
+function MerchantPlusItemListMixin:SetSortOrder(key, state)
 	trace("called: SetSortOrder")
 
-	if self.sortOrder == index and index ~= 0 and state == nil then
+	if self.sortOrder == key and key ~= nil and state == nil then
 		if self.sortOrderState == 1 then
 			self.sortOrderState = 0
 		else
 			self.sortOrderState = 1
 		end
 	else
-		self.sortOrder = index
+		self.sortOrder = key
 		self.sortOrderState = state or 0
 	end
 

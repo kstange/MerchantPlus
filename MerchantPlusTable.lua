@@ -19,9 +19,9 @@ MerchantPlusTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin)
 
 function MerchantPlusTableHeaderStringMixin:OnClick()
 	if IsControlKeyDown() then
-		self:GetParent():GetParent():SetSortOrder(0)
+		self:GetParent():GetParent():SetSortOrder("")
 	else
-		self:GetParent():GetParent():SetSortOrder(self.index)
+		self:GetParent():GetParent():SetSortOrder(self.key)
 	end
 	local headers = { self:GetParent():GetChildren() }
 	for _, header in pairs(headers) do
@@ -29,16 +29,16 @@ function MerchantPlusTableHeaderStringMixin:OnClick()
 	end
 end
 
-function MerchantPlusTableHeaderStringMixin:Init(title, index)
+function MerchantPlusTableHeaderStringMixin:Init(key, title)
 	self:SetText(title)
-	self.index = index
+	self.key = key
 	self:UpdateArrow()
-	self:SetEnabled(index and true)
+	self:SetEnabled(key and true)
 end
 
 function MerchantPlusTableHeaderStringMixin:UpdateArrow()
 	local order, state = self:GetParent():GetParent():GetSortOrder()
-	if order == self.index then
+	if order == self.key then
 		self.Arrow:Show()
 		if state == 0 then
 			self.Arrow:SetTexCoord(0, 1, 0, 1)

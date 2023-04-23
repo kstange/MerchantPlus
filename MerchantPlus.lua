@@ -279,7 +279,7 @@ function Addon:SetTableLayout()
 	end
 	for _, key in ipairs(order) do
 		local col = Metadata.Columns[key]
-		MerchantPlusItemList:AddColumn(col.name, col.celltype, col.id, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
+		MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
 	end
 end
 
@@ -292,7 +292,7 @@ function Addon:Options_Sort_Update()
 		local order, state = MerchantPlusItemList:GetSortOrder()
 		if settings then
 			settings[key] = {
-				order = order or 0,
+				order = order or "",
 				state = state or 0,
 			}
 		end
@@ -323,7 +323,7 @@ function Addon:HandleEvent(event, target)
 			local sort = Addon:GetOption("SortOrder")
 			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
 		else
-			MerchantPlusItemList:SetSortOrder(0)
+			MerchantPlusItemList:SetSortOrder("")
 		end
 	end
 
