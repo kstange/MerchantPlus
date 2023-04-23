@@ -59,7 +59,7 @@ function MerchantPlusItemListLineMixin:UpdateButtonData()
 	self.price        = data.price > 0 and data.price or nil
 	self.extendedCost = data.extendedCost or nil
 	self.name         = data.name
-	self.link         = GetMerchantItemLink(data.index)
+	self.link         = data.link
 	self.texture      = data.texture
 	self.count        = data.quantity
 	self.numInStock   = data.numAvailable
