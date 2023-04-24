@@ -57,7 +57,9 @@ end
 -- Fetch extended item data for a single item by Merchant index
 function Data:GetItemInfo(link)
 	local item = {}
-	_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType, item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID, item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(link)
+	if link then
+		_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType, item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID, item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(link)
+	end
 	return item
 end
 

@@ -173,18 +173,23 @@ end
 MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
 
 function MerchantPlusTableItemMixin:Populate(data)
-	local name = data.name or ""
-	local quality = select(3, GetItemInfo(data.itemKey.itemID))
-	local color = ITEM_QUALITY_COLORS[quality]
-	local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemKey.itemID)
-	local icon = ""
-	if craftquality then
-		icon = C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
-	end
-	if color then
-		self.Text:SetText(color.color:WrapTextInColorCode(name) .. " " .. icon)
+	if data.name then
+		local name = data.name
+		local quality = select(3, GetItemInfo(data.link))
+		local color = ITEM_QUALITY_COLORS[quality]
+		local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
+		local qualityicon = ""
+		if craftquality then
+			qualityicon = C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+		end
+		if color then
+			self.Text:SetText(color.color:WrapTextInColorCode(name) .. " " .. qualityicon)
+		else
+			self.Text:SetText(name .. " " .. qualityicon)
+		end
+		self.Icon:SetTexture(data.texture)
 	else
-		self.Text:SetText(name .. " " .. icon)
+		self.Text:SetText("")
+		self.Icon:SetTexture(134400)
 	end
-	self.Icon:SetTexture(data.texture)
 end
