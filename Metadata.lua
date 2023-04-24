@@ -131,7 +131,7 @@ Metadata.Columns = {
 		padding = { 8, 0 },
 	},
 	itemsubtype = {
-		name = L["Sub Type"],
+		name = L["Subtype"],
 		celltype = Metadata.CellTypes.Text,
 		field = "itemSubType",
 		datafunction = "GetItemInfo", 

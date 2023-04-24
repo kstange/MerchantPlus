@@ -1,6 +1,6 @@
 # Version 10.0.7.2-beta
 
-* Added supported columns: Index, ID, Type, and SubType
+* Added supported columns: Index, ID, Type, and Subtype
 
 # Release History
 
