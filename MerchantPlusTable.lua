@@ -18,6 +18,7 @@ local trace = Shared.Trace or function() end
 MerchantPlusTableHeaderStringMixin = CreateFromMixins(TableBuilderElementMixin)
 
 function MerchantPlusTableHeaderStringMixin:OnClick()
+	trace("called: Header OnClick", self.key)
 	if IsControlKeyDown() then
 		self:GetParent():GetParent():SetSortOrder("")
 	else
@@ -61,7 +62,7 @@ end
 MerchantPlusTableNumberMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 -- TODO: Move key-specific behavior to Metadata or format function
-function MerchantPlusTableNumberMixin:Populate(data, index)
+function MerchantPlusTableNumberMixin:Populate(data)
 	local key = self.key
 
 	if key == "numAvailable" then
@@ -84,7 +85,7 @@ end
 -- This defines a text field
 MerchantPlusTableTextMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
-function MerchantPlusTableTextMixin:Populate(data, index)
+function MerchantPlusTableTextMixin:Populate(data)
 	local key = self.key
 
 	self.Text:SetText(data[key] or "")
@@ -93,7 +94,7 @@ end
 -- This defines a field for showing an icon
 MerchantPlusTableIconMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
-function MerchantPlusTableIconMixin:Populate(data, index)
+function MerchantPlusTableIconMixin:Populate(data)
 	local key = self.key
 
 	if data[key] then
@@ -107,7 +108,7 @@ end
 -- This defines a field for showing a boolean checkmark
 MerchantPlusTableBooleanMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
-function MerchantPlusTableBooleanMixin:Populate(data, index)
+function MerchantPlusTableBooleanMixin:Populate(data)
 	local key = self.key
 
 	self.Icon:SetShown(data[key])
@@ -116,7 +117,7 @@ end
 -- This defines a field for showing prices
 MerchantPlusTablePriceMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTablePriceMixin:Populate(data, index)
+function MerchantPlusTablePriceMixin:Populate(data)
 	self.AltCurrencyDisplay:SetShown(data.extendedCost)
 	self.MoneyDisplay:SetShown(data.price > 0)
 	local color = HIGHLIGHT_FONT_COLOR
@@ -171,7 +172,7 @@ end
 -- This defines a field for showing items
 MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTableItemMixin:Populate(data, index)
+function MerchantPlusTableItemMixin:Populate(data)
 	local name = data.name or ""
 	local quality = select(3, GetItemInfo(data.itemKey.itemID))
 	local color = ITEM_QUALITY_COLORS[quality]

@@ -141,7 +141,7 @@ function Addon:SetTab(index)
 				-- Merchant tab if transitioning from the Buyback tab.
 				--
 				-- The taint clears itself if the user transitions to
-				-- the Merchant tab manually at any time.	
+				-- the Merchant tab manually at any time.
 				PanelTemplates_SetTab(MerchantFrame, 1)
 			end
 
@@ -166,7 +166,7 @@ function Addon:UpdateFrame()
 	local show = PanelTemplates_GetSelectedTab(MerchantPlusTabFrame) == 1
 
 	-- Check if we are on the Buyback tab
-	local buyback = PanelTemplates_GetSelectedTab(MerchantFrame) == 2 
+	local buyback = PanelTemplates_GetSelectedTab(MerchantFrame) == 2
 
 	-- We should have saved the width, but if not use 336 which has been standard for a while
 	local width = show and 800 or InitialWidth or 336
@@ -241,7 +241,7 @@ end
 -- the buyback tab.
 function Addon:UpdateBuyback()
 	local count = GetNumBuybackItems()
-	local name, texture, price, quantity, numAvailable, _, isBound = GetBuybackItemInfo(count)
+	local name, texture, price, quantity, _, _, isBound = GetBuybackItemInfo(count)
 
 	trace("called: UpdateBuyback", name)
 
@@ -392,7 +392,7 @@ end
 function Addon:ClearTaint(n)
 	local t = _G[n]
 	trace("called: ClearTaint", n)
-	for k, v in pairs(t) do
+	for k in pairs(t) do
 		local secure, addon = issecurevariable(t, k)
 		if secure == false and addon == AddonName then
 			t[k] = nil
