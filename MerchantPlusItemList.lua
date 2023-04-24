@@ -36,7 +36,6 @@ end
 -- Before the widget is hidden, clean up stuff
 function MerchantPlusItemListMixin:OnHide()
 	trace("called: OnHide")
-	ResetSetMerchantFilter()
 end
 
 -- On init, we will need to create various structures
@@ -102,7 +101,6 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 		return
 	end
 
-	SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	local count = self.GetDataCount and self:GetDataCount() or 0
 	if count > 0 and self.GetData and self.Sort then
 		self.ResultsText:Hide()

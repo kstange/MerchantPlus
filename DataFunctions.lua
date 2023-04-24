@@ -23,6 +23,7 @@ Data.Functions = {}
 
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
+	SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	local count = GetMerchantNumItems()
 	local MerchantItems = {}
 	trace("called: UpdateMerchant", count, #Data.Functions)
@@ -38,6 +39,7 @@ end
 
 -- Fetch number of merchant items available
 function Data:GetMerchantCount()
+	SetMerchantFilter(LE_LOOT_FILTER_ALL)
 	return GetMerchantNumItems()
 end
 
