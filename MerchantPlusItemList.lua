@@ -69,7 +69,7 @@ end
 -- Update the layout of the table.
 function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
 	trace("called: UpdateTableBuilderLayout")
-	if not self:IsShown() then
+	if not self.initialized then
 		return
 	end
 
