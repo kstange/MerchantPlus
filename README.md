@@ -10,6 +10,7 @@ Merchant Plus adds an additional tab to all WoW merchants, which provides the fo
 
 * Wider vertical scrolling list to allow more information to be viewed at once
 * Sortable columns of item data
+* Optional columns containing additional item data
 
 An options panel is included to configure basic settings.
 
@@ -17,7 +18,7 @@ An options panel is included to configure basic settings.
 
 In future updates, the following major improvements are planned:
 
-* Additional data columns and options to choose which columns are visible
+* Additional data columns and options to choose the visiblity and order of them
 * Filtering based upon data in one or more columns
 * Searching based upon data in one or more columns
 
