@@ -15,6 +15,8 @@ local AddonName, Shared = ...
 local Sort = {}
 Shared.Sort = Sort
 
+local CurrencyCache = {}
+
 -- Item Price: sort by magic:
 --   Items with regular gold prices first, in cost order
 --   Items with extended cost currency, ordered most to least significant
@@ -62,10 +64,10 @@ function Sort:SortPrice(lhs, rhs)
 
 					-- If this is an item instead of a currency, get its name
 					if not lhname then
-						lhname = GetItemInfo(lhlink)
+						lhname = Sort:GetCurrencyName(lhlink)
 					end
 					if not rhname then
-						rhname = GetItemInfo(rhlink)
+						rhname = Sort:GetCurrencyName(rhlink)
 					end
 
 					-- Sort the currency by name first
@@ -98,4 +100,20 @@ function Sort:SortPrice(lhs, rhs)
 		end
 	end
 	return result
+end
+
+-- Cache currency names to reduce calls to GetItemInfo()
+function Sort:GetCurrencyName(link)
+	local id = GetItemInfoInstant(link)
+	if CurrencyCache[id] then
+		name = CurrencyCache[id]
+	else
+		name = GetItemInfo(link)
+		if name then
+			CurrencyCache[id] = name
+		else
+			name = ""
+		end
+	end
+	return name
 end
