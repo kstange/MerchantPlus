@@ -305,10 +305,11 @@ function Addon:SetTableLayout()
 	trace("called: SetTableLayout")
 	Data.Functions = {}
 	for _, key in ipairs(Metadata.ColumnSort) do
+		local col = Metadata.Columns[key]
 		local enabled = Addon:GetOption("Columns", key)
+		local required = col.required
 		trace("column status:", key, enabled)
-		if enabled then
-			local col = Metadata.Columns[key]
+		if enabled or required then
 			if col.datafunction and Data[col.datafunction] then
 				tInsertUnique(Data.Functions, Data[col.datafunction])
 			end

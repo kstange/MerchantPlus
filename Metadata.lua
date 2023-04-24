@@ -170,7 +170,9 @@ Metadata.OptionCallbacks = {}
 local function ListColumns()
 	local columns = {}
 	for k, v in pairs(Metadata.Columns) do
-		columns[k] = v.name
+		if Metadata.Columns[k].required ~= true then
+			columns[k] = v.name
+		end
 	end
 	return columns
 end

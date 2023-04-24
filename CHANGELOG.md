@@ -1,8 +1,7 @@
-# Version 10.0.7.2-beta
+# Version 10.0.7.3-beta
 
-* Added options to select which columns are shown
-* Added merchant columns: Index, ID, Type, and Subtype
-* Fixed errors when trying to look up items before they are cached
+* Changed Item and Price columns to always be required
+* Fixed an error caused by changing columns before a merchant has been opened
 
 # Release History
 
