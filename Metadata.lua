@@ -46,7 +46,7 @@ Metadata.Columns = {
 		required = true,
 		fixed = false,
 		width = 1,
-		padding = { 4, 0 },
+		padding = { 6, 0 },
 	},
 	price = {
 		name = L["Price"],
