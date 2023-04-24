@@ -100,7 +100,7 @@ end
 function MerchantPlusItemListMixin:RefreshScrollFrame()
 	trace("called: RefreshScrollFrame")
 
-	if not self.initialized or not self:IsShown() then
+	if not self.initialized or not self:IsVisible() then
 		return
 	end
 
