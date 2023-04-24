@@ -275,9 +275,14 @@ end
 function Addon:SetTableLayout()
 	trace("called: SetTableLayout")
 	local order = {}
+
+	Data.Functions = {}
 	for key, col in pairs(Metadata.Columns) do
 		if col.default.enabled and not order[col.default.order] then
 			order[col.default.order] = key
+			if col.datafunction and Data[col.datafunction] then
+				tInsertUnique(Data.Functions, Data[col.datafunction])
+			end
 		end
 	end
 	for _, key in ipairs(order) do
@@ -430,3 +435,4 @@ function Addon:Init()
 end
 
 Addon:Init()
+Data:Init()

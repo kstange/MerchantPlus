@@ -119,6 +119,28 @@ Metadata.Columns = {
 		width = 60,
 		padding = { 0, 8 },
 	},
+	itemtype = {
+		name = L["Type"],
+		celltype = Metadata.CellTypes.Text,
+		field = "itemType",
+		datafunction = "GetItemInfo", 
+		required = false,
+		default = { enabled = false, },
+		fixed = true,
+		width = 92,
+		padding = { 8, 0 },
+	},
+	itemsubtype = {
+		name = L["Sub Type"],
+		celltype = Metadata.CellTypes.Text,
+		field = "itemSubType",
+		datafunction = "GetItemInfo", 
+		required = false,
+		default = { enabled = false, },
+		fixed = true,
+		width = 122,
+		padding = { 8, 0 },
+	},
 }
 
 -- A table indicating the defaults for Options by key.

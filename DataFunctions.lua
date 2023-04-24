@@ -11,9 +11,6 @@
 
 local AddonName, Shared = ...
 
--- Import a shared trace function if one exists
-local trace = Shared.Trace or function() end
-
 -- Push us into shared object
 local Data = {}
 Shared.Data = Data
@@ -21,13 +18,20 @@ Shared.Data = Data
 -- From Metadata.lua
 local Metadata = Shared.Metadata
 
+-- List of additional functions to call to populate date
+Data.Functions = {}
+
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
-	local items = GetMerchantNumItems()
+	local count = GetMerchantNumItems()
 	local MerchantItems = {}
-	trace("called: UpdateMerchant", items)
-	for i = 1, items do
-		MerchantItems[i] = Data:UpdateMerchantItem(i)
+	trace("called: UpdateMerchant", count, #Data.Functions)
+	for i = 1, count do
+		local item = Data:GetMerchantItemInfo(i)
+		for _, func in ipairs(Data.Functions) do
+			MergeTable(item, func(i, item.link))
+		end
+		MerchantItems[i] = item
 	end
 	return MerchantItems
 end
@@ -38,7 +42,7 @@ function Data:GetMerchantCount()
 end
 
 -- Fetch the data for a single item by Merchant index
-function Data:UpdateMerchantItem(index)
+function Data:GetMerchantItemInfo(index)
 	local item = {}
 	item.itemID = GetMerchantItemID(index)
 	item.link = GetMerchantItemLink(index)
@@ -49,15 +53,17 @@ function Data:UpdateMerchantItem(index)
 end
 
 -- Fetch extended item data for a single item by Merchant index
-function Data:UpdateMerchantItemInfo(index)
-	local item = {}	
-	_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType, item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID, item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(item.link)
+function Data:GetItemInfo(link)
+	local item = {}
+	_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType, item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID, item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(link)
 	return item
 end
 
 -- Fetch tooltip item data for a single item by Merchant index
-function Data:UpdateMerchantItemTooltip(index)
-	local item = {}	
+function Data:GetMerchantItemTooltip()
+	-- inded ends up in self due to the way this is called
+	local index = self
+	local item = {}
 	item.tooltip = C_TooltipInfo.GetMerchantItem(index)
 	return item
 end
@@ -124,4 +130,9 @@ function Data:Sort(lhs, rhs)
 	else
 		return result
 	end
+end
+
+-- Since this code runs before MerchantPlus.lua we need to reset the trace function after init
+function Data:Init()
+	trace = Shared.Trace or function() end
 end
