@@ -42,6 +42,7 @@ Metadata.Columns = {
 		name = L["Item"],
 		celltype = Metadata.CellTypes.Item,
 		field = "name",
+		datafunction = "GetItemInfo",
 		required = true,
 		fixed = false,
 		width = 1,

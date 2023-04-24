@@ -2,6 +2,7 @@
 
 * Added options to select which columns are shown
 * Added merchant columns: Index, ID, Type, and Subtype
+* Fixed errors when trying to look up items before they are cached
 
 # Release History
 
