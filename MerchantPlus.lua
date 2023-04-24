@@ -303,8 +303,6 @@ end
 -- A callback for when UpdateTableBuilderLayout is called to define the columns that are shown
 function Addon:SetTableLayout()
 	trace("called: SetTableLayout")
-	local order = {}
-
 	Data.Functions = {}
 	for _, key in ipairs(Metadata.ColumnSort) do
 		local enabled = Addon:GetOption("Columns", key)
