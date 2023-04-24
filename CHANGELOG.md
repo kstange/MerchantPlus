@@ -1,6 +1,6 @@
-# Version 10.0.7.1-beta
+# Version 10.0.7.2-beta
 
-* Fixed various sources of taint on the Merchant Frame, which should prevent Action Blocked errors
+* Added supported columns: Index, ID, Type, and SubType
 
 # Release History
 
