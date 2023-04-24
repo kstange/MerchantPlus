@@ -14,12 +14,9 @@ local AddonName, Shared = ...
 -- Import a shared trace function if one exists
 local trace = Shared.Trace or function() end
 
--- From Metadata.lua
-local Metadata = Shared.Metadata
-
 MerchantPlusItemListMixin = {}
 
--- On load, setup the nineslice properly. This doesn't seem to work if defined in XML.
+-- On load, set up the nineslice. The nineslice doesn't seem to work if defined in XML.
 function MerchantPlusItemListMixin:OnLoad()
 	trace("called: OnLoad")
 	self.NineSlice:ClearAllPoints()
@@ -75,8 +72,8 @@ function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
 	trace("called: UpdateTableBuilderLayout")
 
 	self.tableBuilder:Reset()
-	if self.layoutCallback then
-		self:layoutCallback()
+	if self.SetTableLayout then
+		self:SetTableLayout()
 	end
 	self.tableBuilder:SetTableWidth(self.ScrollBox:GetWidth())
 	self.tableBuilder:Arrange()
@@ -106,20 +103,18 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 	end
 
 	SetMerchantFilter(LE_LOOT_FILTER_ALL)
-	local count = GetMerchantNumItems()
-	if count == 0 then
-		self.ResultsText:Show()
-		self.ResultsText:SetText(BROWSE_NO_RESULTS)
-		self.ScrollBox:ClearDataProvider()
-	else
+	local count = self.GetDataCount and self:GetDataCount() or 0
+	if count > 0 and self.GetData and self.Sort then
 		self.ResultsText:Hide()
-		local MerchantItems = self:UpdateMerchant()
-		local dataProvider = CreateDataProvider(MerchantItems)
+		local dataProvider = CreateDataProvider(self:GetData())
 		self.ScrollBox:SetDataProvider(dataProvider, ScrollBoxConstants.RetainScrollPosition)
-
 		self.ScrollBox:GetDataProvider():SetSortComparator(function(lhs, rhs)
 			return self:Sort(lhs, rhs)
 		end)
+	else
+		self.ResultsText:Show()
+		self.ResultsText:SetText(BROWSE_NO_RESULTS)
+		self.ScrollBox:ClearDataProvider()
 	end
 
 end
@@ -127,92 +122,6 @@ end
 -- Return the ElementData back directly to the TableBuilder
 function MerchantPlusItemListMixin:GetDataRow()
 	return self
-end
-
--- Sync updated Merchant information
-function MerchantPlusItemListMixin:UpdateMerchant()
-	local items = GetMerchantNumItems()
-	local MerchantItems = {}
-	trace("called: UpdateMerchant", items)
-	for i = 1, items do
-		MerchantItems[i] = self:UpdateMerchantItem(i)
-	end
-	return MerchantItems
-end
-
--- Fetch the data for a single item by Merchant index
-function MerchantPlusItemListMixin:UpdateMerchantItem(index)
-	local item = {}
-	item.itemID = GetMerchantItemID(index)
-	item.itemKey = { itemID = item.itemID }
-	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
-	item.link = GetMerchantItemLink(index)
-	item.index = index
-	return item
-end
-
--- This fuction will sort based on the request.
-function MerchantPlusItemListMixin:Sort(lhs, rhs)
-	local order, state = self:GetSortOrder()
-
-	-- The sort method will sometimes send nil values
-	if not lhs or not rhs then
-		return false
-	end
-
-	-- Default sort by Merchant index if nothing else is set.
-	-- Use this to ensure that equal values retain a deterministic
-	-- sort, otherwise race conditions may occur where they shift
-	-- randomly.
-	local result = lhs['index'] < rhs['index']
-
-	for ckey, col in pairs(Metadata.Columns) do
-		if ckey == order and col.sortfunction then
-
-			-- Handle custom sort function if provided
-			local sort = col.sortfunction(nil, lhs, rhs)
-			if sort ~= nil then
-				result = sort
-			end
-
-		elseif ckey == order and col.field then
-			local key = col.field
-
-			-- Handle item sort (by name only)
-			if col.celltype == Metadata.CellTypes.Item then
-				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
-				if namecheck ~= 0 then
-					result = namecheck == -1
-				end
-
-			-- Handle number sort
-			elseif col.celltype == Metadata.CellTypes.Number then
-				if lhs[key] ~= rhs[key] then
-					result = lhs[key] < rhs[key]
-				end
-
-			-- Handle text sort
-			elseif col.celltype == Metadata.CellTypes.Text then
-				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
-				if namecheck ~= 0 then
-					result = namecheck == -1
-				end
-
-			-- TODO: Handle icon sort
-
-			-- Handle boolean sort
-			elseif col.celltype == Metadata.CellTypes.Boolean then
-				if lhs[key] ~= rhs[key] then
-					result = lhs[key]
-				end
-			end
-		end
-	end
-	if state == 1 then
-		return not result
-	else
-		return result
-	end
 end
 
 -- Set the sort to the header that was selected, or if it's already selected,
@@ -231,8 +140,8 @@ function MerchantPlusItemListMixin:SetSortOrder(key, state)
 		self.sortOrderState = state or 0
 	end
 
-	if self.sortCallback then
-		self:sortCallback()
+	if self.SortCallback then
+		self:SortCallback()
 	end
 
 	if self.initialized and self:IsVisible() and self.ScrollBox:HasDataProvider() then

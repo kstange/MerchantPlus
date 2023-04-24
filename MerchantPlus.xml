@@ -2,6 +2,7 @@
 ..\FrameXML\UI.xsd">
 	<Script file="SortFunctions.lua" />
 	<Script file="Metadata.lua" />
+	<Script file="DataFunctions.lua" />
 	<Script file="MerchantPlus.lua" />
 	<Script file="MerchantPlusTable.lua" />
 	<Script file="MerchantPlusItemList.lua" />

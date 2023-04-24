@@ -18,6 +18,9 @@ local AddonName, Shared = ...
 local Metadata = Shared.Metadata
 local Callbacks = Metadata.OptionCallbacks
 
+-- From Data.lua
+local Data = Shared.Data
+
 -- Push us into shared object
 local Addon = {}
 Shared.Addon = Addon
@@ -371,8 +374,11 @@ function Addon:HandleEvent(event, target)
 			ACR:RegisterOptionsTable(AddonName, Metadata.Options)
 			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
 		end
-		MerchantPlusItemList.layoutCallback = Addon.SetTableLayout
-		MerchantPlusItemList.sortCallback   = Addon.Options_Sort_Update
+		MerchantPlusItemList.SetTableLayout = Addon.SetTableLayout
+		MerchantPlusItemList.SortCallback   = Addon.Options_Sort_Update
+		MerchantPlusItemList.GetDataCount   = Data.GetMerchantCount
+		MerchantPlusItemList.GetData        = Data.UpdateMerchant
+		MerchantPlusItemList.Sort           = Data.Sort
 	end
 end
 
