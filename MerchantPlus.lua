@@ -64,38 +64,66 @@ function MerchantPlusTabMixin:OnClick()
 	PanelTemplates_SetTab(MerchantPlusTabFrame, self:GetID())
 end
 
--- Get an option for the AceConfigDialog
-function Addon:GetOption(key)
-	if not key then
-		if self and self[#self] then
-			key = self[#self]
-		else
-			return nil
-		end
+-- Get an option for our own use (fake a request from Ace)
+function Addon:GetOption(group, key)
+	local table = { group }
+	if key ~= nil then
+		table.type = "multiselect"
 	end
+	table.GetOption = Addon.GetAceOption
+	return table:GetOption(key)
+end
+
+-- Get an option for the AceConfigDialog
+function Addon:GetAceOption(key)
+	local group = self[#self]
 
 	local value = false;
 	local settings = _G[AddonName]
 
-	if settings and settings[key] ~= nil then
-		value = settings[key]
-	elseif Metadata.Defaults and Metadata.Defaults[key] ~= nil then
-		value = Metadata.Defaults[key]
+	if self.type == "multiselect" then
+		if settings and settings[group] ~= nil then
+			value = settings[group][key] or false
+		elseif Metadata.Defaults and Metadata.Defaults[group] ~= nil then
+			value = Metadata.Defaults[group][key] or false
+		end
+	else
+		if settings and settings[group] ~= nil then
+			value = settings[group]
+		elseif Metadata.Defaults and Metadata.Defaults[group] ~= nil then
+			value = Metadata.Defaults[group]
+		end
 	end
 
 	return value
 end
 
 -- Set an option from the AceConfigDialog
-function Addon:SetOption(...)
+function Addon:SetAceOption(value)
 	local key = self[#self]
 	if not key then	return nil end
 
-	local value = ...
 	local settings = _G[AddonName]
 
-	if settings and settings[key] ~= value then
-		settings[key] = value
+	if self.type == "multiselect" then
+		if settings then
+			if not settings[key] then
+				if Metadata.Defaults and Metadata.Defaults[key] then
+					settings[key] = Metadata.Defaults[key]
+				else
+					settings[key] = {}
+				end
+			end
+			if settings[key][value] == nil then
+				settings[key][value] = true
+			else
+				settings[key][value] = nil
+			end
+		end
+	else
+		if settings and settings[key] ~= value then
+			settings[key] = value
+		end
 	end
 	if Metadata.OptionCallbacks and Metadata.OptionCallbacks[key] then
 		local func = Metadata.OptionCallbacks[key]
@@ -272,41 +300,45 @@ function Addon:UpdateBuyback()
 	BuybackDirty = false
 end
 
+-- A callback for when UpdateTableBuilderLayout is called to define the columns that are shown
 function Addon:SetTableLayout()
 	trace("called: SetTableLayout")
 	local order = {}
 
 	Data.Functions = {}
-	for key, col in pairs(Metadata.Columns) do
-		if col.default.enabled and not order[col.default.order] then
-			order[col.default.order] = key
+	for _, key in ipairs(Metadata.ColumnSort) do
+		local enabled = Addon:GetOption("Columns", key)
+		trace("column status:", key, enabled)
+		if enabled then
+			local col = Metadata.Columns[key]
 			if col.datafunction and Data[col.datafunction] then
 				tInsertUnique(Data.Functions, Data[col.datafunction])
 			end
+			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
 		end
-	end
-	for _, key in ipairs(order) do
-		local col = Metadata.Columns[key]
-		MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
 	end
 end
 
-function Addon:Options_Sort_Update()
+-- Update the displayed columns when they change
+function Addon:UpdateColumns()
+	MerchantPlusItemList:UpdateTableBuilderLayout()
+end
+
+-- Update the saved sort when saving is toggled
+function Addon:UpdateSort()
 	trace("called: Options_Sort_Update")
 	local settings = _G[AddonName]
 	local save = Addon:GetOption('SortRemember')
-	local key = "SortOrder"
 	if save then
 		local order, state = MerchantPlusItemList:GetSortOrder()
 		if settings then
-			settings[key] = {
-				order = order or "",
-				state = state or 0,
-			}
+			settings["SortOrder"] = order or ""
+			settings["SortState"] = state or 0
 		end
 	else
 		if settings then
-			settings[key] = nil
+			settings["SortOrder"] = nil
+			settings["SortState"] = nil
 		end
 	end
 end
@@ -328,8 +360,9 @@ function Addon:HandleEvent(event, target)
 
 		-- Restore the saved sort when opening the vendor if configured
 		if Addon:GetOption("SortRemember") then
-			local sort = Addon:GetOption("SortOrder")
-			MerchantPlusItemList:SetSortOrder(sort.order, sort.state)
+			local order = Addon:GetOption("SortOrder")
+			local state = Addon:GetOption("SortState")
+			MerchantPlusItemList:SetSortOrder(order, state)
 		else
 			MerchantPlusItemList:SetSortOrder("")
 		end
@@ -374,13 +407,13 @@ function Addon:HandleEvent(event, target)
 		trace("called: ADDON_LOADED")
 		-- Don't register options unless they're defined.
 		if Metadata.Options then
-			Metadata.Options.get = Addon.GetOption
-			Metadata.Options.set = Addon.SetOption
+			Metadata.Options.get = Addon.GetAceOption
+			Metadata.Options.set = Addon.SetAceOption
 			ACR:RegisterOptionsTable(AddonName, Metadata.Options)
 			ACD:AddToBlizOptions(AddonName, Metadata.FriendlyName)
 		end
 		MerchantPlusItemList.SetTableLayout = Addon.SetTableLayout
-		MerchantPlusItemList.SortCallback   = Addon.Options_Sort_Update
+		MerchantPlusItemList.SortCallback   = Addon.UpdateSort
 		MerchantPlusItemList.GetDataCount   = Data.GetMerchantCount
 		MerchantPlusItemList.GetData        = Data.UpdateMerchant
 		MerchantPlusItemList.Sort           = Data.Sort
@@ -431,7 +464,8 @@ function Addon:Init()
 	Addon.Events:RegisterEvent("UNIT_INVENTORY_CHANGED")
 	Addon.Events:SetScript("OnEvent", Addon.HandleEvent)
 
-	Callbacks.SortRemember = Addon.Options_Sort_Update
+	Callbacks.SortRemember = Addon.UpdateSort
+	Callbacks.Columns = Addon.UpdateColumns
 end
 
 Addon:Init()

@@ -43,7 +43,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Item,
 		field = "name",
 		required = true,
-		default = { order = 3, enabled = true, },
 		fixed = false,
 		width = 1,
 		padding = { 4, 0 },
@@ -54,7 +53,6 @@ Metadata.Columns = {
 		field = nil,
 		sortfunction = Sort.SortPrice,
 		required = true,
-		default = { order = 4, enabled = true, },
 		fixed = true,
 		width = 146,
 		padding = { 0, 14 },
@@ -64,7 +62,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Number,
 		field = "quantity",
 		required = false,
-		default = { order = 1, enabled = true, },
 		fixed = true,
 		width = 50,
 		padding = { 0, 8 },
@@ -74,7 +71,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Number,
 		field = "numAvailable",
 		required = false,
-		default = { order = 2, enabled = true, },
 		fixed = true,
 		width = 58,
 		padding = { 0, 8 },
@@ -84,7 +80,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Boolean,
 		field = "isUsable",
 		required = false,
-		default = { order = 5, enabled = true, },
 		fixed = true,
 		width = 58,
 		padding = { 0, 0 },
@@ -94,7 +89,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Boolean,
 		field = "isPurchasable",
 		required = false,
-		default = { order = 6, enabled = true, },
 		fixed = true,
 		width = 70,
 		padding = { 0, 0 },
@@ -104,7 +98,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Number,
 		field = "index",
 		required = false,
-		default = { enabled = false, },
 		fixed = true,
 		width = 52,
 		padding = { 0, 8 },
@@ -114,7 +107,6 @@ Metadata.Columns = {
 		celltype = Metadata.CellTypes.Number,
 		field = "itemID",
 		required = false,
-		default = { enabled = false, },
 		fixed = true,
 		width = 60,
 		padding = { 0, 8 },
@@ -125,7 +117,6 @@ Metadata.Columns = {
 		field = "itemType",
 		datafunction = "GetItemInfo",
 		required = false,
-		default = { enabled = false, },
 		fixed = true,
 		width = 92,
 		padding = { 8, 0 },
@@ -136,17 +127,37 @@ Metadata.Columns = {
 		field = "itemSubType",
 		datafunction = "GetItemInfo",
 		required = false,
-		default = { enabled = false, },
 		fixed = true,
 		width = 122,
 		padding = { 8, 0 },
 	},
 }
 
+Metadata.ColumnSort = {
+	'quantity',
+	'supply',
+	'item',
+	'price',
+	'usable',
+	'purchasable',
+	'index',
+	'id',
+	'itemtype',
+	'itemsubtype',
+}
+
 -- A table indicating the defaults for Options by key.
 -- Only populate options where the default isn't false
 Metadata.Defaults = {
 	TabDefault = true,
+	Columns = {
+		quantity    = true,
+		supply      = true,
+		item        = true,
+		price       = true,
+		usable      = true,
+		purchasable = true,
+	},
 }
 
 -- A table of function callbacks to call upon setting certain options.
@@ -154,6 +165,14 @@ Metadata.Defaults = {
 -- the functions won't exist by this point, so this should remain empty
 -- here.
 Metadata.OptionCallbacks = {}
+
+local function ListColumns()
+	local columns = {}
+	for k, v in pairs(Metadata.Columns) do
+		columns[k] = v.name
+	end
+	return columns
+end
 
 -- AceConfig Options table used to display a panel.
 Metadata.Options = {
@@ -173,6 +192,14 @@ Metadata.Options = {
 			type = "toggle",
 			width = "full",
 			order = 2,
+		},
+		Columns = {
+			name = L["OPTIONS_TITLE_COLUMNS"],
+			desc = L["OPTIONS_DESCRIPTION_COLUMNS"],
+			type = "multiselect",
+			width = "full",
+			order = 3,
+			values = ListColumns,
 		},
 	}
 }

@@ -1,6 +1,7 @@
 # Version 10.0.7.2-beta
 
-* Added supported columns: Index, ID, Type, and Subtype
+* Added options to select which columns are shown
+* Added merchant columns: Index, ID, Type, and Subtype
 
 # Release History
 
