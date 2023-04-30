@@ -4,6 +4,7 @@
 ## Notes: A Modern Scrollable UI for Merchants
 ## Author: SimGuy
 ## SavedVariables: MerchantPlus
+## IconAtlas: Cursor_buy_32
 
 ## X-Curse-Project-ID: 852491 
 ## X-WoWI-ID: 26570 
