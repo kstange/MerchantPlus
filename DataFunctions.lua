@@ -75,7 +75,7 @@ function Data:GetMerchantItemTooltip()
 	return item
 end
 
--- This fuction will sort based on the request.
+-- This function will sort based on the request
 function Data:Sort(lhs, rhs)
 	local order, state = self:GetSortOrder()
 
