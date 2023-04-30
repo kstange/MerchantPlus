@@ -18,7 +18,10 @@ Shared.Data = Data
 -- From Metadata.lua
 local Metadata = Shared.Metadata
 
--- List of additional functions to call to populate date
+-- Init an empty trace function to replace later
+local trace = function() end
+
+-- List of additional functions to call to populate data
 Data.Functions = {}
 
 -- Sync updated Merchant information
@@ -54,7 +57,7 @@ function Data:GetMerchantItemInfo(index)
 	return item
 end
 
--- Fetch extended item data for a single item by Merchant index
+-- Fetch extended item data for a single item by item link
 function Data:GetItemInfo(link)
 	local item = {}
 	if link then
@@ -65,7 +68,7 @@ end
 
 -- Fetch tooltip item data for a single item by Merchant index
 function Data:GetMerchantItemTooltip()
-	-- inded ends up in self due to the way this is called
+	-- index ends up in self due to the way this is called
 	local index = self
 	local item = {}
 	item.tooltip = C_TooltipInfo.GetMerchantItem(index)
