@@ -1,7 +1,6 @@
-# Version 10.1.0.0
+# Version 10.1.0.1
 
-* Initial stable release
-* Updated for Retail 10.1.0
+* Fixed inverted sort arrow in column headings (#3)
 
 # Release History
 

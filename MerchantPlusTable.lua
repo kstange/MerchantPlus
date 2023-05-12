@@ -42,9 +42,9 @@ function MerchantPlusTableHeaderStringMixin:UpdateArrow()
 	if order == self.key then
 		self.Arrow:Show()
 		if state == 0 then
-			self.Arrow:SetTexCoord(0, 1, 0, 1)
-		elseif state == 1 then
 			self.Arrow:SetTexCoord(0, 1, 1, 0)
+		elseif state == 1 then
+			self.Arrow:SetTexCoord(0, 1, 0, 1)
 		end
 	else
 		self.Arrow:Hide()
