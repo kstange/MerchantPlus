@@ -41,8 +41,11 @@ MerchantPlusFrameMixin = {}
 
 -- Re-anchor the Buyback and Currency elements to things that won't move around
 function MerchantPlusFrameMixin:OnLoad()
-	MerchantBuyBackItem:ClearAllPoints()
-	MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+	-- Fix for 10.1.5 - No longer need to adjust position of the BuyBack Button
+	if not MerchantSellAllJunkButton then
+		MerchantBuyBackItem:ClearAllPoints()
+		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+	end
 	MerchantExtraCurrencyInset:ClearAllPoints()
 	MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
 	MerchantExtraCurrencyInset:SetSize(166, 23)
@@ -240,7 +243,11 @@ function Addon:UpdateFrame()
 
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
-		MerchantFrameBottomRightBorder:Show()
+
+		-- This was merged into MerchantFrameBottomLeftBorder in 10.1.5
+		if MerchantFrameBottomRightBorder then
+			MerchantFrameBottomRightBorder:Show()
+		end
 	end
 
 	-- Show or hide our own frame now that everything is set up
