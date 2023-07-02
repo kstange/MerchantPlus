@@ -232,6 +232,12 @@ function Addon:UpdateFrame()
 
 		-- Update the state of repair buttons
 		MerchantFrame_UpdateRepairButtons()
+		-- Fix for 10.1.5 - The Sell All Junk button is anchored weirdly
+		-- unless the Repair Buttons are also shown.
+		if MerchantSellAllJunkButton and not CanMerchantRepair() then
+			MerchantSellAllJunkButton:ClearAllPoints()
+			MerchantSellAllJunkButton:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 170, 33)
+		end
 
 		-- Show the Buyback button
 		MerchantBuyBackItem:Show()
