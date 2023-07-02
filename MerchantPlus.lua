@@ -41,10 +41,13 @@ MerchantPlusFrameMixin = {}
 
 -- Re-anchor the Buyback and Currency elements to things that won't move around
 function MerchantPlusFrameMixin:OnLoad()
-	-- Fix for 10.1.5 - No longer need to adjust position of the BuyBack Button
+	-- Fix for 10.1.5 - Need to adjust position of the BuyBack Button differently
 	if not MerchantSellAllJunkButton then
 		MerchantBuyBackItem:ClearAllPoints()
 		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
+	else
+		MerchantBuyBackItem:ClearAllPoints()
+		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 263.5, 33)
 	end
 	MerchantExtraCurrencyInset:ClearAllPoints()
 	MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
@@ -232,11 +235,19 @@ function Addon:UpdateFrame()
 
 		-- Update the state of repair buttons
 		MerchantFrame_UpdateRepairButtons()
-		-- Fix for 10.1.5 - The Sell All Junk button is anchored weirdly
-		-- unless the Repair Buttons are also shown.
-		if MerchantSellAllJunkButton and not CanMerchantRepair() then
-			MerchantSellAllJunkButton:ClearAllPoints()
-			MerchantSellAllJunkButton:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 170, 33)
+
+		-- For 10.1.5 - Update the state of the Sell All Junk button
+		if MerchantSellAllJunkButton then
+			-- The button is anchored weirdly unless the Repair Buttons are shown.
+			if not CanMerchantRepair() then
+				MerchantSellAllJunkButton:ClearAllPoints()
+				MerchantSellAllJunkButton:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 170, 33)
+			end
+
+			local hasJunkItems = C_MerchantFrame.GetNumJunkItems() > 0;
+			MerchantSellAllJunkButton.Icon:SetDesaturated(not hasJunkItems);
+			MerchantSellAllJunkButton:SetEnabled(hasJunkItems);
+			MerchantSellAllJunkButton:Show()
 		end
 
 		-- Show the Buyback button
@@ -245,6 +256,11 @@ function Addon:UpdateFrame()
 		-- Update the Buyback button if something happened while we weren't looking
 		if BuybackDirty then
 			Addon:UpdateBuyback()
+		end
+
+		-- For 10.1.5 - Show the UndoFrame arrow in the Buyback Button
+		if UndoFrame and UndoFrame.Arrow then
+			UndoFrame.Arrow:Show()
 		end
 
 		-- Show the frame backgrounds related to the repair and buyback
@@ -309,6 +325,8 @@ function Addon:UpdateBuyback()
 			GameTooltip:Hide()
 		end
 	end
+
+	MerchantBuyBackItem:Show()
 
 	BuybackDirty = false
 end
