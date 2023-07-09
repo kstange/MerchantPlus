@@ -133,7 +133,7 @@ function Data:GetCollectable(link, itemdata)
 	local class = itemdata.classID
 	local subclass = itemdata.subclassID
 	local itemcategory = Data:GetItemCategory(itemdata.tooltip)
-	item.collectible = Data.Collectable.Unsupported
+	item.collectable = Data.Collectable.Unsupported
 
 	if class == Enum.ItemClass.Recipe then
 		if itemdata.isUsable then
@@ -197,7 +197,7 @@ function Data:GetCollectable(link, itemdata)
 					item.collectable = Data.Collectable.Collectable + (count / max)
 				end
 			else
-				item.collectable = "rstricted"
+				item.collectable = Data.Collectable.Restricted
 			end
 		elseif subclass == Enum.ItemMiscellaneousSubclass.Mount then
 			local mountid = C_MountJournal.GetMountFromItem(itemid)
