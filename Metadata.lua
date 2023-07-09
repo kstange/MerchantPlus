@@ -17,7 +17,7 @@ local L = Shared.Locale
 -- From SortFunctions.lua
 local Sort = Shared.Sort
 
--- From PopulateFunctions.lua
+-- From DisplayFunctions.lua
 local Display = Shared.Display
 
 -- Push us into shared object
