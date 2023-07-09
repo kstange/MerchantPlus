@@ -115,7 +115,11 @@ function MerchantPlusItemListMixin:RefreshScrollFrame()
 	else
 		self.ResultsText:Show()
 		self.ResultsText:SetText(BROWSE_NO_RESULTS)
-		self.ScrollBox:ClearDataProvider()
+		if self.ScrollBox.ClearDataProvider then
+			self.ScrollBox:ClearDataProvider()
+		else
+			self.ScrollBox:FlushDataProvider()
+		end
 	end
 
 end
