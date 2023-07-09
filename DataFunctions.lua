@@ -86,7 +86,6 @@ function Data:FinishItemCategories()
 	if Data.ItemCategoriesReturned == Data.ItemCategoriesQueried then
 		for name, id in pairs(Data.ItemCategories) do
 			local tooltip = C_TooltipInfo.GetItemByID(id)
-			print(tooltip, tooltip.lines, tooltip.lines[2])
 			Data.ItemCategories[name] = Data:GetItemCategory(tooltip)
 		end
 	end
@@ -142,12 +141,14 @@ function Data:GetCollectable(link, itemdata)
 		elseif C_TransmogCollection.PlayerHasTransmogByItemInfo(link) then
 			item.collectable = "known"
 		else
-			local _, sourceid    = C_TransmogCollection.GetItemInfo(link)
-			local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
-			if collectable then
-				item.collectable = "collectable"
-			else
-				item.collectable = "nope"
+			local _, sourceid = C_TransmogCollection.GetItemInfo(link)
+			if sourceid then
+				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
+				if collectable then
+					item.collectable = "collectable"
+				else
+					item.collectable = "nope"
+				end
 			end
 		end
 	elseif class == Enum.ItemClass.Miscellaneous then
@@ -183,7 +184,7 @@ function Data:GetCollectable(link, itemdata)
 			if toyid then
 				if PlayerHasToy(toyid) then
 					item.collectable = "known"
-				elseif itemdata.isUsable then
+				elseif C_ToyBox.IsToyUsable(toyid) then
 					item.collectable = "collectable"
 				else
 					item.collectable = "nope"
@@ -191,14 +192,26 @@ function Data:GetCollectable(link, itemdata)
 			end
 			-- If this is on the vendor and usable, it's collectable
 			if itemcategory == Data.ItemCategories.DrakewatcherManuscript then
-				item.collectable = "collectable"
+				if Data:GetItemKnown(itemdata.tooltip) then
+					item.collectable = "known"
+				elseif itemdata.isUsable then
+					item.collectable = "collectable"
+				else
+					item.collectable = "nope"
+				end
 			end
 		end
 	elseif class == Enum.ItemClass.Consumable and Enum.ItemConsumableSubclass.Other then
-		-- ensemble appears here
-	-- TODO: ensembles, illusions
-	else
-		item.collectable = nil
+		-- We're going trust that if this item appears on the merchant and is dressable it's unlearned
+		-- but collectable
+		local dressable = C_Item.IsDressableItemByID(itemid)
+		if dressable then
+			if Data:GetItemKnown(itemdata.tooltip) then
+				item.collectable = "known"
+			else
+				item.collectable = "collectable"
+			end
+		end
 	end
 	return item
 end
