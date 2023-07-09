@@ -54,9 +54,9 @@ end
 -- Generic cell mixin for common mixin functions
 MerchantPlusTableCellMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTableCellMixin:Init(key, displayfunction)
-	self.key = key
-	self.displayfunction = displayfunction
+function MerchantPlusTableCellMixin:Init(col)
+	self.key = col.field
+	self.displayfunction = col.displayfunction
 end
 
 -- This defines a numeric field

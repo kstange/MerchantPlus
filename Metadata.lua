@@ -14,11 +14,14 @@ local AddonName, Shared = ...
 -- From Locales/Locales.lua
 local L = Shared.Locale
 
--- From SortFunctions.lua
-local Sort = Shared.Sort
+-- From DataFunctions.lua
+local Data = Shared.Data
 
 -- From DisplayFunctions.lua
 local Display = Shared.Display
+
+-- From SortFunctions.lua
+local Sort = Shared.Sort
 
 -- Push us into shared object
 local Metadata = {}
@@ -38,6 +41,7 @@ Metadata.CellTypes = {
 	Icon    = "MerchantPlusTableIconTemplate",
 	Boolean = "MerchantPlusTableBooleanTemplate",
 }
+Data.CellTypes = Metadata.CellTypes
 
 -- This table defines the columns for the TableBuilder to use
 Metadata.Columns = {
@@ -45,7 +49,7 @@ Metadata.Columns = {
 		name = L["Item"],
 		celltype = Metadata.CellTypes.Item,
 		field = "name",
-		datafunction = "GetItemInfo",
+		datafunction = Data.GetItemInfo,
 		required = true,
 		fixed = false,
 		width = 1,
@@ -121,7 +125,7 @@ Metadata.Columns = {
 		name = L["Type"],
 		celltype = Metadata.CellTypes.Text,
 		field = "itemType",
-		datafunction = "GetItemInfo",
+		datafunction = Data.GetItemInfo,
 		required = false,
 		fixed = true,
 		width = 92,
@@ -131,13 +135,14 @@ Metadata.Columns = {
 		name = L["Subtype"],
 		celltype = Metadata.CellTypes.Text,
 		field = "itemSubType",
-		datafunction = "GetItemInfo",
+		datafunction = Data.GetItemInfo,
 		required = false,
 		fixed = true,
 		width = 122,
 		padding = { 8, 0 },
 	},
 }
+Data.Columns = Metadata.Columns
 
 Metadata.ColumnSort = {
 	'quantity',

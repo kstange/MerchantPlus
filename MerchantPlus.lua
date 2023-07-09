@@ -341,10 +341,10 @@ function Addon:SetTableLayout()
 		local required = col.required
 		trace("column status:", key, enabled)
 		if enabled or required then
-			if col.datafunction and Data[col.datafunction] then
-				tInsertUnique(Data.Functions, Data[col.datafunction])
+			if col.datafunction and type(col.datafunction) == "function" then
+				tInsertUnique(Data.Functions, col.datafunction)
 			end
-			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field, col.displayfunction)
+			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col)
 		end
 	end
 end

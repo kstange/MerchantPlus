@@ -15,14 +15,17 @@ local AddonName, Shared = ...
 local Data = {}
 Shared.Data = Data
 
--- From Metadata.lua
-local Metadata = Shared.Metadata
-
 -- Init an empty trace function to replace later
 local trace = function() end
 
--- List of additional functions to call to populate data
+-- List of additional functions to call to populate data, filled later
 Data.Functions = {}
+
+-- This is a list of supported cell types to be, filled later
+Data.CellTypes = {}
+
+-- This is a list of supported columns to be, filled later
+Data.Columns = {}
 
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
@@ -90,7 +93,7 @@ function Data:Sort(lhs, rhs)
 	-- randomly.
 	local result = lhs['index'] < rhs['index']
 
-	local col = Metadata.Columns[order]
+	local col = Data.Columns[order]
 	if col then
 		if col.sortfunction then
 
@@ -104,20 +107,20 @@ function Data:Sort(lhs, rhs)
 			local key = col.field
 
 			-- Handle item sort (by name only)
-			if col.celltype == Metadata.CellTypes.Item then
+			if col.celltype == Data.CellTypes.Item then
 				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
 				if namecheck ~= 0 then
 					result = namecheck == -1
 				end
 
 			-- Handle number sort
-			elseif col.celltype == Metadata.CellTypes.Number then
+			elseif col.celltype == Data.CellTypes.Number then
 				if lhs[key] ~= rhs[key] then
 					result = lhs[key] < rhs[key]
 				end
 
 			-- Handle text sort
-			elseif col.celltype == Metadata.CellTypes.Text then
+			elseif col.celltype == Data.CellTypes.Text then
 				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
 				if namecheck ~= 0 then
 					result = namecheck == -1
@@ -126,7 +129,7 @@ function Data:Sort(lhs, rhs)
 			-- TODO: Handle icon sort
 
 			-- Handle boolean sort
-			elseif col.celltype == Metadata.CellTypes.Boolean then
+			elseif col.celltype == Data.CellTypes.Boolean then
 				if lhs[key] ~= rhs[key] then
 					result = lhs[key]
 				end

@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-	<Script file="SortFunctions.lua" />
-	<Script file="DisplayFunctions.lua" />
-	<Script file="Metadata.lua" />
 	<Script file="DataFunctions.lua" />
+	<Script file="DisplayFunctions.lua" />
+	<Script file="SortFunctions.lua" />
+	<Script file="Metadata.lua" />
 	<Script file="MerchantPlus.lua" />
 	<Script file="MerchantPlusTable.lua" />
 	<Script file="MerchantPlusItemList.lua" />
