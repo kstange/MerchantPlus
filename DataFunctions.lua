@@ -142,6 +142,9 @@ function Data:GetCollectable(link, itemdata)
 			item.collectable = "known"
 		else
 			local _, sourceid = C_TransmogCollection.GetItemInfo(link)
+			if not sourceid then
+				_, sourceid = C_TransmogCollection.GetItemInfo(itemid)
+			end
 			if sourceid then
 				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
 				if collectable then
