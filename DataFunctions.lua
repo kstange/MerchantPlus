@@ -203,7 +203,7 @@ function Data:GetCollectable(link, itemdata)
 			local mountid = C_MountJournal.GetMountFromItem(itemid)
 			local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
 			if mountinfo[11] then
-				item.collected = Data.Collectable.Known
+				item.collectable = Data.Collectable.Known
 			elseif itemdata.isUsable then
 				item.collectable = Data.Collectable.Collectable
 			else

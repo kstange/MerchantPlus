@@ -34,11 +34,11 @@ local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
 -- This is a list of Collectable states
 Metadata.Collectable = {
-	Unsupported =  -3,
-	Unavailable =  -2,
-	Restricted  =  -1,
+	Unsupported =  -1,
 	Collectable =   0,
 	Known       =   1,
+	Restricted  =   2,
+	Unavailable =   3,
 }
 Data.Collectable = Metadata.Collectable
 Display.Collectable = Metadata.Collectable
