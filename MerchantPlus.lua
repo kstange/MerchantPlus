@@ -344,7 +344,7 @@ function Addon:SetTableLayout()
 			if col.datafunction and Data[col.datafunction] then
 				tInsertUnique(Data.Functions, Data[col.datafunction])
 			end
-			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field)
+			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col.field, col.displayfunction)
 		end
 	end
 end

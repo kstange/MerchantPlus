@@ -17,6 +17,9 @@ local L = Shared.Locale
 -- From SortFunctions.lua
 local Sort = Shared.Sort
 
+-- From PopulateFunctions.lua
+local Display = Shared.Display
+
 -- Push us into shared object
 local Metadata = {}
 Shared.Metadata = Metadata
@@ -62,6 +65,7 @@ Metadata.Columns = {
 		name = L["Stack"],
 		celltype = Metadata.CellTypes.Number,
 		field = "quantity",
+		displayfunction = Display.Quantity,
 		required = false,
 		fixed = true,
 		width = 50,
@@ -71,6 +75,7 @@ Metadata.Columns = {
 		name = L["Supply"],
 		celltype = Metadata.CellTypes.Number,
 		field = "numAvailable",
+		displayfunction = Display.Supply,
 		required = false,
 		fixed = true,
 		width = 58,

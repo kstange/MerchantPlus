@@ -54,32 +54,23 @@ end
 -- Generic cell mixin for common mixin functions
 MerchantPlusTableCellMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTableCellMixin:Init(key)
+function MerchantPlusTableCellMixin:Init(key, displayfunction)
 	self.key = key
+	self.displayfunction = displayfunction
 end
 
 -- This defines a numeric field
 MerchantPlusTableNumberMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
--- TODO: Move key-specific behavior to Metadata or format function
 function MerchantPlusTableNumberMixin:Populate(data)
 	local key = self.key
+	local displayfunction = self.displayfunction
+	local value = data[key]
 
-	if key == "numAvailable" then
-		if data[key] >= 0 then
-			self.Text:SetText(data[key])
-		else
-			self.Text:SetText("∞")
-		end
-	elseif key == "quantity" then
-		if  data[key] > 1 then
-			self.Text:SetText(data[key])
-		else
-			self.Text:SetText("")
-		end
-	else
-		self.Text:SetText(data[key])
+	if displayfunction and type(displayfunction) == "function" then
+		value = displayfunction(key, data)
 	end
+	self.Text:SetText(value or 0)
 end
 
 -- This defines a text field
@@ -87,8 +78,13 @@ MerchantPlusTableTextMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTableTextMixin:Populate(data)
 	local key = self.key
+	local displayfunction = self.displayfunction
+	local value = data[key]
 
-	self.Text:SetText(data[key] or "")
+	if displayfunction and type(displayfunction) == "function" then
+		value = displayfunction(key, data)
+	end
+	self.Text:SetText(value or "")
 end
 
 -- This defines a field for showing an icon
@@ -96,9 +92,14 @@ MerchantPlusTableIconMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTableIconMixin:Populate(data)
 	local key = self.key
+	local displayfunction = self.displayfunction
+	local value = data[key]
 
-	if data[key] then
-		self.Icon:SetTexture(data[key])
+	if displayfunction and type(displayfunction) == "function" then
+		value = displayfunction(key, data)
+	end
+	if value then
+		self.Icon:SetTexture(value)
 		self.Icon:Show()
 	else
 		self.Icon:Hide()
@@ -110,8 +111,13 @@ MerchantPlusTableBooleanMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTableBooleanMixin:Populate(data)
 	local key = self.key
+	local displayfunction = self.displayfunction
+	local value = data[key]
 
-	self.Icon:SetShown(data[key])
+	if displayfunction and type(displayfunction) == "function" then
+		value = displayfunction(key, data)
+	end
+	self.Icon:SetShown(value)
 end
 
 -- This defines a field for showing prices
