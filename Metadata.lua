@@ -32,6 +32,17 @@ Metadata.FriendlyName = "Merchant Plus"
 -- Compatibility for WoW 10.1.0
 local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
+-- This is a list of Collectable states
+Metadata.Collectable = {
+	Unsupported = nil,
+	Unavailable =  -2,
+	Restricted  =  -1,
+	Collectable =   0,
+	Known       =   1,
+}
+Data.Collectable = Metadata.Collectable
+Display.Collectable = Metadata.Collectable
+
 -- This is a list of supported cell types
 Metadata.CellTypes = {
 	Item    = "MerchantPlusTableItemTemplate",
@@ -143,7 +154,7 @@ Metadata.Columns = {
 	},
 	collectable = {
 		name = L["Collectable"],
-		celltype = Metadata.CellTypes.Text,
+		celltype = Metadata.CellTypes.Number,
 		field = "collectable",
 		datafunctions = { Data.GetItemInfo, Data.GetMerchantItemTooltip, Data.GetCollectable },
 		required = false,

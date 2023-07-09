@@ -21,6 +21,9 @@ local trace = function() end
 -- List of additional functions to call to populate data to be filled later
 Data.Functions = {}
 
+-- This is a list of Collectable states to be filled in later
+Data.Collectable = {}
+
 -- Item Categories: Find a localized string that will help identify some special items
 Data.ItemCategoriesQueried = 0
 Data.ItemCategoriesReturned = 0
@@ -115,7 +118,6 @@ end
 function Data:GetItemProfession(tooltip, profession)
 	for _, line in ipairs(tooltip.lines) do
 		if line.type == Enum.TooltipDataLineType.RestrictedSkill then
-			print(line.leftText, profession)
 			if string.find(line.leftText, profession) then
 				return true
 			end
@@ -131,14 +133,14 @@ function Data:GetCollectable(link, itemdata)
 	local class = itemdata.classID
 	local subclass = itemdata.subclassID
 	local itemcategory = Data:GetItemCategory(itemdata.tooltip)
-	item.collectible = nil
+	item.collectible = Data.Collectable.Unsupported
 
 	if class == Enum.ItemClass.Recipe then
 		if itemdata.isUsable then
 			if Data:GetItemKnown(itemdata.tooltip) then
-				item.collectable = "known"
+				item.collectable = Data.Collectable.Known
 			else
-				item.collectable = "collectable"
+				item.collectable = Data.Collectable.Collectable
 			end
 		else
 			local profs = { GetProfessions() }
@@ -151,21 +153,21 @@ function Data:GetCollectable(link, itemdata)
 				end
 			end
 			if not profmatch then
-				item.collectable = "unavailable"
+				item.collectable = Data.Collectable.Unavailable
 			else
-				item.collectable = "restricted"
+				item.collectable = Data.Collectable.Restricted
 			end
 		end
 	elseif class == Enum.ItemClass.Weapon or class == Enum.ItemClass.Armor then
 		if C_Heirloom.GetHeirloomInfo(itemid) then
 			if C_Heirloom.PlayerHasHeirloom(itemid) then
-				item.collectable = "known"
+				item.collectable = Data.Collectable.Known
 			-- Heirlooms that aren't known are always collectable
 			else
-				item.collectable = "collectable"
+				item.collectable = Data.Collectable.Collectable
 			end
 		elseif C_TransmogCollection.PlayerHasTransmogByItemInfo(link) then
-			item.collectable = "known"
+			item.collectable = Data.Collectable.Known
 		else
 			local _, sourceid = C_TransmogCollection.GetItemInfo(link)
 			if not sourceid then
@@ -174,11 +176,11 @@ function Data:GetCollectable(link, itemdata)
 			if sourceid then
 				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
 				if collectable and itemdata.isUsable then
-					item.collectable = "collectable"
+					item.collectable = Data.Collectable.Collectable
 				elseif collectable then
-					item.collectable = "restricted"
+					item.collectable = Data.Collectable.Restricted
 				else
-					item.collectable = "unavailable"
+					item.collectable = Data.Collectable.Unavailable
 				end
 			end
 		end
@@ -188,11 +190,11 @@ function Data:GetCollectable(link, itemdata)
 			local count, max = C_PetJournal.GetNumCollectedInfo(petinfo[13])
 			if itemdata.isUsable then
 				if count >= max then
-					item.collectable = "known"
+					item.collectable = Data.Collectable.Known
 				elseif count == 0 then
-					item.collectable = "collectable"
+					item.collectable = Data.Collectable.Collectable
 				elseif count > 0 and count < max then
-					item.collectable = "known (" .. count .. "/" .. max .. ")"
+					item.collectable = Data.Collectable.Collectable + (count / max)
 				end
 			else
 				item.collectable = "rstricted"
@@ -201,32 +203,32 @@ function Data:GetCollectable(link, itemdata)
 			local mountid = C_MountJournal.GetMountFromItem(itemid)
 			local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
 			if mountinfo[11] then
-				item.collected = "known"
+				item.collected = Data.Collectable.Known
 			elseif itemdata.isUsable then
-				item.collectable = "collectable"
+				item.collectable = Data.Collectable.Collectable
 			else
-				item.collectable = "restricted"
+				item.collectable = Data.Collectable.Restricted
 			end
 		else
 			-- See if this is a toy
 			local toyid = C_ToyBox.GetToyInfo(itemid)
 			if toyid then
 				if PlayerHasToy(toyid) then
-					item.collectable = "known"
+					item.collectable = Data.Collectable.Known
 				elseif C_ToyBox.IsToyUsable(toyid) then
-					item.collectable = "collectable"
+					item.collectable = Data.Collectable.Collectable
 				else
-					item.collectable = "restricted"
+					item.collectable = Data.Collectable.Restricted
 				end
 			end
 			-- If this is on the vendor and usable, it's collectable
 			if itemcategory == Data.ItemCategories.DrakewatcherManuscript then
 				if Data:GetItemKnown(itemdata.tooltip) then
-					item.collectable = "known"
+					item.collectable = Data.Collectable.Known
 				elseif itemdata.isUsable then
-					item.collectable = "collectable"
+					item.collectable = Data.Collectable.Collectable
 				else
-					item.collectable = "restricted"
+					item.collectable = Data.Collectable.Restricted
 				end
 			end
 		end
@@ -236,7 +238,7 @@ function Data:GetCollectable(link, itemdata)
 		local dressable = C_Item.IsDressableItemByID(itemid)
 		if dressable then
 			if Data:GetItemKnown(itemdata.tooltip) then
-				item.collectable = "known"
+				item.collectable = Data.Collectable.Known
 			elseif itemdata.isUsable then
 				item.collectable = "collectable"
 			else
