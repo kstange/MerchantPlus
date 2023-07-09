@@ -90,8 +90,9 @@ function Data:Sort(lhs, rhs)
 	-- randomly.
 	local result = lhs['index'] < rhs['index']
 
-	for ckey, col in pairs(Metadata.Columns) do
-		if ckey == order and col.sortfunction then
+	local col = Metadata.Columns[order]
+	if col then
+		if col.sortfunction then
 
 			-- Handle custom sort function if provided
 			local sort = col.sortfunction(nil, lhs, rhs)
@@ -99,7 +100,7 @@ function Data:Sort(lhs, rhs)
 				result = sort
 			end
 
-		elseif ckey == order and col.field then
+		elseif col.field then
 			local key = col.field
 
 			-- Handle item sort (by name only)
