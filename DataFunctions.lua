@@ -235,8 +235,8 @@ function Data:GetCollectable(link, itemdata)
 			-- If the pet collected at all, we know it, if it's usable and we don't know it
 			-- we can collect it, othewise we probably just can't collect it yet
 			--
-			-- We're not storing enough data here when we have fewer than max if we can
-			-- collect more on this character
+			-- We're not storing enough data here when we have fewer than max to tell if we
+			-- can collect more on this character
 			--
 			-- It's possible we could find a merchant pet that isn't collectable by this
 			-- character (class or faction locked), but I didn't find any examples to test
