@@ -2,7 +2,7 @@
 
 * Added merchant column: Collectable - shows whether an item is known or if it can be collected
   * Supports Gear, Cosmetics, Ensembles, Pets, Mounts, Toys, Heirlooms, Recipes, Drakewatcher Manuscripts (Dragonriding)
-  * Please report anything that isn't handled properly. Merchant and item data has evolved over many expansions.
+  * Please report anything that isn't handled properly. Merchant and item data have evolved over many expansions.
 
 # Release History
 
