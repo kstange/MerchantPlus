@@ -1,8 +1,8 @@
-# Version 10.1.5.0
+# Version 10.1.5.x
 
-* Updated for Retail 10.1.5
-* Fixed inverted sort arrow in column headings (#3)
-* Fixed issues related to new Sell All Junk Items button
+* Added merchant column: Collectable - shows whether an item is known or if it can be collected
+  * Supports Gear, Cosmetics, Ensembles, Pets, Mounts, Toys, Heirlooms, Recipes, Drakewatcher Manuscripts (Dragonriding)
+  * Please report anything that isn't handled properly. Merchant and item data has evolved over many expansions.
 
 # Release History
 
