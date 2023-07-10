@@ -115,7 +115,7 @@ end
 function Data:GetItemKnown(tooltip)
 	for _, line in ipairs(tooltip.lines) do
 		-- If there's a RestrictedSpellKnown line in this tooltip we're
-		-- trusting that we known this item
+		-- trusting that we know this item
 		if line.type == Enum.TooltipDataLineType.RestrictedSpellKnown then
 			return true
 		end
@@ -221,22 +221,29 @@ function Data:GetCollectable(link, itemdata)
 	-- Pets, Mounts, Toys, Drakewatcher Manuscripts
 	elseif class == Enum.ItemClass.Miscellaneous then
 
-		-- This s a pet, let's see if we know it and how many we have
+		-- This is a pet, let's see if we know it and how many we have
 		if subclass == Enum.ItemMiscellaneousSubclass.CompanionPet then
 			-- This field could move; look for speciesID index
 			local petinfo = { C_PetJournal.GetPetInfoByItemID(itemid) }
 			local count, max = C_PetJournal.GetNumCollectedInfo(petinfo[13])
 
-			-- If the pet is usable, and we have any, we know it, but it's still collectable
-			-- if we don't know the max quantity, otherwise we probably just can't learn it yet
-			if itemdata.isUsable then
-				if count >= max then
-					item.collectable = Data.Collectable.Known
-				elseif count == 0 then
-					item.collectable = Data.Collectable.Collectable
-				elseif count > 0 and count < max then
-					item.collectable = Data.Collectable.Collectable + (count / max)
-				end
+			-- This is special metadata just for pets, because we might want to use this
+			-- in our display, sorting, or filtering functionality since we're looking it
+			-- up anyway
+			item.collectedpets = { count = count, max = max }
+
+			-- If the pet collected at all, we know it, if it's usable and we don't know it
+			-- we can collect it, othewise we probably just can't collect it yet
+			--
+			-- We're not storing enough data here when we have fewer than max if we can
+			-- collect more on this character
+			--
+			-- It's possible we could find a merchant pet that isn't collectable by this
+			-- character (class or faction locked), but I didn't find any examples to test
+			if count == 0 and itemdata.isUsable then
+				item.collectable = Data.Collectable.Collectable
+			elseif count > 0 then
+				item.collectable = Data.Collectable.Known
 			else
 				item.collectable = Data.Collectable.Restricted
 			end
