@@ -25,6 +25,9 @@ Data.Functions = {}
 Data.Collectable = {}
 
 -- Item Categories: Find a localized string that will help identify some special items
+--
+-- The idea here is to not have to hardcode known localized strings so we can match non-English
+-- clients without having to test in every language or get help from translators
 Data.ItemCategoriesQueried = 0
 Data.ItemCategoriesReturned = 0
 Data.ItemCategories = {
@@ -83,7 +86,7 @@ function Data:GetMerchantItemTooltip()
 	return item
 end
 
--- Finish gathering tooltip data for ItemCategory entries
+-- Finish gathering tooltip data for ItemCategory entries after preload is done
 function Data:FinishItemCategories()
 	Data.ItemCategoriesReturned = Data.ItemCategoriesReturned + 1
 	if Data.ItemCategoriesReturned == Data.ItemCategoriesQueried then
@@ -97,6 +100,10 @@ end
 -- Find the Item Category string in the tooltip
 function Data:GetItemCategory(tooltip)
 	for _, line in ipairs(tooltip.lines) do
+		-- This is hacky: look for the first line with light blue text
+		--
+		-- Usually this will be something like "Crafting Reagent" or another
+		-- type of description indicating a special category of item
 		if string.find(line.leftText, "|cFF66BBFF") then
 			return string.sub(line.leftText, 11)
 		end
@@ -107,6 +114,8 @@ end
 -- Find the Item Known state of the tooltip
 function Data:GetItemKnown(tooltip)
 	for _, line in ipairs(tooltip.lines) do
+		-- If there's a RestrictedSpellKnown line in this tooltip we're
+		-- trusting that we known this item
 		if line.type == Enum.TooltipDataLineType.RestrictedSpellKnown then
 			return true
 		end
@@ -117,6 +126,10 @@ end
 -- Find the Item Profession state of the tooltip
 function Data:GetItemProfession(tooltip, profession)
 	for _, line in ipairs(tooltip.lines) do
+		-- If the localized profession name passed is found in this
+		-- RestrictedSkill line, we're assuming that it's our profession
+		--
+		-- This hopefully makes things localization agnostic
 		if line.type == Enum.TooltipDataLineType.RestrictedSkill then
 			if string.find(line.leftText, profession) then
 				return true
@@ -135,14 +148,19 @@ function Data:GetCollectable(link, itemdata)
 	local itemcategory = Data:GetItemCategory(itemdata.tooltip)
 	item.collectable = Data.Collectable.Unsupported
 
+	-- Profession Recipes
 	if class == Enum.ItemClass.Recipe then
+		-- If this item is usable, it's either known or collectable
 		if itemdata.isUsable then
 			if Data:GetItemKnown(itemdata.tooltip) then
 				item.collectable = Data.Collectable.Known
 			else
 				item.collectable = Data.Collectable.Collectable
 			end
+		-- If it's not usable, it's either not for our profession or
+		-- we might not be able to learn it yet
 		else
+			-- Scan the item data for what profession this item requires
 			local profs = { GetProfessions() }
 			local profmatch = false
 			for _, prof in pairs(profs) do
@@ -152,13 +170,18 @@ function Data:GetCollectable(link, itemdata)
 					break
 				end
 			end
+			-- If it's not for our professions, it's unavailable, else it's restricted
 			if not profmatch then
 				item.collectable = Data.Collectable.Unavailable
 			else
 				item.collectable = Data.Collectable.Restricted
 			end
 		end
+
+	-- Gear and Heirlooms
 	elseif class == Enum.ItemClass.Weapon or class == Enum.ItemClass.Armor then
+
+		-- If this is an heirloom, the whole item is collectable unless it's known
 		if C_Heirloom.GetHeirloomInfo(itemid) then
 			if C_Heirloom.PlayerHasHeirloom(itemid) then
 				item.collectable = Data.Collectable.Known
@@ -166,15 +189,25 @@ function Data:GetCollectable(link, itemdata)
 			else
 				item.collectable = Data.Collectable.Collectable
 			end
+
+		-- If this gear appearance is known, we're done
 		elseif C_TransmogCollection.PlayerHasTransmogByItemInfo(link) then
 			item.collectable = Data.Collectable.Known
+
+		-- If we don't know it, see if we can learn it
 		else
 			local _, sourceid = C_TransmogCollection.GetItemInfo(link)
+			-- Fall back if the item link doesn't give us anything
 			if not sourceid then
 				_, sourceid = C_TransmogCollection.GetItemInfo(itemid)
 			end
+
+			-- If this item has an appearance, let's see if we can learn it
 			if sourceid then
 				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
+
+				-- If usable, we can collect it, if not, we can't collect it yet (probably),
+				-- otherwise, we can't collect it at all on this character
 				if collectable and itemdata.isUsable then
 					item.collectable = Data.Collectable.Collectable
 				elseif collectable then
@@ -184,10 +217,18 @@ function Data:GetCollectable(link, itemdata)
 				end
 			end
 		end
+
+	-- Pets, Mounts, Toys, Drakewatcher Manuscripts
 	elseif class == Enum.ItemClass.Miscellaneous then
+
+		-- This s a pet, let's see if we know it and how many we have
 		if subclass == Enum.ItemMiscellaneousSubclass.CompanionPet then
+			-- This field could move; look for speciesID index
 			local petinfo = { C_PetJournal.GetPetInfoByItemID(itemid) }
 			local count, max = C_PetJournal.GetNumCollectedInfo(petinfo[13])
+
+			-- If the pet is usable, and we have any, we know it, but it's still collectable
+			-- if we don't know the max quantity, otherwise we probably just can't learn it yet
 			if itemdata.isUsable then
 				if count >= max then
 					item.collectable = Data.Collectable.Known
@@ -199,9 +240,18 @@ function Data:GetCollectable(link, itemdata)
 			else
 				item.collectable = Data.Collectable.Restricted
 			end
+
+		-- This is a mount, let's see if we know it
 		elseif subclass == Enum.ItemMiscellaneousSubclass.Mount then
 			local mountid = C_MountJournal.GetMountFromItem(itemid)
 			local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
+
+			-- This field could move; look for isCollected index
+			-- If collected, then we know it, if it's usable we can collect it, otherwise
+			-- we probably can't collect it yet
+			--
+			-- It's possible we could find a merchant mount that isn't collectable by this
+			-- character (class or faction locked), but I didn't find any examples to test
 			if mountinfo[11] then
 				item.collectable = Data.Collectable.Known
 			elseif itemdata.isUsable then
@@ -209,9 +259,14 @@ function Data:GetCollectable(link, itemdata)
 			else
 				item.collectable = Data.Collectable.Restricted
 			end
+
+		-- This could be anything! We'll have to just try to figure out what it is
 		else
-			-- See if this is a toy
+			-- Let's see if this is a toy
 			local toyid = C_ToyBox.GetToyInfo(itemid)
+
+			-- It's a toy! If we have it, we have it, if the toy is usable, we can
+			-- collect it, otherwise we probably can't collect it yet
 			if toyid then
 				if PlayerHasToy(toyid) then
 					item.collectable = Data.Collectable.Known
@@ -221,8 +276,16 @@ function Data:GetCollectable(link, itemdata)
 					item.collectable = Data.Collectable.Restricted
 				end
 			end
-			-- If this is on the vendor and usable, it's collectable
+
+			-- With some tooltip magic we tried to guess if this item has a special category
+			-- Let's see if it's a Drakewatcher Manuscript
 			if itemcategory == Data.ItemCategories.DrakewatcherManuscript then
+
+				-- If this is on the vendor and usable, it's collectable
+				--
+				-- We shouldn't ever see this kind of item on the merchant if it can't be
+				-- collected by this character or is known, but we'll try to check just
+				-- in case
 				if Data:GetItemKnown(itemdata.tooltip) then
 					item.collectable = Data.Collectable.Known
 				elseif itemdata.isUsable then
@@ -232,9 +295,15 @@ function Data:GetCollectable(link, itemdata)
 				end
 			end
 		end
+
+	-- This is a consumable! Sometimes these can be collected
 	elseif class == Enum.ItemClass.Consumable and Enum.ItemConsumableSubclass.Other then
-		-- We're going trust that if this item appears on the merchant and is dressable it's unlearned
-		-- but collectable
+
+		-- We're going trust that if this item appears on the merchant and is dressable it's
+		-- unlearned but collectable
+		--
+		-- This is known to cover Ensembles... ideally it would cover Illusions but it doesn't
+		-- seem to do that and I couldn't find any other way to test them
 		local dressable = C_Item.IsDressableItemByID(itemid)
 		if dressable then
 			if Data:GetItemKnown(itemdata.tooltip) then
@@ -246,6 +315,7 @@ function Data:GetCollectable(link, itemdata)
 			end
 		end
 	end
+
 	return item
 end
 
