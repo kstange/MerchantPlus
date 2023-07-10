@@ -18,8 +18,11 @@ local AddonName, Shared = ...
 local Metadata = Shared.Metadata
 local Callbacks = Metadata.OptionCallbacks
 
--- From Data.lua
+-- From DataFunctions.lua
 local Data = Shared.Data
+
+-- From SortFunctions.lua
+local Sort = Shared.Sort
 
 -- Push us into shared object
 local Addon = {}
@@ -446,7 +449,7 @@ function Addon:HandleEvent(event, target)
 		MerchantPlusItemList.SortCallback   = Addon.UpdateSort
 		MerchantPlusItemList.GetDataCount   = Data.GetMerchantCount
 		MerchantPlusItemList.GetData        = Data.UpdateMerchant
-		MerchantPlusItemList.Sort           = Data.Sort
+		MerchantPlusItemList.Sort           = Sort.Sort
 	end
 end
 

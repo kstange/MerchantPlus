@@ -15,6 +15,12 @@ local AddonName, Shared = ...
 local Sort = {}
 Shared.Sort = Sort
 
+-- This is a list of supported cell types to be filled later
+Sort.CellTypes = {}
+
+-- This is a list of supported columns to be filled later
+Sort.Columns = {}
+
 local CurrencyCache = {}
 
 -- Item Price: sort by magic:
@@ -116,4 +122,69 @@ function Sort:GetCurrencyName(link)
 		end
 	end
 	return name
+end
+
+-- This function will sort based on the request
+function Sort:Sort(lhs, rhs)
+	local order, state = self:GetSortOrder()
+
+	-- The sort method will sometimes send nil values
+	if not lhs or not rhs then
+		return false
+	end
+
+	-- Default sort by Merchant index if nothing else is set.
+	-- Use this to ensure that equal values retain a deterministic
+	-- sort, otherwise race conditions may occur where they shift
+	-- randomly.
+	local result = lhs['index'] < rhs['index']
+
+	local col = Sort.Columns[order]
+	if col then
+		if col.sortfunction then
+
+			-- Handle custom sort function if provided
+			local sort = col.sortfunction(nil, lhs, rhs)
+			if sort ~= nil then
+				result = sort
+			end
+
+		elseif col.field then
+			local key = col.field
+
+			-- Handle item sort (by name only)
+			if col.celltype == Sort.CellTypes.Item then
+				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
+				if namecheck ~= 0 then
+					result = namecheck == -1
+				end
+
+			-- Handle number sort
+			elseif col.celltype == Sort.CellTypes.Number then
+				if lhs[key] ~= rhs[key] then
+					result = lhs[key] < rhs[key]
+				end
+
+			-- Handle text sort
+			elseif col.celltype == Sort.CellTypes.Text then
+				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
+				if namecheck ~= 0 then
+					result = namecheck == -1
+				end
+
+			-- TODO: Handle icon sort
+
+			-- Handle boolean sort
+			elseif col.celltype == Sort.CellTypes.Boolean then
+				if lhs[key] ~= rhs[key] then
+					result = lhs[key]
+				end
+			end
+		end
+	end
+	if state == 1 then
+		return not result
+	else
+		return result
+	end
 end

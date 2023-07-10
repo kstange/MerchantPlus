@@ -41,7 +41,7 @@ Metadata.CellTypes = {
 	Icon    = "MerchantPlusTableIconTemplate",
 	Boolean = "MerchantPlusTableBooleanTemplate",
 }
-Data.CellTypes = Metadata.CellTypes
+Sort.CellTypes = Metadata.CellTypes
 
 -- This table defines the columns for the TableBuilder to use
 Metadata.Columns = {
@@ -142,7 +142,7 @@ Metadata.Columns = {
 		padding = { 8, 0 },
 	},
 }
-Data.Columns = Metadata.Columns
+Sort.Columns = Metadata.Columns
 
 Metadata.ColumnSort = {
 	'quantity',

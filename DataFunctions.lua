@@ -18,14 +18,8 @@ Shared.Data = Data
 -- Init an empty trace function to replace later
 local trace = function() end
 
--- List of additional functions to call to populate data, filled later
+-- List of additional functions to call to populate data to be filled later
 Data.Functions = {}
-
--- This is a list of supported cell types to be, filled later
-Data.CellTypes = {}
-
--- This is a list of supported columns to be, filled later
-Data.Columns = {}
 
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
@@ -76,71 +70,6 @@ function Data:GetMerchantItemTooltip()
 	local item = {}
 	item.tooltip = C_TooltipInfo.GetMerchantItem(index)
 	return item
-end
-
--- This function will sort based on the request
-function Data:Sort(lhs, rhs)
-	local order, state = self:GetSortOrder()
-
-	-- The sort method will sometimes send nil values
-	if not lhs or not rhs then
-		return false
-	end
-
-	-- Default sort by Merchant index if nothing else is set.
-	-- Use this to ensure that equal values retain a deterministic
-	-- sort, otherwise race conditions may occur where they shift
-	-- randomly.
-	local result = lhs['index'] < rhs['index']
-
-	local col = Data.Columns[order]
-	if col then
-		if col.sortfunction then
-
-			-- Handle custom sort function if provided
-			local sort = col.sortfunction(nil, lhs, rhs)
-			if sort ~= nil then
-				result = sort
-			end
-
-		elseif col.field then
-			local key = col.field
-
-			-- Handle item sort (by name only)
-			if col.celltype == Data.CellTypes.Item then
-				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
-				if namecheck ~= 0 then
-					result = namecheck == -1
-				end
-
-			-- Handle number sort
-			elseif col.celltype == Data.CellTypes.Number then
-				if lhs[key] ~= rhs[key] then
-					result = lhs[key] < rhs[key]
-				end
-
-			-- Handle text sort
-			elseif col.celltype == Data.CellTypes.Text then
-				local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
-				if namecheck ~= 0 then
-					result = namecheck == -1
-				end
-
-			-- TODO: Handle icon sort
-
-			-- Handle boolean sort
-			elseif col.celltype == Data.CellTypes.Boolean then
-				if lhs[key] ~= rhs[key] then
-					result = lhs[key]
-				end
-			end
-		end
-	end
-	if state == 1 then
-		return not result
-	else
-		return result
-	end
 end
 
 -- Since this code runs before MerchantPlus.lua we need to reset the trace function after init
