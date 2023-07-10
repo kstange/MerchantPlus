@@ -98,7 +98,10 @@ function MerchantPlusTableIconMixin:Populate(data)
 	if displayfunction and type(displayfunction) == "function" then
 		value = displayfunction(key, data)
 	end
-	if value then
+	if type(value) == "table" and value['atlas'] then
+		self.Icon:SetAtlas(value['atlas'])
+		self.Icon:Show()
+	elseif value then
 		self.Icon:SetTexture(value)
 		self.Icon:Show()
 	else

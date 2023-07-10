@@ -162,15 +162,7 @@
 				<Texture parentKey="Icon">
 					<Size x="14" y="14"/>
 					<Anchors>
-						<Anchor point="LEFT"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="BACKGROUND" textureSubLevel="2">
-				<Texture parentKey="IconBorder" atlas="auctionhouse-itemicon-small-border" useAtlasSize="false">
-					<Size x="16" y="16"/>
-					<Anchors>
-						<Anchor point="CENTER" relativeKey="$parent.Icon"/>
+						<Anchor point="CENTER" />
 					</Anchors>
 				</Texture>
 			</Layer>

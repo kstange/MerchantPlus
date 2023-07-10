@@ -27,7 +27,7 @@ local CurrencyCache = {}
 --   Items with regular gold prices first, in cost order
 --   Items with extended cost currency, ordered most to least significant
 --     First by name of currency, then by amount of currency
-function Sort:SortPrice(lhs, rhs)
+function Sort:Price(lhs, rhs)
 	local result = nil
 
 	-- If extendedCost state is the same, compare the values
@@ -172,7 +172,20 @@ function Sort:Sort(lhs, rhs)
 					result = namecheck == -1
 				end
 
-			-- TODO: Handle icon sort
+			-- Handle icon sort
+			-- This tries to sort by number, or else UTF8 comparison if these aren't numbers
+			-- If something weird is stashed in here, a custom sort function should be used
+			elseif col.celltype == Sort.CellTypes.Icon then
+				if type(lhs[key]) == "number" and type(rhs[key]) == "number" then
+					if lhs[key] ~= rhs[key] then
+						result = lhs[key] < rhs[key]
+					end
+				else
+					local namecheck = SortUtil.CompareUtf8i(lhs[key] or "", rhs[key] or "")
+					if namecheck ~= 0 then
+						result = namecheck == -1
+					end
+				end
 
 			-- Handle boolean sort
 			elseif col.celltype == Sort.CellTypes.Boolean then

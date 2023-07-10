@@ -33,15 +33,15 @@ Metadata.FriendlyName = "Merchant Plus"
 local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
 
 -- This is a list of Collectable states
-Metadata.Collectable = {
+Metadata.CollectableState = {
 	Unsupported =  -1,
 	Collectable =   0,
 	Known       =   1,
 	Restricted  =   2,
 	Unavailable =   3,
 }
-Data.Collectable = Metadata.Collectable
-Display.Collectable = Metadata.Collectable
+Data.CollectableState = Metadata.CollectableState
+Display.CollectableState = Metadata.CollectableState
 
 -- This is a list of supported cell types
 Metadata.CellTypes = {
@@ -70,7 +70,7 @@ Metadata.Columns = {
 		name = L["Price"],
 		celltype = Metadata.CellTypes.Price,
 		field = nil,
-		sortfunction = Sort.SortPrice,
+		sortfunction = Sort.Price,
 		required = true,
 		fixed = true,
 		width = 146,
@@ -154,13 +154,14 @@ Metadata.Columns = {
 	},
 	collectable = {
 		name = L["Collectable"],
-		celltype = Metadata.CellTypes.Number,
+		celltype = Metadata.CellTypes.Icon,
 		field = "collectable",
 		datafunctions = { Data.GetItemInfo, Data.GetMerchantItemTooltip, Data.GetCollectable },
+		displayfunction = Display.Collectable,
 		required = false,
 		fixed = true,
-		width = 122,
-		padding = { 8, 0 },
+		width = 88,
+		padding = { 0, 0 },
 	}
 }
 Sort.Columns = Metadata.Columns

@@ -22,7 +22,7 @@ local trace = function() end
 Data.Functions = {}
 
 -- This is a list of Collectable states to be filled in later
-Data.Collectable = {}
+Data.CollectableState = {}
 
 -- Item Categories: Find a localized string that will help identify some special items
 --
@@ -146,16 +146,16 @@ function Data:GetCollectable(link, itemdata)
 	local class = itemdata.classID
 	local subclass = itemdata.subclassID
 	local itemcategory = Data:GetItemCategory(itemdata.tooltip)
-	item.collectable = Data.Collectable.Unsupported
+	item.collectable = Data.CollectableState.Unsupported
 
 	-- Profession Recipes
 	if class == Enum.ItemClass.Recipe then
 		-- If this item is usable, it's either known or collectable
 		if itemdata.isUsable then
 			if Data:GetItemKnown(itemdata.tooltip) then
-				item.collectable = Data.Collectable.Known
+				item.collectable = Data.CollectableState.Known
 			else
-				item.collectable = Data.Collectable.Collectable
+				item.collectable = Data.CollectableState.Collectable
 			end
 		-- If it's not usable, it's either not for our profession or
 		-- we might not be able to learn it yet
@@ -172,9 +172,9 @@ function Data:GetCollectable(link, itemdata)
 			end
 			-- If it's not for our professions, it's unavailable, else it's restricted
 			if not profmatch then
-				item.collectable = Data.Collectable.Unavailable
+				item.collectable = Data.CollectableState.Unavailable
 			else
-				item.collectable = Data.Collectable.Restricted
+				item.collectable = Data.CollectableState.Restricted
 			end
 		end
 
@@ -184,15 +184,15 @@ function Data:GetCollectable(link, itemdata)
 		-- If this is an heirloom, the whole item is collectable unless it's known
 		if C_Heirloom.GetHeirloomInfo(itemid) then
 			if C_Heirloom.PlayerHasHeirloom(itemid) then
-				item.collectable = Data.Collectable.Known
+				item.collectable = Data.CollectableState.Known
 			-- Heirlooms that aren't known are always collectable
 			else
-				item.collectable = Data.Collectable.Collectable
+				item.collectable = Data.CollectableState.Collectable
 			end
 
 		-- If this gear appearance is known, we're done
 		elseif C_TransmogCollection.PlayerHasTransmogByItemInfo(link) then
-			item.collectable = Data.Collectable.Known
+			item.collectable = Data.CollectableState.Known
 
 		-- If we don't know it, see if we can learn it
 		else
@@ -209,11 +209,11 @@ function Data:GetCollectable(link, itemdata)
 				-- If usable, we can collect it, if not, we can't collect it yet (probably),
 				-- otherwise, we can't collect it at all on this character
 				if collectable and itemdata.isUsable then
-					item.collectable = Data.Collectable.Collectable
+					item.collectable = Data.CollectableState.Collectable
 				elseif collectable then
-					item.collectable = Data.Collectable.Restricted
+					item.collectable = Data.CollectableState.Restricted
 				else
-					item.collectable = Data.Collectable.Unavailable
+					item.collectable = Data.CollectableState.Unavailable
 				end
 			end
 		end
@@ -241,11 +241,11 @@ function Data:GetCollectable(link, itemdata)
 			-- It's possible we could find a merchant pet that isn't collectable by this
 			-- character (class or faction locked), but I didn't find any examples to test
 			if count == 0 and itemdata.isUsable then
-				item.collectable = Data.Collectable.Collectable
+				item.collectable = Data.CollectableState.Collectable
 			elseif count > 0 then
-				item.collectable = Data.Collectable.Known
+				item.collectable = Data.CollectableState.Known
 			else
-				item.collectable = Data.Collectable.Restricted
+				item.collectable = Data.CollectableState.Restricted
 			end
 
 		-- This is a mount, let's see if we know it
@@ -260,11 +260,11 @@ function Data:GetCollectable(link, itemdata)
 			-- It's possible we could find a merchant mount that isn't collectable by this
 			-- character (class or faction locked), but I didn't find any examples to test
 			if mountinfo[11] then
-				item.collectable = Data.Collectable.Known
+				item.collectable = Data.CollectableState.Known
 			elseif itemdata.isUsable then
-				item.collectable = Data.Collectable.Collectable
+				item.collectable = Data.CollectableState.Collectable
 			else
-				item.collectable = Data.Collectable.Restricted
+				item.collectable = Data.CollectableState.Restricted
 			end
 
 		-- This could be anything! We'll have to just try to figure out what it is
@@ -276,11 +276,11 @@ function Data:GetCollectable(link, itemdata)
 			-- collect it, otherwise we probably can't collect it yet
 			if toyid then
 				if PlayerHasToy(toyid) then
-					item.collectable = Data.Collectable.Known
+					item.collectable = Data.CollectableState.Known
 				elseif C_ToyBox.IsToyUsable(toyid) then
-					item.collectable = Data.Collectable.Collectable
+					item.collectable = Data.CollectableState.Collectable
 				else
-					item.collectable = Data.Collectable.Restricted
+					item.collectable = Data.CollectableState.Restricted
 				end
 			end
 
@@ -294,11 +294,11 @@ function Data:GetCollectable(link, itemdata)
 				-- collected by this character or is known, but we'll try to check just
 				-- in case
 				if Data:GetItemKnown(itemdata.tooltip) then
-					item.collectable = Data.Collectable.Known
+					item.collectable = Data.CollectableState.Known
 				elseif itemdata.isUsable then
-					item.collectable = Data.Collectable.Collectable
+					item.collectable = Data.CollectableState.Collectable
 				else
-					item.collectable = Data.Collectable.Restricted
+					item.collectable = Data.CollectableState.Restricted
 				end
 			end
 		end
@@ -314,11 +314,11 @@ function Data:GetCollectable(link, itemdata)
 		local dressable = C_Item.IsDressableItemByID(itemid)
 		if dressable then
 			if Data:GetItemKnown(itemdata.tooltip) then
-				item.collectable = Data.Collectable.Known
+				item.collectable = Data.CollectableState.Known
 			elseif itemdata.isUsable then
-				item.collectable = "collectable"
+				item.collectable = Data.CollectableState.Collectable
 			else
-				item.collectable = "restricted"
+				item.collectable = Data.CollectableState.Restricted
 			end
 		end
 	end
