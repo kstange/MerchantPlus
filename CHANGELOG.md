@@ -1,3 +1,8 @@
+# Version 10.1.5.1
+
+* Added zhCN (Simplified Chinese) translation (ekrid1107)
+* Added zhTW (Traditional Chinese) translation (ekrid1107)
+
 # Version 10.1.5.0
 
 * Updated for Retail 10.1.5
