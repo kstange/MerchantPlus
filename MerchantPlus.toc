@@ -8,6 +8,8 @@
 ## SavedVariables: MerchantPlus
 ## IconAtlas: Cursor_buy_32
 
+## OptionalDeps: ElvUI
+
 ## X-Curse-Project-ID: 852491 
 ## X-WoWI-ID: 26570 
 ## X-Wago-ID: XKq99xKy

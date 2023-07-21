@@ -455,6 +455,13 @@ function Addon:HandleEvent(event, target)
 		MerchantPlusItemList.GetDataCount   = Data.GetMerchantCount
 		MerchantPlusItemList.GetData        = Data.UpdateMerchant
 		MerchantPlusItemList.Sort           = Sort.Sort
+
+		-- Detect ElvUI and register callback to apply the skin
+		if ElvUI then
+			Addon.ElvUI = unpack(ElvUI)
+			Addon.ElvUISkin = Addon.ElvUI:GetModule('Skins')
+			Addon.ElvUISkin:AddCallbackForAddon('MerchantPlus', 'Merchant Plus', Addon.ElvUILoad)
+		end
 	end
 end
 
@@ -479,6 +486,48 @@ function Addon:ClearMerchantTaint()
 	Addon:ClearTaint("MerchantBuyBackItem")
 	Addon:ClearTaint("MerchantBuyBackItemItemButton")
 	Addon:ClearTaint("MerchantBuyBackItemMoneyFrame")
+end
+
+-- When the Merchant Frame opens, we need to reskin any headers that may have
+-- been created since we last checked
+function Addon:ElvUIHeaders()
+	trace("called: ElvUIHeaders")
+	for i, header in next, { MerchantPlusItemList.HeaderContainer:GetChildren() } do
+		if not header.IsSkinned then
+			header:DisableDrawLayer('BACKGROUND')
+			header:CreateBackdrop('Transparent')
+			header.IsSkinned = true
+		end
+	end
+end
+
+-- When loading, if ElvUI is skinning the Merchant Frame, we'll try to adopt
+-- the same style
+function Addon:ElvUILoad()
+	local E = Addon.ElvUI
+	local S = Addon.ElvUISkin
+	trace("called: ElvUILoad")
+
+	-- Only skin us if the Merchant Frame is skinned
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.merchant) then return end
+
+	trace("skinning: ElvUI")
+	S:HandleTab(MerchantPlusTab)
+	MerchantPlusTab:ClearAllPoints()
+	MerchantPlusTab:Point('TOPLEFT', MerchantFrameTab2, 'TOPRIGHT', -5, 0)
+
+	MerchantPlusFrame:StripTextures()
+	MerchantPlusItemList:StripTextures()
+	S:HandleTrimScrollBar(MerchantPlusItemList.ScrollBar)
+	MerchantPlusItemList.ScrollBar:ClearAllPoints()
+	MerchantPlusItemList.ScrollBar:Point('TOPRIGHT', MerchantPlusItemList, -6, -16)
+	MerchantPlusItemList.ScrollBar:Point('BOTTOMRIGHT', MerchantPlusItemList, -6, 16)
+	MerchantPlusItemList.ScrollBox:SetTemplate('Transparent')
+	MerchantPlusItemList.NineSlice:SetTemplate('Transparent')
+	MerchantPlusItemList.NineSlice:SetInside(MerchantPlusItemList)
+	MerchantPlusItemList:SetTemplate('Transparent')
+
+	hooksecurefunc(MerchantPlusItemList, "RefreshScrollFrame", Addon.ElvUIHeaders)
 end
 
 -- These are init steps specific to this addon

@@ -1,3 +1,7 @@
+# Version 10.1.5.2
+
+* Added support for ElvUI when the Merchant Frame is skinned
+
 # Version 10.1.5.1
 
 * Added zhCN (Simplified Chinese) translation (ekrid1107)
