@@ -1,6 +1,7 @@
 # Version 10.1.5.2
 
 * Added support for ElvUI when the Merchant Frame is skinned
+* Updated zhTW (Traditional Chinese) translation (BNS333)
 
 # Version 10.1.5.1
 

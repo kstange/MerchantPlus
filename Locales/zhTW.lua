@@ -18,6 +18,7 @@ local _, Shared = ...
 local L = Shared.Locale
 
 L["Available"] = "可購買"
+L["Collectable"] = "可收藏"
 L["Index"] = "索引"
 L["Item"] = "物品"
 L["Item ID"] = "物品 ID"
