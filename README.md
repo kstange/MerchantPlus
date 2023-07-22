@@ -30,7 +30,7 @@ Currently Merchant Plus requires functionality only available in Retail.  Blizza
 
 ## Compatibility
 
-This addon does not replace the existing UI, but it makes many changes to the merchant window, so it may conflict with other addons that modify the contents or layout.  Addons that replace the window will prevent Merchant Plus from appearing entirely.  Addons that re-skin the merchant window may cause layout problems.
+This addon does not replace the existing UI, but it makes many changes to the merchant window, so it may conflict with other addons that modify the contents or layout.  Addons that replace the window will prevent Merchant Plus from appearing entirely.  ElvUI is supported when the Blizzard Merchant Frame skin is enabled.  Other addons that re-skin the merchant window may cause layout problems.
 
 Ideally, Merchant Plus will not be the cause of any conflicts. If you discover any, please [report them](https://github.com/kstange/MerchantPlus/issues/), and I'll fix what I can from the Merchant Plus side.
 
