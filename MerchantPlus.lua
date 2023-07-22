@@ -44,14 +44,6 @@ MerchantPlusFrameMixin = {}
 
 -- Re-anchor the Buyback and Currency elements to things that won't move around
 function MerchantPlusFrameMixin:OnLoad()
-	-- Fix for 10.1.5 - Need to adjust position of the BuyBack Button differently
-	if not MerchantSellAllJunkButton then
-		MerchantBuyBackItem:ClearAllPoints()
-		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 252.5, 33)
-	else
-		MerchantBuyBackItem:ClearAllPoints()
-		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 263.5, 33)
-	end
 	MerchantExtraCurrencyInset:ClearAllPoints()
 	MerchantExtraCurrencyInset:SetPoint("RIGHT", MerchantMoneyInset, "LEFT", 5, 0)
 	MerchantExtraCurrencyInset:SetSize(166, 23)
@@ -254,7 +246,10 @@ function Addon:UpdateFrame()
 			MerchantSellAllJunkButton:Show()
 		end
 
-		-- Show the Buyback button
+		-- Reanchor and show the Buyback button
+		-- Reanchoring works around an issue with ElvUI when switching from the Buyback tab
+		MerchantBuyBackItem:ClearAllPoints()
+		MerchantBuyBackItem:SetPoint("BOTTOM", MerchantFrame, "BOTTOMLEFT", 263.5, 33)
 		MerchantBuyBackItem:Show()
 
 		-- Update the Buyback button if something happened while we weren't looking

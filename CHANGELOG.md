@@ -1,3 +1,7 @@
+# Version 10.1.5.3
+
+* Fixed the Buyback button position after switching from the Buyback tab with the ElvUI skin enabled
+
 # Version 10.1.5.2
 
 * Added support for ElvUI when the Merchant Frame is skinned
