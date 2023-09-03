@@ -232,8 +232,7 @@ function Addon:UpdateFrame()
 		MerchantFrame_UpdateRepairButtons()
 
 		-- For 10.1.7 - Update the state of the Sell All Junk button
-		-- Disabled until 10.1.7 due to last minute Blizzard announcement
-		if MerchantSellAllJunkButton and false then
+		if C_MerchantFrame.IsSellAllJunkEnabled and C_MerchantFrame.IsSellAllJunkEnabled() then
 			-- The button is anchored weirdly unless the Repair Buttons are shown.
 			if not CanMerchantRepair() then
 				MerchantSellAllJunkButton:ClearAllPoints()
