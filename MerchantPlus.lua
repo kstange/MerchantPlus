@@ -256,11 +256,6 @@ function Addon:UpdateFrame()
 			Addon:UpdateBuyback()
 		end
 
-		-- For 10.1.5 - Show the UndoFrame arrow in the Buyback Button
-		if UndoFrame and UndoFrame.Arrow then
-			UndoFrame.Arrow:Show()
-		end
-
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
 
