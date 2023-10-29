@@ -34,6 +34,17 @@ Data.ItemCategories = {
 	DrakewatcherManuscript = 196970,
 }
 
+-- Merchant items with wrong Blizz classifications
+-- 'Misc: Companion Pets' that aren't pets (but toys, except 174925)
+local falsePets = {
+	[37460] = true, -- Rope Pet Leash (verified): Toy
+	[44820] = true, -- Red Ribbon Pet Leash (verified): Toy
+	[174995] = true, -- Void Tendril Pet Leash (verified): Toy
+	[174925] = true, -- Void Tendril Pet Leash (verified): One-time use item
+	[71137] = true, -- Brewfest Keg Pony (wowhead); Brewfest event only: Toy
+	[75042] = true, -- Flimsy Yellow Balloon (wowhead); DMF event only: Toy
+}
+
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
 	SetMerchantFilter(LE_LOOT_FILTER_ALL)
@@ -222,7 +233,7 @@ function Data:GetCollectable(link, itemdata)
 	elseif class == Enum.ItemClass.Miscellaneous then
 
 		-- This is a pet, let's see if we know it and how many we have
-		if subclass == Enum.ItemMiscellaneousSubclass.CompanionPet then
+		if subclass == Enum.ItemMiscellaneousSubclass.CompanionPet and not falsePets[itemid] then
 			-- This field could move; look for speciesID index
 			local petinfo = { C_PetJournal.GetPetInfoByItemID(itemid) }
 			local count, max = C_PetJournal.GetNumCollectedInfo(petinfo[13])
