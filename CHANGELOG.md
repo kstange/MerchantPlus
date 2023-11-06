@@ -1,7 +1,8 @@
 # Version 10.2.0.0
 
 * Updated for Retail 10.2.0
-* Fixed handling of toys that are mislabeled as pets (tflo)
+* Fixed collectable status for toys that are mislabeled as pets (tflo)
+* Fixed collectable status for upgradable armor with multiple appearances
 
 # Version 10.1.7.0
 

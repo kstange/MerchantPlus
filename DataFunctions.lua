@@ -204,30 +204,44 @@ function Data:GetCollectable(link, itemdata)
 				item.collectable = Data.CollectableState.Collectable
 			end
 
-		-- If this gear appearance is known, we're done
-		elseif C_TransmogCollection.PlayerHasTransmogByItemInfo(link) then
-			item.collectable = Data.CollectableState.Known
-
-		-- If we don't know it, see if we can learn it
+		-- Examine this item as a regular piece of gear
 		else
+			-- Try to find an appearance for this item
+			--
+			-- C_TransmogCollection.PlayerHasTransmogByItemInfo seems to
+			-- check against the lowest upgrade level's appearance but
+			-- C_TransmogCollection.GetItemInfo seems to be reliable.
 			local _, sourceid = C_TransmogCollection.GetItemInfo(link)
+
 			-- Fall back if the item link doesn't give us anything
 			if not sourceid then
+				trace("logic: GetCollectable: fell back to item ID on appearance source", itemid)
 				_, sourceid = C_TransmogCollection.GetItemInfo(itemid)
 			end
 
-			-- If this item has an appearance, let's see if we can learn it
-			if sourceid then
-				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
+			-- If this item has an appearance, see what we know about it
+                        if sourceid then
+				-- This field could move; look for isCollected
+				local sourceinfo = { C_TransmogCollection.GetAppearanceSourceInfo(sourceid) }
+				isCollected = sourceinfo[5]
 
-				-- If usable, we can collect it, if not, we can't collect it yet (probably),
-				-- otherwise, we can't collect it at all on this character
-				if collectable and itemdata.isUsable then
-					item.collectable = Data.CollectableState.Collectable
-				elseif collectable then
-					item.collectable = Data.CollectableState.Restricted
+				-- If this appearance is known, we're done
+				if isCollected then
+					item.collectable = Data.CollectableState.Known
+
+				-- If we don't know it, see if we can learn it
 				else
-					item.collectable = Data.CollectableState.Unavailable
+					local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
+
+					-- If usable, we can collect it, if not, we can't collect it yet (probably),
+					-- otherwise, we can't collect it at all on this character
+					if collectable and itemdata.isUsable then
+						item.collectable = Data.CollectableState.Collectable
+					elseif collectable then
+						item.collectable = Data.CollectableState.Restricted
+					else
+						item.collectable = Data.CollectableState.Unavailable
+					end
 				end
 			end
 		end
