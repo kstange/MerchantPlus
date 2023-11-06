@@ -18,6 +18,9 @@ Shared.Data = Data
 -- Init an empty trace function to replace later
 local trace = function() end
 
+-- From Locales/Locales.lua
+local L = Shared.Locale
+
 -- List of additional functions to call to populate data to be filled later
 Data.Functions = {}
 
@@ -39,10 +42,10 @@ Data.ItemCategories = {
 local falsePets = {
 	[37460] = true, -- Rope Pet Leash (verified): Toy
 	[44820] = true, -- Red Ribbon Pet Leash (verified): Toy
-	[174995] = true, -- Void Tendril Pet Leash (verified): Toy
-	[174925] = true, -- Void Tendril Pet Leash (verified): One-time use item
 	[71137] = true, -- Brewfest Keg Pony (wowhead); Brewfest event only: Toy
 	[75042] = true, -- Flimsy Yellow Balloon (wowhead); DMF event only: Toy
+	[174925] = true, -- Void Tendril Pet Leash (verified): One-time use item
+	[174995] = true, -- Void Tendril Pet Leash (verified): Toy
 }
 
 -- Sync updated Merchant information
@@ -236,27 +239,32 @@ function Data:GetCollectable(link, itemdata)
 		if subclass == Enum.ItemMiscellaneousSubclass.CompanionPet and not falsePets[itemid] then
 			-- This field could move; look for speciesID index
 			local petinfo = { C_PetJournal.GetPetInfoByItemID(itemid) }
-			local count, max = C_PetJournal.GetNumCollectedInfo(petinfo[13])
+			local speciesID = petinfo[13]
+			if speciesID then
+				local count, max = C_PetJournal.GetNumCollectedInfo(speciesID)
 
-			-- This is special metadata just for pets, because we might want to use this
-			-- in our display, sorting, or filtering functionality since we're looking it
-			-- up anyway
-			item.collectedpets = { count = count, max = max }
+				-- This is special metadata just for pets, because we might want to use this
+				-- in our display, sorting, or filtering functionality since we're looking it
+				-- up anyway
+				item.collectedpets = { count = count, max = max }
 
-			-- If the pet collected at all, we know it, if it's usable and we don't know it
-			-- we can collect it, othewise we probably just can't collect it yet
-			--
-			-- We're not storing enough data here when we have fewer than max to tell if we
-			-- can collect more on this character
-			--
-			-- It's possible we could find a merchant pet that isn't collectable by this
-			-- character (class or faction locked), but I didn't find any examples to test
-			if count == 0 and itemdata.isUsable then
-				item.collectable = Data.CollectableState.Collectable
-			elseif count > 0 then
-				item.collectable = Data.CollectableState.Known
+				-- If the pet collected at all, we know it, if it's usable and we don't know it
+				-- we can collect it, othewise we probably just can't collect it yet
+				--
+				-- We're not storing enough data here when we have fewer than max to tell if we
+				-- can collect more on this character
+				--
+				-- It's possible we could find a merchant pet that isn't collectable by this
+				-- character (class or faction locked), but I didn't find any examples to test
+				if count == 0 and itemdata.isUsable then
+					item.collectable = Data.CollectableState.Collectable
+				elseif count > 0 then
+					item.collectable = Data.CollectableState.Known
+				else
+					item.collectable = Data.CollectableState.Restricted
+				end
 			else
-				item.collectable = Data.CollectableState.Restricted
+				print(format(L['ERROR_FALSE_COLLECTABLE_PET'], itemdata.name, itemid, "https://github.com/kstange/MerchantPlus/issues"))
 			end
 
 		-- This is a mount, let's see if we know it
