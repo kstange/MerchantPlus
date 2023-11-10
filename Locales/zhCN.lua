@@ -18,6 +18,7 @@ local _, Shared = ...
 local L = Shared.Locale
 
 L["Available"] = "可购买"
+L["Collectable"] = "收藏品"
 L["Index"] = "索引"
 L["Item"] = "物品"
 L["Item ID"] = "物品 ID"
@@ -27,6 +28,8 @@ L["Subtype"] = "子类型"
 L["Supply"] = "供应量"
 L["Type"] = "类型"
 L["Usable"] = "可用"
+
+L["ERROR_FALSE_COLLECTABLE_PET"] = "该商家的 %s (%d) 被错误标记为宠物。 请通过 %s 报告此问题"
 
 L["OPTIONS_DESCRIPTION_COLUMNS"] = "选择要显示的栏位。"
 L["OPTIONS_DESCRIPTION_SORT_REMEMBER"] = "在不同商人间切换时，保持你选择的排序方式。按住 Ctrl 点击分类标题可以将排序重置为默认。"
