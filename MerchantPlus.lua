@@ -341,7 +341,8 @@ function Addon:SetTableLayout()
 					end
 				end
 			end
-			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed, col.width, col.padding[1], col.padding[2], col)
+			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed,
+			                               col.width, col.padding[1], col.padding[2], col)
 		end
 	end
 end
@@ -481,7 +482,7 @@ end
 -- been created since we last checked
 function Addon:ElvUIHeaders()
 	trace("called: ElvUIHeaders")
-	for i, header in next, { MerchantPlusItemList.HeaderContainer:GetChildren() } do
+	for _, header in next, { MerchantPlusItemList.HeaderContainer:GetChildren() } do
 		if not header.IsSkinned then
 			header:DisableDrawLayer('BACKGROUND')
 			header:CreateBackdrop('Transparent')

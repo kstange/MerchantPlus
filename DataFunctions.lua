@@ -78,7 +78,8 @@ function Data:GetMerchantItemInfo(index)
 	item.itemID = GetMerchantItemID(index)
 	item.link = GetMerchantItemLink(index)
 	item.itemKey = { itemID = item.itemID }
-	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable, item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
+	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable,
+		item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
 	item.index = index
 	return item
 end
@@ -86,8 +87,11 @@ end
 -- Fetch extended item data for a single item by item link
 function Data:GetItemInfo(link)
 	local item = {}
+	local _
 	if link then
-		_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType, item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID, item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(link)
+		_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType,
+			item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID,
+			item.bindType, item.expacID, item.setID, item.isCraftingReagent = GetItemInfo(link)
 	end
 	return item
 end
@@ -225,7 +229,7 @@ function Data:GetCollectable(link, itemdata)
                         if sourceid then
 				-- This field could move; look for isCollected
 				local sourceinfo = { C_TransmogCollection.GetAppearanceSourceInfo(sourceid) }
-				isCollected = sourceinfo[5]
+				local isCollected = sourceinfo[5]
 
 				-- If this appearance is known, we're done
 				if isCollected then
@@ -280,7 +284,8 @@ function Data:GetCollectable(link, itemdata)
 					item.collectable = Data.CollectableState.Restricted
 				end
 			else
-				print(format(L['ERROR_FALSE_COLLECTABLE_PET'], itemdata.name, itemid, "https://github.com/kstange/MerchantPlus/issues"))
+				print(format(L['ERROR_FALSE_COLLECTABLE_PET'], itemdata.name, itemid,
+				             "https://github.com/kstange/MerchantPlus/issues"))
 			end
 
 		-- This is a mount, let's see if we know it

@@ -213,7 +213,8 @@ end
 -- AceConfig Options table used to display a panel.
 Metadata.Options = {
 	type = "group",
-	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA" .. (GetAddOnMetadata(AddonName, "Version") or "Unknown"),
+	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA" ..
+	              (GetAddOnMetadata(AddonName, "Version") or "Unknown"),
 	args = {
 		TabDefault = {
 			name = format(L["OPTIONS_TITLE_TAB_DEFAULT"], Metadata.FriendlyName),
