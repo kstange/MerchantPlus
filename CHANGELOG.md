@@ -1,6 +1,6 @@
 # Version 10.2.5.0
 
-* Updated for Retail 10.2.5 (TOC bump)
+* Updated TOC for Retail 10.2.5
 
 # Release History
 
