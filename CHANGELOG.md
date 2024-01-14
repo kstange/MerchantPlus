@@ -1,12 +1,6 @@
-# Version 10.2.0.1
+# Version 10.2.5.0
 
-* Updated zhCN (Simplified Chinese) translation (kuaishan)
-
-# Version 10.2.0.0
-
-* Updated for Retail 10.2.0
-* Fixed collectable status for toys that are mislabeled as pets (tflo)
-* Fixed collectable status for upgradable armor with multiple appearances
+* Updated for Retail 10.2.5 (TOC bump)
 
 # Release History
 
