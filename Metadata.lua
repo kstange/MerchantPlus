@@ -29,9 +29,6 @@ Shared.Metadata = Metadata
 
 Metadata.FriendlyName = "Merchant Plus"
 
--- Compatibility for WoW 10.1.0
-local GetAddOnMetadata = _G.GetAddOnMetadata or C_AddOns.GetAddOnMetadata
-
 -- This is a list of Collectable states
 Metadata.CollectableState = {
 	Unsupported =  -1,
@@ -214,7 +211,7 @@ end
 Metadata.Options = {
 	type = "group",
 	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA" ..
-	              (GetAddOnMetadata(AddonName, "Version") or "Unknown"),
+	              (C_AddOns.GetAddOnMetadata(AddonName, "Version") or "Unknown"),
 	args = {
 		TabDefault = {
 			name = format(L["OPTIONS_TITLE_TAB_DEFAULT"], Metadata.FriendlyName),

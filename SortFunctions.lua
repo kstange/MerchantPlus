@@ -110,12 +110,12 @@ end
 
 -- Cache currency names to reduce calls to GetItemInfo()
 function Sort:GetCurrencyName(link)
-	local id = GetItemInfoInstant(link)
+	local id = C_Item.GetItemInfoInstant(link)
 	local name
 	if CurrencyCache[id] then
 		name = CurrencyCache[id]
 	else
-		name = GetItemInfo(link)
+		name = C_Item.GetItemInfo(link)
 		if name then
 			CurrencyCache[id] = name
 		else
