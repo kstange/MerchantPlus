@@ -1,3 +1,7 @@
+# Version 10.2.6.1
+
+* Updated for future API deprecations; no functional changes
+
 # Version 10.2.6.0
 
 * Updated TOC for Retail 10.2.6
