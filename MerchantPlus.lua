@@ -140,7 +140,11 @@ function Addon:SetTab(index)
 
 		-- Reset the filter back to Blizzard's default
 		ResetSetMerchantFilter()
-		MerchantFrame_UpdateFilterString()
+		if MerchantFrame_UpdateFilterString then
+			MerchantFrame_UpdateFilterString()
+		elseif MerchantFrame.FilterDropdown then
+			MerchantFrame.FilterDropdown:Update()
+		end
 
 		-- If on tab 1 and Merchant Plus is requested, immediately switch
 		if index == 1 and SwitchOnOpen then
@@ -212,7 +216,8 @@ function Addon:UpdateFrame()
 	end
 
 	-- Hide or show the filtering dropdown
-	MerchantFrameLootFilter:SetShown(not show)
+	local LootFilterFrame = MerchantFrameLootFilter or MerchantFrame.FilterDropdown
+	LootFilterFrame:SetShown(not show)
 
 	-- Set up the frame if our tab is selected
 	if show then
