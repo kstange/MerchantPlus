@@ -1,3 +1,7 @@
+# Version 11.0.0.0
+
+* Updated TOC for Retail 11.0.2 (beta)
+
 # Version 10.2.7.1
 
 * Updated for initial Retail 11.0.0 compatibility
