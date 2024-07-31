@@ -6,5 +6,4 @@
 	<Include file="AceGUI-3.0\AceGUI-3.0.xml"/>
 	<Include file="AceConfigRegistry-3.0\AceConfigRegistry-3.0.xml"/>
 	<Include file="AceConfigDialog-3.0\AceConfigDialog-3.0.xml"/>
-	<Script file="SecureTabs-2.0\SecureTabs-2.0.lua"/>
 </Ui>
