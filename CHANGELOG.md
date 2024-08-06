@@ -1,6 +1,6 @@
 # Version 11.0.0.1
 
-- Added an option to set the width of the Merchant window
+- Added an option to set the width of the merchant window
 - Changed equipment that a character can't equip to appear as collectable instead of restricted
 - Fixed detection of collectable toys that are in the Consumable category instead of Miscellaneous
 
