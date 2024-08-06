@@ -230,7 +230,7 @@ Metadata.Options = {
 		},
 		WindowWidth = {
 			name = L["OPTIONS_TITLE_WINDOW_WIDTH"],
-			desc = L["OPTIONS_DESCRIPTION_WINDOW_WIDTH"],
+			desc = format(L["OPTIONS_DESCRIPTION_WINDOW_WIDTH"], Metadata.Defaults.WindowWidth, 336),
 			type = "range",
 			min = 336,
 			max = 1800,
