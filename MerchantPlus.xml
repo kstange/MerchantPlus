@@ -35,7 +35,7 @@
 							<KeyValue key="layoutType" value="InsetFrameTemplate" type="string" />
 						</KeyValues>
 					</Frame>
-					<Frame parentKey="HeaderContainer">
+					<Frame parentKey="HeaderContainer" clipChildren="true">
 						<Size x="0" y="19" />
 						<Anchors>
 							<Anchor point="TOPLEFT" x="4" y="-1"/>

@@ -189,6 +189,7 @@ Metadata.Defaults = {
 		usable      = true,
 		purchasable = true,
 	},
+	WindowWidth = 800,
 }
 
 -- A table of function callbacks to call upon setting certain options.
@@ -227,12 +228,22 @@ Metadata.Options = {
 			width = "full",
 			order = 2,
 		},
+		WindowWidth = {
+			name = L["OPTIONS_TITLE_WINDOW_WIDTH"],
+			desc = L["OPTIONS_DESCRIPTION_WINDOW_WIDTH"],
+			type = "range",
+			min = 336,
+			max = 1800,
+			step = 1,
+			width = "double",
+			order = 3,
+		},
 		Columns = {
 			name = L["OPTIONS_TITLE_COLUMNS"],
 			desc = L["OPTIONS_DESCRIPTION_COLUMNS"],
 			type = "multiselect",
 			width = "full",
-			order = 3,
+			order = 4,
 			values = ListColumns,
 		},
 	}

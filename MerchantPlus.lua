@@ -202,7 +202,7 @@ function Addon:UpdateFrame()
 	local buyback = PanelTemplates_GetSelectedTab(MerchantFrame) == 2
 
 	-- We should have saved the width, but if not use 336 which has been standard for a while
-	local width = show and 800 or InitialWidth or 336
+	local width = show and Addon:GetOption("WindowWidth") or InitialWidth or 336
 
 	trace("called: UpdateFrame; show", show)
 
