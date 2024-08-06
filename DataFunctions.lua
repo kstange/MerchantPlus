@@ -239,12 +239,9 @@ function Data:GetCollectable(link, itemdata)
 				else
 					local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
 
-					-- If usable, we can collect it, if not, we can't collect it yet (probably),
-					-- otherwise, we can't collect it at all on this character
-					if collectable and itemdata.isUsable then
+					-- With warbands as long as the item is collectable it should be available
+					if collectable then
 						item.collectable = Data.CollectableState.Collectable
-					elseif collectable then
-						item.collectable = Data.CollectableState.Restricted
 					else
 						item.collectable = Data.CollectableState.Unavailable
 					end
@@ -345,6 +342,21 @@ function Data:GetCollectable(link, itemdata)
 
 	-- This is a consumable! Sometimes these can be collected
 	elseif class == Enum.ItemClass.Consumable and Enum.ItemConsumableSubclass.Other then
+
+		-- Let's see if this is a toy
+		local toyid = C_ToyBox.GetToyInfo(itemid)
+
+		-- It's a toy! If we have it, we have it, if the toy is usable, we can
+		-- collect it, otherwise we probably can't collect it yet
+		if toyid then
+			if PlayerHasToy(toyid) then
+				item.collectable = Data.CollectableState.Known
+			elseif C_ToyBox.IsToyUsable(toyid) then
+				item.collectable = Data.CollectableState.Collectable
+			else
+				item.collectable = Data.CollectableState.Restricted
+			end
+		end
 
 		-- We're going trust that if this item appears on the merchant and is dressable it's
 		-- unlearned but collectable
