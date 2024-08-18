@@ -2,14 +2,14 @@
 -- Merchant Plus
 -- A Modern Scrollable UI for Merchants
 --
--- Copyright 2023 SimGuy
+-- Copyright 2023 - 2024 SimGuy
 --
 -- Use of this source code is governed by an MIT-style
 -- license that can be found in the LICENSE file or at
 -- https://opensource.org/licenses/MIT.
 --
 
-local AddonName, Shared = ...
+local _, Shared = ...
 
 -- From Locales/Locales.lua
 local L = Shared.Locale
@@ -211,8 +211,7 @@ end
 -- AceConfig Options table used to display a panel.
 Metadata.Options = {
 	type = "group",
-	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA" ..
-	              (C_AddOns.GetAddOnMetadata(AddonName, "Version") or "Unknown"),
+	name = format(L["OPTIONS_TITLE_MAIN"], Metadata.FriendlyName) .. "     |cFFAAAAAA@project-version@",
 	args = {
 		TabDefault = {
 			name = format(L["OPTIONS_TITLE_TAB_DEFAULT"], Metadata.FriendlyName),
