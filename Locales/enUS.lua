@@ -38,7 +38,7 @@ L["OPTIONS_DESCRIPTION_TAB_DEFAULT"] = "Use the enhanced merchant interface for 
                                        "The standard merchant tab can still be accessed at any time."
 L["OPTIONS_TITLE_SORT_REMEMBER"] = "Remember sort order"
 L["OPTIONS_DESCRIPTION_SORT_REMEMBER"] = "Keep the last used sort when switching between merchants. " ..
-                                         "You can reset a merchant to the game's standard sort by" ..
+                                         "You can reset a merchant to the game's standard sort by " ..
                                          "holding CTRL while clicking on a column heading."
 L["OPTIONS_TITLE_WINDOW_WIDTH"] = "Merchant window width"
 L["OPTIONS_DESCRIPTION_WINDOW_WIDTH"] = "Set the window width of the enhanced merchant interface. " ..
