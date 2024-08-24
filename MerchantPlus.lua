@@ -140,11 +140,7 @@ function Addon:SetTab(index)
 
 		-- Reset the filter back to Blizzard's default
 		ResetSetMerchantFilter()
-		if MerchantFrame_UpdateFilterString then
-			MerchantFrame_UpdateFilterString()
-		elseif MerchantFrame.FilterDropdown then
-			MerchantFrame.FilterDropdown:Update()
-		end
+		MerchantFrame.FilterDropdown:Update()
 
 		-- If on tab 1 and Merchant Plus is requested, immediately switch
 		if index == 1 and SwitchOnOpen then
@@ -219,8 +215,7 @@ function Addon:UpdateFrame()
 	end
 
 	-- Hide or show the filtering dropdown
-	local LootFilterFrame = MerchantFrameLootFilter or MerchantFrame.FilterDropdown
-	LootFilterFrame:SetShown(not show)
+	MerchantFrame.FilterDropdown:SetShown(not show)
 
 	-- Set up the frame if our tab is selected
 	if show then
@@ -239,7 +234,7 @@ function Addon:UpdateFrame()
 		-- Update the state of repair buttons
 		MerchantFrame_UpdateRepairButtons()
 
-		-- For 10.1.7 - Update the state of the Sell All Junk button
+		-- Update the state of the Sell All Junk button
 		if C_MerchantFrame.IsSellAllJunkEnabled and C_MerchantFrame.IsSellAllJunkEnabled() then
 			-- The button is anchored weirdly unless the Repair Buttons are shown.
 			if not CanMerchantRepair() then
@@ -266,11 +261,6 @@ function Addon:UpdateFrame()
 
 		-- Show the frame backgrounds related to the repair and buyback
 		MerchantFrameBottomLeftBorder:Show()
-
-		-- This was merged into MerchantFrameBottomLeftBorder in 10.1.5
-		if MerchantFrameBottomRightBorder then
-			MerchantFrameBottomRightBorder:Show()
-		end
 	end
 
 	-- Show or hide our own frame now that everything is set up
