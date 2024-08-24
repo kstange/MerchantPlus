@@ -1,8 +1,8 @@
 # Version 11.0.2.0
 
-- Fixed an issue buying a second item after switching from the Buyback tab and buying something
-- Fixed the quick buyback button failing to update correctly after buying an item back on the Buyback tab
-- Removed various compatibility code for Dragonflight
+- Fixed a failure when switching from the Buyback tab, buying a merchant item, then trying to buy another one
+- Fixed an issue after buying back an item from the Buyback tab, then buying a merchant item, where the quick buyback button would no longer display the correct item
+- Removed compatibility code related to Dragonflight
 
 # Version 11.0.0.1
 
