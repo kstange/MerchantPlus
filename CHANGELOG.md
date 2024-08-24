@@ -1,3 +1,8 @@
+# Version 11.0.2.0
+
+- Fixed an issue buying a second item after switching from the Buyback tab and buying something
+- Fixed the quick buyback button failing to update correctly after buying an item back on the Buyback tab
+
 # Version 11.0.0.1
 
 - Added an option to set the width of the merchant window

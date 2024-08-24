@@ -175,12 +175,15 @@ function Addon:SetTab(index)
 				--
 				-- The taint clears itself if the user transitions to
 				-- the Merchant tab manually at any time.
+				--
+				-- This should be okay because nothing ever copies this
+				-- value except into lastTab and that value seems unused.
 				PanelTemplates_SetTab(MerchantFrame, 1)
 			end
 
 			-- Deselect the Merchant tab, since we should always be
 			-- transitioning from it, but we don't want to change the
-			-- internal value ot selectedTab.
+			-- internal value of selectedTab if we don't have to.
 			PanelTemplates_DeselectTab(MerchantFrameTab1)
 			Addon:UpdateFrame()
 		end
@@ -295,29 +298,27 @@ end
 -- To minimize how often this gets called, we will only call it if a buyback happens while on
 -- the buyback tab.
 function Addon:UpdateBuyback()
-	local count = GetNumBuybackItems()
-	local name, texture, price, quantity, _, _, isBound = GetBuybackItemInfo(count)
-
-	trace("called: UpdateBuyback", name)
+	trace("called: UpdateBuyback", BuybackDirty)
 
 	if not BuybackDirty then
 		return
 	end
 
+	local last = GetNumBuybackItems()
+	local name, texture, _, quantity, _, _, isBound = GetBuybackItemInfo(last)
+
 	if ( name ) then
+		trace("updated: UpdateBuyback", name)
 		MerchantBuyBackItemName:SetText(name)
 		SetItemButtonCount(MerchantBuyBackItemItemButton, quantity)
 		SetItemButtonTexture(MerchantBuyBackItemItemButton, texture)
-		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, GetBuybackItemLink(count), isBound)
-		MerchantBuyBackItemMoneyFrame:Show()
-		MoneyFrame_Update("MerchantBuyBackItemMoneyFrame", price)
+		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, GetBuybackItemLink(last), isBound)
 	else
+		trace("cleared: UpdateBuyback")
 		MerchantBuyBackItemName:SetText("")
 		SetItemButtonCount(MerchantBuyBackItemItemButton, nil)
 		SetItemButtonTexture(MerchantBuyBackItemItemButton, nil)
 		MerchantFrameItem_UpdateQuality(MerchantBuyBackItem, nil)
-		MerchantBuyBackItemMoneyFrame:Hide()
-		MoneyFrame_Update("MerchantBuyBackItemMoneyFrame", 0)
 		-- Hide the tooltip upon sale
 		if GameTooltip:IsOwned(MerchantBuyBackItemItemButton) then
 			GameTooltip:Hide()
@@ -466,21 +467,34 @@ function Addon:ClearTaint(n)
 	local t = _G[n]
 	trace("called: ClearTaint", n)
 	for k in pairs(t) do
-		local secure, addon = issecurevariable(t, k)
-		if secure == false and addon == AddonName then
-			t[k] = nil
-			local fixed = issecurevariable(t, k)
-			trace("tainted:", n, addon, k, "| cleared:", fixed)
+		-- Don't clear the selectedTab automatically, because it breaks stuff
+		if not (n == 'MerchantFrame' and k == 'selectedTab') then
+			Addon:ClearSingleTaint(n, k)
 		end
 	end
 end
 
--- Provide a function to hook for MerchantFrame actions
+-- Provide a way to clear a single value's taint if needed
+function Addon:ClearSingleTaint(n, k)
+	local t = _G[n]
+	local secure, addon = issecurevariable(t, k)
+	if secure == false and addon == AddonName then
+		t[k] = nil
+		local fixed = issecurevariable(t, k)
+		trace("tainted:", n, addon, k, "| cleared:", fixed)
+	end
+end
+
+-- Clear all the taint we can when the window is closed
 function Addon:ClearMerchantTaint()
 	Addon:ClearTaint("MerchantFrame")
 	Addon:ClearTaint("MerchantBuyBackItem")
 	Addon:ClearTaint("MerchantBuyBackItemItemButton")
-	Addon:ClearTaint("MerchantBuyBackItemMoneyFrame")
+end
+
+-- Clear taint specific to purchasing items
+function Addon:ClearPurchaseTaint()
+	Addon:ClearTaint("MerchantFrame")
 end
 
 -- When the Merchant Frame opens, we need to reskin any headers that may have
@@ -535,7 +549,7 @@ function Addon:Init()
 
 	-- Attempt to clear tainted table data from the MerchantFrame
 	-- after buying something
-	hooksecurefunc("BuyMerchantItem", Addon.ClearMerchantTaint)
+	hooksecurefunc("BuyMerchantItem", Addon.ClearPurchaseTaint)
 
 	Addon.Events = CreateFrame("Frame")
 	Addon.Events:RegisterEvent("ADDON_LOADED")
