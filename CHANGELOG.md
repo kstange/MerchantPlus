@@ -1,3 +1,8 @@
+# Version 11.0.5.0
+
+- Updated TOC for Retail 11.0.5
+- Added koKR (Korean) translation (hinski)
+
 # Version 11.0.2.0
 
 - Fixed a failure when switching from the Buyback tab, buying a merchant item, then trying to buy another one
