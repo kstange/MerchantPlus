@@ -1,3 +1,7 @@
+# Version 11.0.5.1
+
+- Fixed handling of temporary mounts like Magic Broom that can't be collected
+
 # Version 11.0.5.0
 
 - Updated TOC for Retail 11.0.5

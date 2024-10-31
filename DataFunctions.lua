@@ -288,20 +288,24 @@ function Data:GetCollectable(link, itemdata)
 		-- This is a mount, let's see if we know it
 		elseif subclass == Enum.ItemMiscellaneousSubclass.Mount then
 			local mountid = C_MountJournal.GetMountFromItem(itemid)
-			local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
+			if mountid then
+				local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
 
-			-- This field could move; look for isCollected index
-			-- If collected, then we know it, if it's usable we can collect it, otherwise
-			-- we probably can't collect it yet
-			--
-			-- It's possible we could find a merchant mount that isn't collectable by this
-			-- character (class or faction locked), but I didn't find any examples to test
-			if mountinfo[11] then
-				item.collectable = Data.CollectableState.Known
-			elseif itemdata.isUsable then
-				item.collectable = Data.CollectableState.Collectable
+				-- This field could move; look for isCollected index
+				-- If collected, then we know it, if it's usable we can collect it, otherwise
+				-- we probably can't collect it yet
+				--
+				-- It's possible we could find a merchant mount that isn't collectable by this
+				-- character (class or faction locked), but I didn't find any examples to test
+				if mountinfo[11] then
+					item.collectable = Data.CollectableState.Known
+				elseif itemdata.isUsable then
+					item.collectable = Data.CollectableState.Collectable
+				else
+					item.collectable = Data.CollectableState.Restricted
+				end
 			else
-				item.collectable = Data.CollectableState.Restricted
+				trace("logic: GetCollectable: item in mount category was not collectable", itemid)
 			end
 
 		-- This could be anything! We'll have to just try to figure out what it is
