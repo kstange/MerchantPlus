@@ -18,6 +18,32 @@ Shared.Display = Display
 -- This is a list of Collectable states to be filled in later
 Display.CollectableState = {}
 
+-- This display function returns the icon and display name for the merchant item
+function Display:Item(data, options)
+	local name = data.name
+	local quality = data.quality
+	local quantity = data.quantity
+	local texture = data.texture
+
+	-- Apply item quality color
+	local color = ITEM_QUALITY_COLORS[quality]
+	if color then
+		name = color.color:WrapTextInColorCode(name)
+	end
+
+	-- Append crafting quality icon
+	local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
+	if craftquality then
+		name = name .. " " .. C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+	end
+
+	if name and options['ShowStackSize'] and quantity > 1 then
+		name = name .. " (" .. quantity .. ")"
+	end
+
+	return name, texture
+end
+
 -- This display function shows an infinity symbol if the supply is infinite (-1)
 function Display:Supply(data)
 	local key = self

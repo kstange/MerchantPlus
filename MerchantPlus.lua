@@ -99,6 +99,25 @@ function Addon:GetAceOption(key)
 	return value
 end
 
+-- Get all the options for a particular column
+function Addon:GetColumnOptions(column)
+	local settings = _G[AddonName]
+	local options = {}
+	for key, value in pairs(Metadata.Defaults) do
+		local prefix = "Column_" .. column .. "_"
+		if string.find(key, '^' .. prefix) then
+			options[string.sub(key, #prefix+1)] = value
+		end
+	end
+	for key, value in pairs(settings) do
+		local prefix = "Column_" .. column .. "_"
+		if string.find(key, '^' .. prefix) then
+			options[string.sub(key, #prefix+1)] = value
+		end
+	end
+	return options
+end
+
 -- Set an option from the AceConfigDialog
 function Addon:SetAceOption(value)
 	local key = self[#self]
@@ -337,8 +356,9 @@ function Addon:SetTableLayout()
 					end
 				end
 			end
+			local options = Addon:GetColumnOptions(key)
 			MerchantPlusItemList:AddColumn(key, col.name, col.celltype, col.fixed,
-			                               col.width, col.padding[1], col.padding[2], col)
+			                               col.width, col.padding[1], col.padding[2], col, options)
 		end
 	end
 end

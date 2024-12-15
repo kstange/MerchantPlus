@@ -54,9 +54,10 @@ end
 -- Generic cell mixin for common mixin functions
 MerchantPlusTableCellMixin = CreateFromMixins(TableBuilderCellMixin)
 
-function MerchantPlusTableCellMixin:Init(col)
+function MerchantPlusTableCellMixin:Init(col, options)
 	self.key = col.field
 	self.displayfunction = col.displayfunction
+	self.options = options
 end
 
 -- This defines a numeric field
@@ -129,7 +130,7 @@ function MerchantPlusTableBooleanMixin:Populate(data)
 end
 
 -- This defines a field for showing prices
-MerchantPlusTablePriceMixin = CreateFromMixins(TableBuilderCellMixin)
+MerchantPlusTablePriceMixin = CreateFromMixins(MerchantPlusTableCellMixin)
 
 function MerchantPlusTablePriceMixin:Populate(data)
 	self.AltCurrencyDisplay:SetShown(data.extendedCost)
@@ -184,24 +185,30 @@ function MerchantPlusTablePriceMixin:Populate(data)
 end
 
 -- This defines a field for showing items
-MerchantPlusTableItemMixin = CreateFromMixins(TableBuilderCellMixin)
+MerchantPlusTableItemMixin = CreateFromMixins(MerchantPlusTableCellMixin)
+
+function MerchantPlusTableItemMixin:Init(col, options)
+	self.key = col.field
+	self.tex = col.texture
+	self.displayfunction = col.displayfunction
+	self.options = options
+end
 
 function MerchantPlusTableItemMixin:Populate(data)
-	if data.name then
-		local name = data.name
-		local quality = data.quality
-		local color = ITEM_QUALITY_COLORS[quality]
-		local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
-		local qualityicon = ""
-		if craftquality then
-			qualityicon = C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
-		end
-		if color then
-			self.Text:SetText(color.color:WrapTextInColorCode(name) .. " " .. qualityicon)
-		else
-			self.Text:SetText(name .. " " .. qualityicon)
-		end
-		self.Icon:SetTexture(data.texture)
+	local key = self.key
+	local tex = self.tex
+	local text = data[key]
+	local texture =  data[tex] or 134400
+	local displayfunction = self.displayfunction
+	local options = self.options
+
+	if displayfunction and type(displayfunction) == "function" then
+		text, texture = displayfunction(key, data, options)
+	end
+
+	if text then
+		self.Text:SetText(text)
+		self.Icon:SetTexture(texture)
 	else
 		self.Text:SetText("")
 		self.Icon:SetTexture(134400)

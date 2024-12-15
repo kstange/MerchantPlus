@@ -57,7 +57,9 @@ Metadata.Columns = {
 		name = L["Item"],
 		celltype = Metadata.CellTypes.Item,
 		field = "name",
+		texture = "texture",
 		datafunctions = { Data.GetItemInfo },
+		displayfunction = Display.Item,
 		required = true,
 		fixed = false,
 		width = 1,
@@ -253,10 +255,25 @@ Metadata.Options = {
 			name = L["OPTIONS_TITLE_COLUMNS"],
 			desc = L["OPTIONS_DESCRIPTION_COLUMNS"],
 			type = "multiselect",
-			width = "full",
 			order = 4,
 			values = ListColumns,
 		},
+		ColumnOptions = {
+			name = L["OPTIONS_TITLE_COLUMN_OPTIONS"],
+			type = "header",
+		},
+		Column_item = {
+			name = L["Item"],
+			type = "group",
+			args = {
+				Column_item_ShowStackSize = {
+					name = L["OPTIONS_TITLE_COLUMN_ITEM_SHOW_STACK"],
+					type = "toggle",
+					width = "full",
+					order = 1,
+				},
+			}
+		}
 	}
 }
 

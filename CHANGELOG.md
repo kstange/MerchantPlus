@@ -2,6 +2,7 @@
 
 - Updated TOC for Retail 11.0.7
 - Added merchant column: Expansion - shows the expansion in which an item was added to the game
+- Added an option to show the stack size after the name of each item in lieu of the Stack column
 
 # Version 11.0.5.1
 

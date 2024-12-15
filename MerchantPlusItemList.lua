@@ -82,11 +82,11 @@ function MerchantPlusItemListMixin:UpdateTableBuilderLayout()
 end
 
 -- Add a column to the TableBuilder
-function MerchantPlusItemListMixin:AddColumn(key, title, celltype, fixed, width, left, right, col)
+function MerchantPlusItemListMixin:AddColumn(key, title, celltype, fixed, width, left, right, col, options)
 	local tableBuilder = self.tableBuilder
 	local column = tableBuilder:AddColumn()
 	column:ConstructHeader("BUTTON", "MerchantPlusTableHeaderStringTemplate", key, title)
-	column:ConstructCells("FRAME", celltype, col)
+	column:ConstructCells("FRAME", celltype, col, options)
 	if fixed then
 		column:SetFixedConstraints(width, 0)
 	else
