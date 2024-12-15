@@ -2,7 +2,8 @@
 
 - Updated TOC for Retail 11.0.7
 - Added Expansion merchant column that shows which expansion items are associated with
-- Added an option to show the stack size after the name of each item in lieu of the Stack column
+- Added an option to show the stack size after the name of each item
+- Added a new section for Column Options to make room for options that are coming soon
 - Added some invalid pets from the Anniversary event to the filter list
 - Fixed a logic error when sorting that could sort in reverse incorrectly
 
