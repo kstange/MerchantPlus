@@ -126,8 +126,16 @@ function Sort:GetCurrencyName(link)
 end
 
 -- This function will sort based on the request
-function Sort:Sort(lhs, rhs)
+function Sort:Sort(left, right)
 	local order, state = self:GetSortOrder()
+	local lhs = left
+	local rhs = right
+
+	-- Flip left and right if the sort is reversed
+	if state == 1 then
+		lhs = right
+		rhs = left
+	end
 
 	-- The sort method will sometimes send nil values
 	if not lhs or not rhs then
@@ -196,9 +204,5 @@ function Sort:Sort(lhs, rhs)
 			end
 		end
 	end
-	if state == 1 then
-		return not result
-	else
-		return result
-	end
+	return result
 end

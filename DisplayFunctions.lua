@@ -79,6 +79,7 @@ function Display:Collectable(data)
 	return nil
 end
 
+-- Display the localized expansion name by number rather than the number itself
 function Display:ExpansionName(data)
 	local key = self
 	if data[key] ~= nil then

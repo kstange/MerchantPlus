@@ -1,8 +1,9 @@
 # Version 11.0.7.0
 
 - Updated TOC for Retail 11.0.7
-- Added merchant column: Expansion - shows the expansion in which an item was added to the game
+- Added merchant column Expansion that shows in which expansion items were added to the game
 - Added an option to show the stack size after the name of each item in lieu of the Stack column
+- Fixed a logic error when sorting that could sort in reverse incorrectly
 
 # Version 11.0.5.1
 
