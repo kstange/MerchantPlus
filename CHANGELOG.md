@@ -1,6 +1,7 @@
 # Version 11.0.7.0
 
 - Updated TOC for Retail 11.0.7
+- Added merchant column: Expansion - shows the expansion in which an item was added to the game
 
 # Version 11.0.5.1
 

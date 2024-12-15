@@ -70,6 +70,11 @@ function MerchantPlusTableNumberMixin:Populate(data)
 	if displayfunction and type(displayfunction) == "function" then
 		value = displayfunction(key, data)
 	end
+	if tonumber(value) == nil and value ~= "∞" then
+		self.Text:SetJustifyH("LEFT")
+	else
+		self.Text:SetJustifyH("RIGHT")
+	end
 	self.Text:SetText(value or 0)
 end
 

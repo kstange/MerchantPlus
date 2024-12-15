@@ -52,3 +52,12 @@ function Display:Collectable(data)
 	end
 	return nil
 end
+
+function Display:ExpansionName(data)
+	local key = self
+	if data[key] ~= nil then
+		return _G['EXPANSION_NAME'..data[key]]
+	else
+		return ""
+	end
+end

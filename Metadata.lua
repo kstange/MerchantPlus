@@ -159,7 +159,18 @@ Metadata.Columns = {
 		fixed = true,
 		width = 88,
 		padding = { 0, 0 },
-	}
+	},
+	expansion = {
+		name = L["Expansion"],
+		celltype = Metadata.CellTypes.Number,
+		field = "expacID",
+		datafunctions = { Data.GetItemInfo },
+		displayfunction = Display.ExpansionName,
+		required = false,
+		fixed = true,
+		width = 122,
+		padding = { 8, 0 },
+	},
 }
 Sort.Columns = Metadata.Columns
 
@@ -175,6 +186,7 @@ Metadata.ColumnSort = {
 	'id',
 	'itemtype',
 	'itemsubtype',
+	'expansion',
 }
 
 -- A table indicating the defaults for Options by key.

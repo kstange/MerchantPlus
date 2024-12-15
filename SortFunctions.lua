@@ -162,7 +162,7 @@ function Sort:Sort(lhs, rhs)
 
 			-- Handle number sort
 			elseif col.celltype == Sort.CellTypes.Number then
-				if lhs[key] ~= rhs[key] then
+				if lhs[key] ~= rhs[key] and lhs[key] ~= nil and rhs[key] ~= nil then
 					result = lhs[key] < rhs[key]
 				end
 
