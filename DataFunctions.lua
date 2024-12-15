@@ -48,6 +48,9 @@ local falsePets = {
 	[75042] = true, -- Flimsy Yellow Balloon (wowhead); DMF event only: Toy
 	[174925] = true, -- Void Tendril Pet Leash (verified): One-time use item
 	[174995] = true, -- Void Tendril Pet Leash (verified): Toy
+	[229829] = true, -- Light Blue Balloon (verified): Temporary summon
+	[229830] = true, -- Dark Blue Balloon (verified): Temporary summon
+	[229831] = true, -- Gold Balloon (verified): Temporary summon
 }
 
 -- Sync updated Merchant information
