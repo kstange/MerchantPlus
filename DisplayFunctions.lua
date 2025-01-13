@@ -20,7 +20,7 @@ Display.CollectableState = {}
 
 -- This display function returns the icon and display name for the merchant item
 function Display:Item(data, options)
-	local name = data.name
+	local name = data.name or ""
 	local quality = data.quality
 	local quantity = data.quantity
 	local texture = data.texture
