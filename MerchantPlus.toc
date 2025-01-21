@@ -3,6 +3,7 @@
 ## Title: Merchant Plus
 ## Notes: A Modern Scrollable UI for Merchants
 ## Notes-koKR: 현대적으로 스크롤되는 상인 UI
+## Notes-ruRU: Современный прокручиваемый пользовательский интерфейс для торговцев
 ## Notes-zhCN: 现代化的滚动式清单商人物品列表。
 ## Notes-zhTW: 現代化的滾動式清單商人列表
 ## Author: SimGuy
