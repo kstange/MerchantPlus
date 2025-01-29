@@ -1,3 +1,7 @@
+# Version 11.1.0.2
+
+- Added a missing translatable word reported by ZamestoTV
+
 # Version 11.1.0.1
 
 - Added ruRU (Russian) translation from ZamestoTV

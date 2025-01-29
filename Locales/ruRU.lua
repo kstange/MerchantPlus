@@ -19,6 +19,7 @@ local L = Shared.Locale
 
 L["Available"] = "Доступно"
 L["Collectable"] = "Собрано"
+L["Expansion"] = "Дополнение"
 L["Index"] = "Номер"
 L["Item"] = "Предмет"
 L["Item ID"] = "ID"
