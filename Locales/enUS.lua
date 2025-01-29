@@ -30,6 +30,7 @@ local L = Shared.Locale
 --L["Type"] = "Type"
 --L["Subtype"] = "Subtype"
 --L["Collectable"] = "Collectable"
+--L["Expansion"] = "Expansion"
 
 -- Using short keys for these long strings, so enUS needs to be defined as well
 L["OPTIONS_TITLE_MAIN"] = "%s Main Options"
