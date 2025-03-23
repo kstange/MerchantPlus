@@ -1,3 +1,8 @@
+# Version 11.1.5.0
+
+- Updated TOC for Retail 11.1.5 (PTR)
+- Fixed an error caused by merchants selling things like currencies that have no item ID
+
 # Version 11.1.0.2
 
 - Added a missing translatable word reported by ZamestoTV

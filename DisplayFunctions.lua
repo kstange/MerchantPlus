@@ -32,9 +32,11 @@ function Display:Item(data, options)
 	end
 
 	-- Append crafting quality icon
-	local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
-	if craftquality then
-		name = name .. " " .. C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+	if data.itemID then
+		local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
+		if craftquality then
+			name = name .. " " .. C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+		end
 	end
 
 	if name and options['ShowStackSize'] and quantity > 1 then
