@@ -1,3 +1,7 @@
+# Version 11.1.7.0
+
+- Updated TOC for Retail 11.1.7
+
 # Version 11.1.5.0
 
 - Updated TOC for Retail 11.1.5
