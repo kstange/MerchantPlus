@@ -1,6 +1,6 @@
 # Version 11.2.0.0
 
-- Updated TOC for Retail 11.2.0 (PTR)
+- Updated TOC for Retail 11.2.0
 
 # Release History
 
