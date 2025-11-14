@@ -1,3 +1,9 @@
+# Version 11.2.7.0
+
+- Replaced usage of deprecated function that was removed in 12.0.0
+- Updated TOC for Retail 11.2.7
+- Updated TOC for Retail 12.0.0 (beta)
+
 # Version 11.2.5.0
 
 - Updated TOC for Retail 11.2.5

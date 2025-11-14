@@ -77,12 +77,12 @@ end
 
 -- Fetch the data for a single item by Merchant index
 function Data:GetMerchantItemInfo(index)
-	local item = {}
+	local item = C_MerchantFrame.GetItemInfo(index)
+	item.quantity = item.stackCount
+	item.extendedCost = item.hasExtendedCost
 	item.itemID = GetMerchantItemID(index)
 	item.link = GetMerchantItemLink(index)
 	item.itemKey = { itemID = item.itemID }
-	item.name, item.texture, item.price, item.quantity, item.numAvailable, item.isPurchasable,
-		item.isUsable, item.extendedCost = GetMerchantItemInfo(index)
 	item.index = index
 	return item
 end
