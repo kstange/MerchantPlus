@@ -33,9 +33,10 @@ function Display:Item(data, options)
 
 	-- Append crafting quality icon
 	if data.itemID then
-		local craftquality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(data.itemID)
+		local craftquality = C_TradeSkillUI.GetItemReagentQualityInfo(data.itemID)
 		if craftquality then
-			name = name .. " " .. C_Texture.GetCraftingReagentQualityChatIcon(craftquality)
+			local markup = CreateAtlasMarkup(craftquality.iconChat)
+			name = name .. " " .. markup
 		end
 	end
 

@@ -1,3 +1,8 @@
+# Version 12.0.0.0
+
+- Fixed display of items with crafting qualities
+- Updated TOC for Retail 12.0.1 (beta)
+
 # Version 11.2.7.0
 
 - Replaced usage of deprecated function that was removed in 12.0.0
