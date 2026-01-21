@@ -94,7 +94,8 @@ function Data:GetItemInfo(link)
 	if link then
 		_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType,
 			item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID,
-			item.bindType, item.expacID, item.setID, item.isCraftingReagent = C_Item.GetItemInfo(link)
+			item.bindType, item.expacID, item.setID, item.isCraftingReagent,
+			item.itemDescription = C_Item.GetItemInfo(link)
 	end
 	return item
 end
