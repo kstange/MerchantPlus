@@ -39,8 +39,6 @@ Data.ItemCategories = {
 	AirshipSchematic = 235691,
 }
 
-Data.ProfessionInfo = nil
-
 -- Sync updated Merchant information
 function Data:UpdateMerchant()
 	SetMerchantFilter(LE_LOOT_FILTER_ALL)
@@ -178,6 +176,10 @@ function Data:AppearanceKnownFromAnySource(sourceid)
 end
 
 -- Look at the item and determine if the item is collectable or known
+--
+-- Blizzard can't be trusted to put items in the right categories, so we're just
+-- going to have to test for everything.
+--
 function Data:GetCollectable(link, itemdata)
 	local item = {}
 	local itemid = itemdata.itemID
@@ -189,14 +191,12 @@ function Data:GetCollectable(link, itemdata)
 		return item
 	end
 
-	-- Blizzard can't be trusted to put items in the right categories, so we're just
-	-- going to have to test for everything.
-
 	-- Toys
-	local toyid = C_ToyBox.GetToyInfo(itemid)
-
+	--
 	-- It's a toy! If we have it, we have it, if the toy is usable, we can
 	-- collect it, otherwise we probably can't collect it yet
+	--
+	local toyid = C_ToyBox.GetToyInfo(itemid)
 	if toyid then
 		if PlayerHasToy(toyid) then
 			item.collectable = Data.CollectableState.Known
@@ -209,6 +209,16 @@ function Data:GetCollectable(link, itemdata)
 	end
 
 	-- Pets
+	--
+	-- If the pet collected at all, we know it, if it's usable and we don't know it
+	-- we can collect it, othewise we probably just can't collect it yet
+	--
+	-- We're not storing enough data here when we have fewer than max to tell if we
+	-- can collect more on this character
+	--
+	-- It's possible we could find a merchant pet that isn't collectable by this
+	-- character (class or faction locked), but I didn't find any examples to test
+	--
 	-- This field could move; look for speciesID index
 	local petinfo = { C_PetJournal.GetPetInfoByItemID(itemid) }
 	local speciesID = petinfo[13]
@@ -220,14 +230,6 @@ function Data:GetCollectable(link, itemdata)
 		-- up anyway
 		item.collectedpets = { count = count, max = max }
 
-		-- If the pet collected at all, we know it, if it's usable and we don't know it
-		-- we can collect it, othewise we probably just can't collect it yet
-		--
-		-- We're not storing enough data here when we have fewer than max to tell if we
-		-- can collect more on this character
-		--
-		-- It's possible we could find a merchant pet that isn't collectable by this
-		-- character (class or faction locked), but I didn't find any examples to test
 		if count == 0 and itemdata.isUsable then
 			item.collectable = Data.CollectableState.Collectable
 		elseif count > 0 then
@@ -238,16 +240,19 @@ function Data:GetCollectable(link, itemdata)
 		return item
 	end
 
+	-- Mounts
+	--
+	-- If collected, then we know it, if it's usable we can collect it, otherwise
+	-- we probably can't collect it yet
+	--
+	-- It's possible we could find a merchant mount that isn't collectable by this
+	-- character (class or faction locked), but I didn't find any examples to test
+	--
 	local mountid = C_MountJournal.GetMountFromItem(itemid)
 	if mountid then
 		local mountinfo = { C_MountJournal.GetMountInfoByID(mountid) }
 
 		-- This field could move; look for isCollected index
-		-- If collected, then we know it, if it's usable we can collect it, otherwise
-		-- we probably can't collect it yet
-		--
-		-- It's possible we could find a merchant mount that isn't collectable by this
-		-- character (class or faction locked), but I didn't find any examples to test
 		if mountinfo[11] then
 			item.collectable = Data.CollectableState.Known
 		elseif itemdata.isUsable then
@@ -259,11 +264,12 @@ function Data:GetCollectable(link, itemdata)
 	end
 
 	-- Decor
+	--
+	-- Check if the player has any of these anywhere, if not, then they are uncollected
+	-- Housing items are always collectable, so we're counting having even one copy as "known"
+	--
 	if C_Item.IsDecorItem(itemid) then
 		local decoritem = C_HousingCatalog.GetCatalogEntryInfoByItem(itemid, true)
-		-- Check if the player has any of these anywhere, if not, then they are uncollected
-		-- Housing items are always collectable, so we're counting having even one copy as "known"
-		-- We'll also store some other info for future use
 		item.storedDecor = decoritem.quantity + decoritem.remainingRedeemable
 		item.placedDecor = decoritem.numPlaced
 		if decoritem.quantity + decoritem.numPlaced + decoritem.remainingRedeemable == 0 then
@@ -275,9 +281,14 @@ function Data:GetCollectable(link, itemdata)
 	end
 
 	-- Profession Recipes
+	--
 	-- We are looking for a Requires skill line and spell ID 483 (Learning)
 	-- This should hopefully rule out non-profession things that can be learned
 	-- without missing legitimate recipes
+	--
+	-- If this item not known or usable, it is retricted (unsatified conditions)
+	-- If it's not for our professions, it's unavailable
+	--
 	local _, spellID = C_Item.GetItemSpell(link)
 	if spellID == 483 then
 		local itemProf = Data:GetItemProfession(itemdata.tooltip)
@@ -290,9 +301,6 @@ function Data:GetCollectable(link, itemdata)
 				break
 			end
 		end
-		-- Scan the item data for what profession this item requires
-		-- If this item not known or usable, it is retricted (unsatified conditions)
-		-- If it's not for our professions, it's unavailable
 		if profMatch then
 			if Data:GetItemKnown(itemdata.tooltip) then
 				item.collectable = Data.CollectableState.Known
@@ -308,7 +316,9 @@ function Data:GetCollectable(link, itemdata)
 	end
 
 	-- Heirlooms
+	--
 	-- If this is an heirloom, the whole item is collectable unless it's known
+	--
 	if C_Heirloom.GetHeirloomInfo(itemid) then
 		if C_Heirloom.PlayerHasHeirloom(itemid) then
 			item.collectable = Data.CollectableState.Known
@@ -319,8 +329,19 @@ function Data:GetCollectable(link, itemdata)
 		return item
 	end
 
-	-- Gear
-	-- Try to find an appearance for this item
+	-- Transmog Items
+	--
+	-- Try to find an appearance for this item by checking sourceid (aka ItemModifiedAppearanceId)
+	-- of the item link, which should give us the version of the item actually appearing on the
+	-- merchant. If we can't get a source from that, we'll try the itemID directly, which may work
+	-- for some older items that have only one appearance type.
+	--
+	-- To make sure that we count an item as collected if we have an alternate source, we'll scan
+	-- those sources if the first one comes back negative.
+	--
+	-- Starting with Warbands as long as the item is collectable it should be available to collect
+	-- even if the armor type doesn't match the player's class.
+	--
 	if C_Item.IsDressableItemByID(link) then
 		local _, sourceid = C_TransmogCollection.GetItemInfo(link)
 
@@ -330,18 +351,15 @@ function Data:GetCollectable(link, itemdata)
 			_, sourceid = C_TransmogCollection.GetItemInfo(itemid)
 		end
 
-		-- If this item has an appearance, see what we know about it
+		-- If we fail this check the item likely isn't a single piece of equipment
 		if sourceid then
 
-			-- If this appearance is known, we're done
 			if Data:AppearanceKnownFromAnySource(sourceid) then
 				item.collectable = Data.CollectableState.Known
 
-			-- If we don't know it, see if we can learn it
 			else
 				local _, collectable = C_TransmogCollection.PlayerCanCollectSource(sourceid)
 
-				-- With warbands as long as the item is collectable it should be available
 				if collectable then
 					item.collectable = Data.CollectableState.Collectable
 				else
@@ -351,6 +369,12 @@ function Data:GetCollectable(link, itemdata)
 
 		else
 			-- Ensembles
+			--
+			-- Here we check to see if the item is actually an ensemble instead of a regular
+			-- piece of equipment. We check to see if the player owns every appearance in this
+			-- set and if they are missing even one, we mark it as available to collect, provided
+			-- it's not otherwise restricted.
+			--
 			local setid = C_Item.GetItemLearnTransmogSet(link)
 			if setid then
 				local setSources = C_Transmog.GetAllSetAppearancesByID(setid)
@@ -375,17 +399,23 @@ function Data:GetCollectable(link, itemdata)
 
 	end
 
-	-- With some tooltip magic we tried to guess if this item has a special category
-
-	-- Let's see if it's a Drakewatcher Manuscript or Airship Schematic
+	-- Special Collectable Items -- Usually customization parts
+	--
+	-- With some tooltip magic we tried to guess if this item has a special category.
+	-- Hopefully doing it this way is localization agnostic.
+	--
+	-- If this is on the vendor and usable, it's collectable
+	--
+	-- We shouldn't ever see these kinds of items on the merchant if they can't be
+	-- collected by this character or are known, but we'll try to check just
+	-- in case.
+	--
+	-- There are probably a few more types of items that work like this, if you find
+	-- this comment, feel free to submit suggestions.
+	--
 	if itemcategory == Data.ItemCategories.DrakewatcherManuscript or
 	   itemcategory == Data.ItemCategories.AirshipSchematic then
 
-		-- If this is on the vendor and usable, it's collectable
-		--
-		-- We shouldn't ever see this kind of item on the merchant if it can't be
-		-- collected by this character or is known, but we'll try to check just
-		-- in case
 		if Data:GetItemKnown(itemdata.tooltip) then
 			item.collectable = Data.CollectableState.Known
 		elseif itemdata.isUsable then

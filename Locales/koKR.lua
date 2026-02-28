@@ -31,8 +31,6 @@ L["Supply"] = "재고"
 L["Type"] = "분류"
 L["Usable"] = "사용가능"
 
-L["ERROR_FALSE_COLLECTABLE_PET"] = "이 상인의 %s (%d) 아이템이 애완동물로 잘못 표시되어 있습니다. 이 문제를 %s에 알려 주세요."
-
 L["OPTIONS_DESCRIPTION_COLUMNS"] = "상인에게 표시할 항목을 선택합니다."
 L["OPTIONS_DESCRIPTION_SORT_REMEMBER"] = "다른 상인을 이용해도 마지막으로 사용한 정렬을 유지합니다. CTRL을 누른 채로 정렬 항목을 클릭하면 게임의 기본 정렬로 되돌릴 수 있습니다."
 L["OPTIONS_DESCRIPTION_TAB_DEFAULT"] = "개선된 상인 인터페이스를 모든 상인에게 적용합니다. 기본 상인 탭으로 언제든지 전환할 수 있습니다."

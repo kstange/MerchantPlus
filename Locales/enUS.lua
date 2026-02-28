@@ -49,5 +49,3 @@ L["OPTIONS_TITLE_COLUMNS"] = "Displayed Columns"
 L["OPTIONS_DESCRIPTION_COLUMNS"] = "Select the columns to be shown on merchants."
 L["OPTIONS_TITLE_COLUMN_OPTIONS"] = "Column Options"
 L["OPTIONS_TITLE_COLUMN_ITEM_SHOW_STACK"] = "Show stack size"
-
-L["ERROR_FALSE_COLLECTABLE_PET"] = "%s (%d) on this merchant is mislabeled as a pet. Please report this issue via %s"
