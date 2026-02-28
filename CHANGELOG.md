@@ -5,6 +5,7 @@ Note: Please report any issues you find with the Collectable column as it has be
 - Refactored item type detection for collected status since Blizzard frequently puts items in the wrong categories
 - Fixed collected status for transmog appearances in Midnight
 - Fixed collected status for profession recipes in Midnight
+- Added support for collected status of Decor items
 - Changed appearances to show as collected if the appearance has been obtained from another item (fixes #12)
 
 # Version 12.0.0.1
