@@ -1,3 +1,8 @@
+# Version 12.0.1.1
+
+- Fixed unavailable profession recipes showing as restricted if they craft an item that requires a known profession to use
+- Fixed an error caused by broken decor items -- these items will not show as collectable because they can't be looked up in the catalog
+
 # Version 12.0.1.0
 
 Note: Please report any issues you find with the Collectable column as it has been completely reimplemented
