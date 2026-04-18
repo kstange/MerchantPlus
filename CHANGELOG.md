@@ -1,5 +1,9 @@
 Note: Please report any issues you find with the Collectable column as it has been completely reimplemented recently
 
+# Version 12.0.5.0
+
+- Updated TOC for Retail 12.0.5
+
 # Version 12.0.1.1
 
 - Fixed unavailable profession recipes showing as restricted if they craft an item that requires a known profession to use
