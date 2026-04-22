@@ -82,6 +82,12 @@ function Data:GetMerchantItemInfo(index)
 	item.extendedCost = item.hasExtendedCost
 	item.itemID = GetMerchantItemID(index)
 	item.link = GetMerchantItemLink(index)
+	if not item.itemID then
+		local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(item.link)
+		if currency then
+			item.currencyID = currency.currencyID
+		end
+	end
 	item.itemKey = { itemID = item.itemID }
 	item.index = index
 	return item
@@ -91,11 +97,18 @@ end
 function Data:GetItemInfo(link)
 	local item = {}
 	local _
+	local itemID
 	if link then
-		_, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType,
+		itemID, _, item.quality, item.level, item.minLevel, item.itemType, item.itemSubType,
 			item.stackCount, item.equipLoc, _, item.sellPrice, item.classID, item.subclassID,
 			item.bindType, item.expacID, item.setID, item.isCraftingReagent,
 			item.itemDescription = C_Item.GetItemInfo(link)
+		if not itemID then
+			local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(link)
+			if currency then
+				item.quality = currency.quality
+			end
+		end
 	end
 	return item
 end
@@ -557,6 +570,10 @@ function Data:GetCollectable(link, itemdata)
 	if not link then
 		local itemid = itemdata.itemID
 		trace("logic: GetCollectable: item link was nil; may have tried to fetch info too early", itemid)
+		return emptyItem
+	end
+	if not itemdata or not itemdata.itemID then
+		trace("logic: GetCollectable: item ID was nil, this is probably not a regular item", link)
 		return emptyItem
 	end
 
