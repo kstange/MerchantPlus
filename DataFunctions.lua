@@ -175,7 +175,8 @@ function Data:GetItemProfession(tooltip)
 	for _, line in ipairs(tooltip.lines) do
 		-- Search for a UsageRequirement line, if there is one
 		-- If there is more than one, we want the last one
-		if line.type == Enum.TooltipDataLineType.UsageRequirement then
+		-- that isn't "already known"
+		if line.type == Enum.TooltipDataLineType.UsageRequirement and line.leftText ~= ITEM_SPELL_KNOWN then
 			profText = line.leftText
 		end
 	end
@@ -371,6 +372,7 @@ function Data:GetRecipeInfo(link, itemdata)
 		local itemProf = Data:GetItemProfession(itemdata.tooltip)
 		local profs = { GetProfessions() }
 		local profMatch = false
+		trace("logic: GetRecipeInfo: recipe", link, "requires", itemProf)
 		for _, prof in pairs(profs) do
 			local profName = GetProfessionInfo(prof)
 			if itemProf == profName then

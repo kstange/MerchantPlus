@@ -3,7 +3,8 @@ Note: Please report any issues you find with the Collectable column as it has be
 # Version 12.0.5.1
 
 - Fixed an error that could occur on merchants containing currency items when the Collectable column is shown
-- Fixed the display of quality colors for currency items
+- Fixed missing quality colors for currency items
+- Fixed profession recipes showing as unavailable when they are known
 
 # Version 12.0.5.0
 
