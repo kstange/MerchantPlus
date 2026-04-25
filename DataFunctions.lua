@@ -124,11 +124,11 @@ end
 
 -- Finish gathering tooltip data for ItemCategory entries after preload is done
 function Data:FinishLoadedItem(itemID)
-	local type = self
-	trace("called: FinishLoadedItem: finishing pre-loading", type, "with ID", itemID)
+	local itemType = self
+	trace("called: FinishLoadedItem: finishing pre-loading", itemType, "with ID", itemID)
 	if itemID then
 		local tooltip = C_TooltipInfo.GetItemByID(itemID)
-		Data.ItemCategories[type] = Data:GetItemCategory(tooltip)
+		Data.ItemCategories[itemType] = Data:GetItemCategory(tooltip)
 	end
 end
 
@@ -594,10 +594,10 @@ end
 function Data:Init()
 	trace = Shared.Trace or function() end
 
-	for type, itemID in pairs(Data.ItemCategorySamples) do
-		Data.ItemCategories[type] = false
+	for itemType, itemID in pairs(Data.ItemCategorySamples) do
+		Data.ItemCategories[itemType] = false
 		local item = Item:CreateFromItemID(itemID)
-		item:ContinueOnItemLoad(function() Data.FinishLoadedItem(type, itemID) end)
+		item:ContinueOnItemLoad(function() Data.FinishLoadedItem(itemType, itemID) end)
 	end
 
 end
