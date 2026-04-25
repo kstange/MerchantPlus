@@ -32,11 +32,10 @@ Data.CollectableState = {}
 --
 -- The idea here is to not have to hardcode known localized strings so we can match non-English
 -- clients without having to test in every language or get help from translators
-Data.ItemCategoriesQueried = 0
-Data.ItemCategoriesReturned = 0
-Data.ItemCategories = {
+Data.ItemCategories = {}
+Data.ItemCategorySamples = {
 	DrakewatcherManuscript = 196970,
-	AirshipSchematic = 235691,
+	AirshipSchematic       = 235691,
 }
 
 -- This is an enum of things that a collectable can be
@@ -124,13 +123,12 @@ function Data:GetMerchantItemTooltip()
 end
 
 -- Finish gathering tooltip data for ItemCategory entries after preload is done
-function Data:FinishItemCategories()
-	Data.ItemCategoriesReturned = Data.ItemCategoriesReturned + 1
-	if Data.ItemCategoriesReturned == Data.ItemCategoriesQueried then
-		for name, id in pairs(Data.ItemCategories) do
-			local tooltip = C_TooltipInfo.GetItemByID(id)
-			Data.ItemCategories[name] = Data:GetItemCategory(tooltip)
-		end
+function Data:FinishLoadedItem(itemID)
+	local type = self
+	trace("called: FinishLoadedItem: finishing pre-loading", type, "with ID", itemID)
+	if itemID then
+		local tooltip = C_TooltipInfo.GetItemByID(itemID)
+		Data.ItemCategories[type] = Data:GetItemCategory(tooltip)
 	end
 end
 
@@ -596,10 +594,10 @@ end
 function Data:Init()
 	trace = Shared.Trace or function() end
 
-	for _, id in pairs(Data.ItemCategories) do
-		Data.ItemCategoriesQueried = Data.ItemCategoriesQueried + 1
-		local item = Item:CreateFromItemID(id)
-		item:ContinueOnItemLoad(Data.FinishItemCategories)
+	for type, itemID in pairs(Data.ItemCategorySamples) do
+		Data.ItemCategories[type] = false
+		local item = Item:CreateFromItemID(itemID)
+		item:ContinueOnItemLoad(function() Data.FinishLoadedItem(type, itemID) end)
 	end
 
 end
