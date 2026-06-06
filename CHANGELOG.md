@@ -1,5 +1,11 @@
 Note: Please report any issues you find with the Collectable column as it has been completely reimplemented recently
 
+# Version 12.0.7.0
+
+- Updated TOC for Retail 12.0.7
+- Added frFR (French) translation from Tulsow
+- Updated zhCN (Simplified Chinese) translation from 7peanuts
+
 # Version 12.0.5.2
 
 - Fixed an error that could occur when reloading the UI due to background item loading
