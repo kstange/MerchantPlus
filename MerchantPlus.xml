@@ -24,7 +24,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="MerchantPlusItemList" mixin="MerchantPlusItemListMixin" virtual="true">
+			<Frame name="MerchantPlusItemList" mixin="MerchantPlusItemListMixin">
 				<Anchors>
 					<Anchor point="TOPLEFT" />
 					<Anchor point="BOTTOMRIGHT" />
