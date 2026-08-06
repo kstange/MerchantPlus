@@ -1,45 +1,7 @@
-Note: Please report any issues you find with the Collectable column as it has been completely reimplemented recently
+# Version 12.1.0.0
 
-# Version 12.0.7.0
-
-- Updated TOC for Retail 12.0.7
-- Added frFR (French) translation from Tulsow
-- Updated zhCN (Simplified Chinese) translation from 7peanuts
-
-# Version 12.0.5.2
-
-- Fixed an error that could occur when reloading the UI due to background item loading
-
-# Version 12.0.5.1
-
-- Fixed an error that could occur on merchants containing currency items when the Collectable column is shown
-- Fixed missing quality colors for currency items
-- Fixed profession recipes showing as unavailable when they are known
-
-# Version 12.0.5.0
-
-- Updated TOC for Retail 12.0.5
-
-# Version 12.0.1.1
-
-- Fixed unavailable profession recipes showing as restricted if they craft an item that requires a known profession to use
-- Fixed an error caused by broken decor items -- these items will not show as collectable because they can't be looked up in the catalog
-
-# Version 12.0.1.0
-
-- Refactored item type detection for collected status since Blizzard frequently puts items in the wrong categories
-- Fixed collected status for transmog appearances in Midnight
-- Fixed collected status for profession recipes in Midnight
-- Added support for collected status of Decor items
-- Changed appearances to show as collected if the appearance has been obtained from another item (fixes #12)
-
-# Version 12.0.0.1
-
-- Updated TOC for Retail 12.0.1 (beta)
-
-# Version 12.0.0.0
-
-- Fixed display of items with crafting qualities
+- Fixed a bug that prevented MerchantPlus from loading correctly in 12.1.0
+- Updated TOC for Retail 12.1.0
 
 # Release History
 

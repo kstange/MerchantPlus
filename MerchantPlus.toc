@@ -1,4 +1,4 @@
-## Interface: 120007, 120005
+## Interface: 120100, 120007
 ## Version: @project-version@
 ## Title: Merchant Plus
 ## Notes: A Modern Scrollable UI for Merchants
