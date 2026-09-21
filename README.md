@@ -28,6 +28,8 @@ There is no specific timeline for these features to be completed.
 
 Currently Merchant Plus requires functionality only available in Retail.  Blizzard periodically backports features to Classic versions, so the required functions may be available eventually.  Until that time, Classic support is not planned.
 
+However, World of Warcraft: Forever uses the same interfaces as Retail, so it is fully supported.
+
 ## Compatibility
 
 This addon does not replace the existing UI, but it makes many changes to the merchant window, so it may conflict with other addons that modify the contents or layout.  Addons that replace the window will prevent Merchant Plus from appearing entirely.  ElvUI is supported when the Blizzard Merchant Frame skin is enabled.  Other addons that re-skin the merchant window may cause layout problems.
