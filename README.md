@@ -24,11 +24,13 @@ In future updates, the following major improvements are planned:
 
 There is no specific timeline for these features to be completed.
 
+## Forever Support
+
+World of Warcraft: Forever uses the same interfaces as Retail, so it is _fully supported_.
+
 ## Classic Support
 
-Currently Merchant Plus requires functionality only available in Retail.  Blizzard periodically backports features to Classic versions, so the required functions may be available eventually.  Until that time, Classic support is not planned.
-
-However, World of Warcraft: Forever uses the same interfaces as Retail, so it is fully supported.
+Merchant Plus requires interface features only available in Retail.  Blizzard periodically backports features to Classic versions, so the required functions may be available eventually.  Until that time, Classic support is not planned.
 
 ## Compatibility
 
