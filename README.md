@@ -26,7 +26,7 @@ There is no specific timeline for these features to be completed.
 
 ## Forever Support
 
-World of Warcraft: Forever uses the same interfaces as Retail, so it is _fully supported_.
+World of Warcraft: Forever has the same interface features as Retail, so it is _fully supported_.
 
 ## Classic Support
 
