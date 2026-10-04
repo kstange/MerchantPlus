@@ -128,7 +128,9 @@ function Data:FinishLoadedItem(itemID)
 	trace("called: FinishLoadedItem: finishing pre-loading", itemType, "with ID", itemID)
 	if itemID then
 		local tooltip = C_TooltipInfo.GetItemByID(itemID)
-		Data.ItemCategories[itemType] = Data:GetItemCategory(tooltip)
+		local category = Data:GetItemCategory(tooltip)
+		trace("logic: FinishLoadedItem: got item category", category, "for item", itemID)
+		Data.ItemCategories[itemType] = category
 	end
 end
 
@@ -541,9 +543,15 @@ function Data:GetSpecialItemInfo(itemdata)
 	local item = {}
 	local itemcategory = Data:GetItemCategory(itemdata.tooltip)
 
+	-- If the item has a nil or false category, it's not special
+	if not itemcategory then
+		return false
+	end
+
 	if itemcategory == Data.ItemCategories.DrakewatcherManuscript or
 	   itemcategory == Data.ItemCategories.AirshipSchematic then
 
+		item.collectabletype = Data.CollectableType.Special
 		if Data:GetItemKnown(itemdata.tooltip) then
 			item.collectable = Data.CollectableState.Known
 		elseif itemdata.isUsable then
@@ -577,16 +585,20 @@ function Data:GetCollectable(link, itemdata)
 		return emptyItem
 	end
 
-	return Data:GetToyInfo(itemdata)
-	    or Data:GetPetInfo(itemdata)
-	    or Data:GetMountInfo(itemdata)
-	    or Data:GetDecorInfo(link, itemdata)
-	    or Data:GetRecipeInfo(link, itemdata)
-	    or Data:GetHeirloomInfo(itemdata)
-	    or Data:GetTransmogInfo(link, itemdata)
-	    or Data:GetEnsembleInfo(link, itemdata)
-	    or Data:GetSpecialItemInfo(itemdata)
-	    or emptyItem
+	local result = Data:GetToyInfo(itemdata)
+	            or Data:GetPetInfo(itemdata)
+	            or Data:GetMountInfo(itemdata)
+	            or Data:GetDecorInfo(link, itemdata)
+	            or Data:GetRecipeInfo(link, itemdata)
+	            or Data:GetHeirloomInfo(itemdata)
+	            or Data:GetTransmogInfo(link, itemdata)
+	            or Data:GetEnsembleInfo(link, itemdata)
+	            or Data:GetSpecialItemInfo(itemdata)
+	            or emptyItem
+
+	trace("logic: GetCollectable: item", link, "state", result.collectable, "type", result.collectabletype)
+
+	return result
 end
 
 -- Since this code runs before MerchantPlus.lua we need to reset the trace function after init
