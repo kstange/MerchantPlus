@@ -553,7 +553,7 @@ function Data:GetSpecialItemInfo(itemdata)
 	if itemcategory == Data.ItemCategories.DrakewatcherManuscript or
 	   itemcategory == Data.ItemCategories.AirshipSchematic then
 
-		item.collectabletype = Data.CollectableType.Special
+		item.collectableType = Data.CollectableType.Special
 		if Data:GetItemKnown(itemdata.tooltip) then
 			item.collectable = Data.CollectableState.Known
 		elseif itemdata.isUsable then
@@ -575,7 +575,7 @@ end
 --
 function Data:GetCollectable(link, itemdata)
 	local emptyItem = { collectable     = Data.CollectableState.Unsupported,
-	                    collectabletype = Data.CollectableType.None }
+	                    collectableType = Data.CollectableType.None }
 
 	if not link then
 		local itemid = itemdata.itemID
@@ -598,7 +598,7 @@ function Data:GetCollectable(link, itemdata)
 	            or Data:GetSpecialItemInfo(itemdata)
 	            or emptyItem
 
-	trace("logic: GetCollectable: item", link, "state", result.collectable, "type", result.collectabletype)
+	trace("logic: GetCollectable: item", link, "state", result.collectable, "type", result.collectableType)
 
 	return result
 end
