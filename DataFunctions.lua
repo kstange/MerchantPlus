@@ -142,7 +142,9 @@ function Data:GetItemCategory(tooltip)
 		-- Usually this will be something like "Crafting Reagent" or another
 		-- type of description indicating a special category of item
 		if string.find(line.leftText, "|cFF66BBFF") then
-			return string.sub(line.leftText, 11)
+			local category = string.sub(line.leftText, 11)
+			trace("logic: GetItemCategory: category found:", category)
+			return category
 		end
 	end
 	return nil
