@@ -5,7 +5,7 @@ Plus remains unsupported on other Classic versions due to UI limitations.
 
 # Version 12.1.5.0
 
-- Fixed an issue causing all items to show as collectable or restricted on Forever
+- Fixed an issue causing all regular items to show as collectable or restricted on Forever
 
 # Version 12.1.0.2
 
