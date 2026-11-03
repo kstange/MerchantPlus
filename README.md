@@ -42,3 +42,6 @@ Ideally, Merchant Plus will not be the cause of any conflicts. If you discover a
 
 If you'd like to help localize this addon, please submit translations [here](https://www.curseforge.com/wow/addons/merchant-plus/localization).
 
+## LLM Policy
+
+LLM ("Generative AI") agents are not used for development of this project and such contributions will not be accepted.
